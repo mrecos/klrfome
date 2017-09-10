@@ -1,0 +1,86 @@
+############### Logistic Mean Embedding KRR (and non-Logistic)
+### Full process example with simulated data
+### Works with functions in FUNCTIONS_KRR_Logit_fit_predict_functions.R
+
+library("dplyr")
+library("corrplot")
+library("latex2exp")
+library("data.table")
+library("ggplot2")
+
+#Parameters
+set.seed(717)
+sigma = 0.9
+lambda = 0.015
+
+### Simulate Training Data
+sim_data <- get_sim_data(sites_var1_mean = 50, sites_var1_sd = 10,
+                         sites_var2_mean = 3,   sites_var2_sd   = 2,
+                         backg_var1_mean = 60, backg_var1_sd   = 12,
+                         backg_var2_mean = 4,   backg_var2_sd   = 2.25,
+             site_samples    = 300,
+             N_site_bags     = 20,
+             background_site_balance = 1,
+             test_train_split = 0.50)
+
+train_data <- sim_data[["train_data"]] %>%
+  lapply(., function(x) dplyr::select(x,-SITENO)) ## remove SITENO = workaround
+train_presence <- sim_data[["train_presence"]]
+test_data <- sim_data[["test_data"]] %>%
+  lapply(., function(x) dplyr::select(x,-SITENO)) ## remove SITENO = workaround
+test_presence <- sim_data[["test_presence"]]
+
+## Used? SITENO here is an issue for build_K()
+# tbl_train_data <- rbindlist(train_data)
+# tbl_train_data$presence <- ifelse(tbl_train_data$SITENO == "Site", 1, 0)
+# tbl_train_presence <- tbl_train_data$presence
+# tbl_test_data <- rbindlist(test_data)
+# tbl_test_data$presence <- ifelse(tbl_test_data$SITENO == "Site", 1, 0)
+# tbl_test_presence <- tbl_test_data$presence
+
+##### Logistic Mean Embedding KRR Model
+#### Build Kernel Matrix
+method_object <- pr_DB$get_entry("Euclidean")
+K <- build_K(train_data, train_data, sigma, dist_method = method_object)
+#### Train 
+train_log_pred <- KRR_logit_optim(K, train_presence, lambda, 500, 0.01)
+alphas_pred   <- train_log_pred[["alphas"]]
+#### Predict
+test_log_pred <- KRR_logit_predict(test_data, train_data, alphas_pred, sigma)
+
+##### Plots
+### Plot K Matrix
+colnames(K) <- names(train_data)
+rownames(K) <- names(train_data)
+col3 <- colorRampPalette(c("red", "white", "blue")) 
+corrplot::corrplot(K,tl.cex = 0.5, tl.col = "black",
+                   order="hclust", col=col3(100), cl.lim=c(0,1),
+                   addrect = 4)
+### Plot Fit 
+train_log_pred_plot <- data.frame(pred = train_log_pred[["pred"]],
+                                  obs = train_presence)
+ggplot(train_log_pred_plot, aes(x = obs, y = pred)) +
+  geom_jitter(width=0.05) +
+  theme_bw() +
+  ylim(c(0,1))
+### Plot Prediction
+predicted_log <- data.frame(pred = test_log_pred,
+                            obs = test_presence)
+# group_by(predicted_log, obs) %>%
+#   summarize(mean_pred = mean(pred))
+subtitle <- TeX('$1/(1 + exp(-\\frac{1}{n}\\sum{n}^{i=1}(K_g(x,x`)) + \\lambda ||f||^2_H))\n;\n K_g(x,x`) = K(\\mu_x,\\mu_{x`})$')
+ggplot(predicted_log, aes(x = as.factor(obs), y = pred,
+                          color = as.factor(obs))) +
+  geom_jitter(width = 0.2) +
+  scale_color_manual(values=c("blue","orange")) +
+  theme_bw() +
+  ylim(c(0,1)) +
+  labs(y = "Predicted Probability",
+       x = "Site Presence",
+       title = "Mean Embedding Logistic Kernel Ridge Regression",
+       subtitle = subtitle) +
+  theme(
+    legend.position = "none",
+    text=element_text(family="Trebuchet MS", size = 10),
+    plot.title = element_text(size = 12, family = "TrebuchetMS-Bold")
+  )
