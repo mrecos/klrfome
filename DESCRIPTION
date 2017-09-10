@@ -9,4 +9,9 @@ Encoding: UTF-8
 LazyData: true
 URL: https://github.com/mrecos/DistRegLMERR
 BugReports: https://github.com/mrecos/DistRegLMERR/issues
-Imports: bookdown
+Imports: 
+  bookdown,
+  dplyr,
+  proxy,
+  boot,
+  pROC
