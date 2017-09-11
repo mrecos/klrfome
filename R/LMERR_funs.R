@@ -1,4 +1,13 @@
-# active Developments
+
+#' KRR_Logit
+#'
+#' @param K - matrix
+#' @param y - vecotr
+#' @param lambda - scaler
+#'
+#' @return list: `pred` - predicted probabiity of positive class, `alphas` - estimated coefficients
+#' @export
+#'
 KRR_logit <- function(K,y, lambda){
   #### Logistic KRR
   # KRR_logit(K,presence)
@@ -19,6 +28,18 @@ KRR_logit <- function(K,y, lambda){
   log_pred <- 1 / (1 + exp(-as.vector(K %*% theSol)))
   return(list(pred = log_pred, alphas = theSol))
 }
+
+#' KRR_logit_optim
+#'
+#' @param K - matrix
+#' @param presence - vector
+#' @param lambda - scaler
+#' @param maxiter - integer
+#' @param tol - double
+#'
+#' @return list: `pred` - predicted probabiity of positive class, `alphas` - estimated coefficients
+#' @export
+#'
 KRR_logit_optim <- function(K, presence, lambda, maxiter = 100, tol = 0.01){
   # LOGISTIC - optimize alpha
   # example: KRR_logit_optim(K,presence, 100, 0.01)
@@ -36,7 +57,7 @@ KRR_logit_optim <- function(K, presence, lambda, maxiter = 100, tol = 0.01){
     diagW = pi * (1 - pi)
     e = (presence - pi) / diagW
     q = Kalpha + e
-    theSol = try(solve(K + lambda * Diagonal(x=1/diagW), q))
+    theSol = try(solve(K + lambda * Matrix::Diagonal(x=1/diagW), q))
     if (class(theSol) == "try-error") {
       break
     }
@@ -56,12 +77,37 @@ KRR_logit_optim <- function(K, presence, lambda, maxiter = 100, tol = 0.01){
   log_pred <-  1 / (1 + exp(-as.vector(K %*% theSol)))
   return(list(pred = log_pred, alphas = theSol))
 }
+
+
+#' get_k
+#'
+#' @param y1 - matrix
+#' @param y2 - matrix
+#' @param sigma - scaler
+#' @param dist_method - object or character string
+#'
+#' @return Matrix G
+#' @export
+#'
 get_k <- function(y1,y2,sigma, dist_method = "Euclidean"){
   g = proxy::dist(as.matrix(y1),as.matrix(y2), method = dist_method,
                   by_rows = TRUE, auto_convert_data_frames = FALSE) # speed bottle neck accordingn to profvis
   g = exp(-g^2 / (2 * sigma^2))
   return(g)
 }
+
+
+#' build_k
+#'
+#' @param y1 - Matrix
+#' @param y2 - Matrix
+#' @param sigma - scaler
+#' @param progress - logical
+#' @param ... - option passed to get_k for `dist_method`
+#'
+#' @return - matrix K
+#' @export
+#'
 build_K <- function(y1,y2,sigma, progress = TRUE, ...){
   # example: K <- build_K(x_data_norm, x_data_norm, sigma)
   K <- matrix(nrow = length(y1), ncol = length(y2))
@@ -85,11 +131,32 @@ build_K <- function(y1,y2,sigma, progress = TRUE, ...){
   K <- tri_swap(K)
   return(K)
 }
+
+
+#' tri_swap
+#'
+#' @param m - Matrix
+#'
+#' @return - Matrix
+#'
 tri_swap <- function(m) {
   m[lower.tri(m)] <- t(m)[lower.tri(m)]
   m
 }
 
+
+#' KRR_logit_predict
+#'
+#' @param test_data - data.frame or matrix
+#' @param train_data - data.frame or matrix
+#' @param alphas_pred - numeric vector
+#' @param sigma - scaler
+#' @param dist_method - object or character string
+#' @param progress - logical
+#'
+#' @return - numeric vector - predicted probabiity of positive class
+#' @export
+#'
 KRR_logit_predict <- function(test_data, train_data, alphas_pred, sigma, dist_method = "Euclidean", progress = TRUE){
   # example: KRR_logit_predict(test_dat, train_dat, theSol, sigma)
   pred_yhat <- matrix(nrow = length(test_data), ncol = length(train_data))

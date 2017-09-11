@@ -23,8 +23,7 @@ background_site_balance = 1
 sample_fraction = 0.50
 train_test_split = 0.75
 confusion_matrix_cutoff = 0.5
-data_location = "~/Dropbox/R/r91_all_upland_section_6_regression_data_SITENO.csv"
-# data_location = "C:/Users/Matthew_Harris/Dropbox/R/r91_all_upland_section_6_regression_data_SITENO.csv"
+data_location = "data/r91_all_upland_section_6_regression_data_SITENO.csv"
 
 ### Load Data
 # dat <- fread(data_location)
@@ -54,7 +53,7 @@ tbl_test_presence       <- formatted_data[["tbl_test_presence"]]
 #### Build Kernel Matrix
 method_object <- pr_DB$get_entry("Euclidean")
 K <- build_K(train_data, train_data, sigma, dist_method = method_object)
-#### Train 
+#### Train
 train_log_pred <- KRR_logit_optim(K, train_presence, lambda, 1000, 0.001)
 # train_log_pred <- KRR_logit(K, train_presence, lambda)
 alphas_pred   <- train_log_pred[["alphas"]]
@@ -84,11 +83,11 @@ metrics(TP,TN,FP,FN)$Sensitivity
 ### Plot K Matrix
 # colnames(K) <- names(train_data)
 # rownames(K) <- names(train_data)
-# col3 <- colorRampPalette(c("red", "white", "blue")) 
+# col3 <- colorRampPalette(c("red", "white", "blue"))
 # corrplot::corrplot(K,tl.cex = 0.5, tl.col = "black",
 #                    order="hclust", col=col3(10), cl.lim=c(0,1),
 #                    addrect = 6)
-# ### Plot Fit 
+# ### Plot Fit
 # ggplot(train_log_pred_plot, aes(x = obs, y = pred)) +
 #   geom_jitter(width=0.05) +
 #   theme_bw() +

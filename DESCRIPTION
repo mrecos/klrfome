@@ -14,4 +14,7 @@ Imports:
   dplyr,
   proxy,
   boot,
-  pROC
+  pROC,
+  rstan,
+  Matrix
+RoxygenNote: 6.0.1

@@ -1,3 +1,13 @@
+#' format_site_data
+#'
+#' @param dat - data.frame
+#' @param N_sites - scaler
+#' @param train_test_split - scaler
+#' @param background_site_balance - scaler
+#'
+#' @return - list of various ways to arrange site data
+#' @export
+#'
 format_site_data <- function(dat, N_sites, train_test_split, background_site_balance){
   library("dplyr")
   variables <- setdiff(colnames(dat1), c("presence", "SITENO"))

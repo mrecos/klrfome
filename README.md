@@ -2,7 +2,7 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.888409.svg)](https://doi.org/10.5281/zenodo.888409)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-DistRegLMERR
+DistRegLMERR - Logisitic Mean Embeddings Ridge Regression (LMERR) for the Distribution Regression problem.
 ============
 
 The goal of DistRegLMERR is to ...

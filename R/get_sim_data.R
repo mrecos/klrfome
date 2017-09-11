@@ -1,3 +1,21 @@
+#' get_sim_data
+#'
+#' @param sites_var1_mean - scaler
+#' @param sites_var1_sd - scaler
+#' @param sites_var2_mean - scaler
+#' @param sites_var2_sd - scaler
+#' @param backg_var1_mean - scaler
+#' @param backg_var1_sd - scaler
+#' @param backg_var2_mean - scaler
+#' @param backg_var2_sd - scaler
+#' @param site_samples - scaler
+#' @param N_site_bags - scaler
+#' @param background_site_balance - scaler
+#' @param test_train_split - scaler
+#'
+#' @return - data.frame of simulated site data
+#' @export
+#'
 get_sim_data <- function(sites_var1_mean = 50,
                          sites_var1_sd   = 10,
                          sites_var2_mean = 3,

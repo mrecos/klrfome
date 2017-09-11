@@ -7,6 +7,9 @@ library("corrplot")
 library("latex2exp")
 library("data.table")
 library("ggplot2")
+library("proxy")
+library("Matrix")
+# library("DistRegLMERR")
 
 #Parameters
 set.seed(717)
@@ -42,7 +45,7 @@ test_presence <- sim_data[["test_presence"]]
 #### Build Kernel Matrix
 method_object <- pr_DB$get_entry("Euclidean")
 K <- build_K(train_data, train_data, sigma, dist_method = method_object)
-#### Train 
+#### Train
 train_log_pred <- KRR_logit_optim(K, train_presence, lambda, 500, 0.01)
 alphas_pred   <- train_log_pred[["alphas"]]
 #### Predict
@@ -52,11 +55,11 @@ test_log_pred <- KRR_logit_predict(test_data, train_data, alphas_pred, sigma)
 ### Plot K Matrix
 colnames(K) <- names(train_data)
 rownames(K) <- names(train_data)
-col3 <- colorRampPalette(c("red", "white", "blue")) 
+col3 <- colorRampPalette(c("red", "white", "blue"))
 corrplot::corrplot(K,tl.cex = 0.5, tl.col = "black",
                    order="hclust", col=col3(100), cl.lim=c(0,1),
                    addrect = 4)
-### Plot Fit 
+### Plot Fit
 train_log_pred_plot <- data.frame(pred = train_log_pred[["pred"]],
                                   obs = train_presence)
 ggplot(train_log_pred_plot, aes(x = obs, y = pred)) +
