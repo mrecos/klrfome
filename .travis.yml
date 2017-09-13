@@ -2,7 +2,7 @@
 
 env:
   global:
-  - REPO=$DOCKER_USER/DistRegLMERR
+  - REPO=$DOCKER_USER/distreglmerr
 
 sudo: required
 
