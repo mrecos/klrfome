@@ -5,3 +5,5 @@
 ^CONDUCT\.md$
 ^CONTRIBUTING\.md$
 analysis
+^Dockerfile$
+^\.travis\.yml$
