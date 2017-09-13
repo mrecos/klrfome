@@ -53,12 +53,8 @@ test_log_pred <- KRR_logit_predict(test_data, train_data, alphas_pred, sigma)
 
 ##### Plots
 ### Plot K Matrix
-colnames(K) <- names(train_data)
-rownames(K) <- names(train_data)
-col3 <- colorRampPalette(c("red", "white", "blue"))
-corrplot::corrplot(K,tl.cex = 0.5, tl.col = "black",
-                   order="hclust", col=col3(100), cl.lim=c(0,1),
-                   addrect = 4)
+K_corrplot(K,train_data,clusters=4)
+
 ### Plot Fit
 train_log_pred_plot <- data.frame(pred = train_log_pred[["pred"]],
                                   obs = train_presence)
