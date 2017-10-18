@@ -3,6 +3,7 @@
 export(KRR_logit)
 export(KRR_logit_optim)
 export(KRR_logit_predict)
+export(K_corrplot)
 export(build_K)
 export(format_site_data)
 export(get_k)

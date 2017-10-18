@@ -89,10 +89,12 @@ KRR_logit_optim <- function(K, presence, lambda, maxiter = 100, tol = 0.01){
 #' @return Matrix G
 #' @export
 #'
-get_k <- function(y1,y2,sigma, dist_method = "Euclidean"){
+get_k <- function(y1,y2,sigma, dist_method = dist_method){
   g = proxy::dist(as.matrix(y1),as.matrix(y2), method = dist_method,
                   by_rows = TRUE, auto_convert_data_frames = FALSE) # speed bottle neck accordingn to profvis
-  g = exp(-g^2 / (2 * sigma^2))
+  ## my version
+  g = exp(-g^2/(2*sigma^2)) # equal to exp(-sigma2*g^2) ; sigma2 = 1/(2*sigma^2)
+  # g = exp(-(1/(2*sigma^2))*g^2) # equal to exp(-g^2/(2*sigma^2))
   return(g)
 }
 
@@ -103,12 +105,12 @@ get_k <- function(y1,y2,sigma, dist_method = "Euclidean"){
 #' @param y2 - Matrix
 #' @param sigma - scaler
 #' @param progress - logical
-#' @param ... - option passed to get_k for `dist_method`
+#' @param dist_method - option passed to get_k for `dist_method`
 #'
 #' @return - matrix K
 #' @export
 #'
-build_K <- function(y1,y2,sigma, progress = TRUE, ...){
+build_K <- function(y1,y2=y1,sigma, progress = TRUE, dist_method){
   # example: K <- build_K(x_data_norm, x_data_norm, sigma)
   K <- matrix(nrow = length(y1), ncol = length(y2))
   if(isTRUE(progress)){
@@ -117,10 +119,9 @@ build_K <- function(y1,y2,sigma, progress = TRUE, ...){
   }
   iter <- 0
   for(i in 1:length(y1)){
-    for(j in i:length(y2)){  ## index to i so that only does upper triangle
+    for(j in i:length(y2)){  ## index to i so that only does upper triangle (only for square matrix!)
       # print(paste0(i, " : ", j))
-      g <- get_k(y1[[i]],
-                 y2[[j]], sigma, ...)
+      g <- get_k(y1[[i]], y2[[j]], sigma, dist_method)
       k <- round(mean(g),3)
       K[i,j] <- k
       if(isTRUE(progress)){setTxtProgressBar(pb, iter)}
@@ -157,7 +158,7 @@ tri_swap <- function(m) {
 #' @return - numeric vector - predicted probabiity of positive class
 #' @export
 #'
-KRR_logit_predict <- function(test_data, train_data, alphas_pred, sigma, dist_method = "Euclidean", progress = TRUE){
+KRR_logit_predict <- function(test_data, train_data, alphas_pred, sigma, dist_method = dist_method, progress = TRUE){
   # example: KRR_logit_predict(test_dat, train_dat, theSol, sigma)
   pred_yhat <- matrix(nrow = length(test_data), ncol = length(train_data))
   if(isTRUE(progress)){
@@ -168,7 +169,7 @@ KRR_logit_predict <- function(test_data, train_data, alphas_pred, sigma, dist_me
   for(j in 1:length(test_data)){
     for(i in 1:length(train_data)){
       g_i <- get_k(train_data[[i]],
-                   test_data[[j]], sigma, dist_method = dist_method)
+                   test_data[[j]], sigma, dist_method)
       k_i <- round(mean(g_i),3)
       pred_yhat[j,i] <- k_i
       if(isTRUE(progress)){setTxtProgressBar(pb, iter)}

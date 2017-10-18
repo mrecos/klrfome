@@ -4,7 +4,7 @@
 \alias{build_K}
 \title{build_k}
 \usage{
-build_K(y1, y2, sigma, progress = TRUE, ...)
+build_K(y1, y2, sigma, progress = TRUE, dist_method)
 }
 \arguments{
 \item{y1}{- Matrix}
@@ -15,7 +15,7 @@ build_K(y1, y2, sigma, progress = TRUE, ...)
 
 \item{progress}{- logical}
 
-\item{...}{- option passed to get_k for `dist_method`}
+\item{dist_method}{- option passed to get_k for `dist_method`}
 }
 \value{
 - matrix K

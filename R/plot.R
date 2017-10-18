@@ -16,4 +16,3 @@ K_corrplot <- function(K,train_data,clusters=4){
                      order="hclust", col=col3(100), cl.lim=c(0,1),
                      addrect = clusters)
 }
-
