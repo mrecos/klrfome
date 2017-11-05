@@ -15,7 +15,6 @@ RUN . /etc/environment \
   && sudo apt-get install libudunits2-dev -y \
 
   #setup R configs
-  && -e "r <- getOption('repos'); r['CRAN'] <- 'http://cran.us.r-project.org'; options(repos = r);" > ~/.Rprofile
   && R -e "install.packages('proxy')"
 
   # build this compendium package
