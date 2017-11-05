@@ -12,6 +12,7 @@ BugReports: https://github.com/mrecos/DistRegLMERR/issues
 Imports: 
   bookdown,
   dplyr,
+  proxy,
   boot,
   pROC,
   Matrix
