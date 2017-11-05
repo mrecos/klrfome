@@ -19,6 +19,18 @@ get_metric <- function(TP,TN,FP,FN,metric_type){
 }
 ##### NEED TO UPDATE WITH NEW KG CALCs
 metrics <- function(TP,TN,FP,FN){
+  if (!requireNamespace("dplyr", quietly = TRUE)) {
+    stop("dplyr needed for this function to work. Please install it.",
+         call. = FALSE)
+  }
+  if (!requireNamespace("boot", quietly = TRUE)) {
+    stop("boot needed for this function to work. Please install it.",
+         call. = FALSE)
+  }
+  if (!requireNamespace("pROC", quietly = TRUE)) {
+    stop("pROC needed for this function to work. Please install it.",
+         call. = FALSE)
+  }
   # metrics derived from TP,TN,FP, and FN
   ### "Summary" scores
   # Sens, Spec, Precision, Recall calculated here and reused below

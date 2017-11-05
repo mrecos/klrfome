@@ -6,10 +6,14 @@
 #' @param background_site_balance - scaler
 #'
 #' @return - list of various ways to arrange site data
+#' @import dplyr
 #' @export
 #'
 format_site_data <- function(dat, N_sites, train_test_split, background_site_balance){
-  library("dplyr")
+  if (!requireNamespace("dplyr", quietly = TRUE)) {
+    stop("dplyr needed for this function to work. Please install it.",
+         call. = FALSE)
+  }
   variables <- setdiff(colnames(dat1), c("presence", "SITENO"))
   dat1   <- data.frame(apply(dat1[, variables],2,scale))
   dat1   <- cbind(dat1, dat[,c("presence","SITENO")])

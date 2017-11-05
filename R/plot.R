@@ -6,9 +6,14 @@
 #'
 #' @return - a plot
 #' @export
+#' @importFrom corrplot corrplot
 #'
 K_corrplot <- function(K,train_data,clusters=4){
   # should be a method instead of a function probably
+  if (!requireNamespace("corrplot", quietly = TRUE)) {
+    stop("corrplot needed for this function to work. Please install it.",
+         call. = FALSE)
+  }
   colnames(K) <- names(train_data)
   rownames(K) <- names(train_data)
   col3 <- colorRampPalette(c("red", "white", "blue"))

@@ -10,10 +10,11 @@ LazyData: true
 URL: https://github.com/mrecos/DistRegLMERR
 BugReports: https://github.com/mrecos/DistRegLMERR/issues
 Imports: 
-  bookdown,
-  dplyr,
   proxy,
-  boot,
-  pROC,
   Matrix
+Suggests:
+  boot,
+  corrplot,
+  dplyr,
+  pROC
 RoxygenNote: 6.0.1

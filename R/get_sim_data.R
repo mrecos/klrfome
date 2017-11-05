@@ -14,6 +14,7 @@
 #' @param test_train_split - scaler
 #'
 #' @return - data.frame of simulated site data
+#' @import dplyr
 #' @export
 #'
 get_sim_data <- function(sites_var1_mean = 50,
@@ -28,6 +29,10 @@ get_sim_data <- function(sites_var1_mean = 50,
                          N_site_bags     = 0,
                          background_site_balance = 1,
                          test_train_split = 0.75){
+  if (!requireNamespace("dplyr", quietly = TRUE)) {
+    stop("dplyr needed for this function to work. Please install it.",
+         call. = FALSE)
+  }
   back_samples <- site_samples*background_site_balance
   N_site_bags <- site_samples/10
   sites <- data.frame(var1 = rnorm(site_samples,sites_var1_mean,sites_var1_sd),

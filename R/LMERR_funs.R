@@ -38,6 +38,7 @@ KRR_logit <- function(K,y, lambda){
 #' @param tol - double
 #'
 #' @return list: `pred` - predicted probabiity of positive class, `alphas` - estimated coefficients
+#' @importFrom Matrix Diagonal
 #' @export
 #'
 KRR_logit_optim <- function(K, presence, lambda, maxiter = 100, tol = 0.01){
