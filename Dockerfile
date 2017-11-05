@@ -14,10 +14,8 @@ RUN . /etc/environment \
   && sudo apt-get update \
   && sudo apt-get install libudunits2-dev -y \
 
-  #setup R configs
-  && R -e "install.packages('proxy')"
-
   # build this compendium package
+  && R -e "install.packages('proxy')"
   && R -e "devtools::install('/DistRegLMERR', dep=TRUE)" \
 
  # render the manuscript into a docx, you'll need to edit this if you've
