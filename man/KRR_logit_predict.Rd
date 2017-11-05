@@ -5,7 +5,7 @@
 \title{KRR_logit_predict}
 \usage{
 KRR_logit_predict(test_data, train_data, alphas_pred, sigma,
-  dist_method = "Euclidean", progress = TRUE)
+  dist_method = dist_method, progress = TRUE)
 }
 \arguments{
 \item{test_data}{- data.frame or matrix}

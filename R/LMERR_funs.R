@@ -87,6 +87,7 @@ KRR_logit_optim <- function(K, presence, lambda, maxiter = 100, tol = 0.01){
 #' @param dist_method - object or character string
 #'
 #' @return Matrix G
+#' @importFrom proxy dist
 #' @export
 #'
 get_k <- function(y1,y2,sigma, dist_method = dist_method){

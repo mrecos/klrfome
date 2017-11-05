@@ -4,11 +4,9 @@
 
 ### IDEA: in predict, limit examples/coefficients to those in neighborhood of test bag; local similaritiy
 
-library("dplyr")
 library("corrplot")
 library("latex2exp")
 library("data.table")
-library("Matrix")
 library("ggplot2")
 
 #Parameters

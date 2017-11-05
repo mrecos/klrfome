@@ -4,7 +4,7 @@
 \alias{build_K}
 \title{build_k}
 \usage{
-build_K(y1, y2, sigma, progress = TRUE, dist_method)
+build_K(y1, y2 = y1, sigma, progress = TRUE, dist_method)
 }
 \arguments{
 \item{y1}{- Matrix}

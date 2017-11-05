@@ -4,7 +4,7 @@
 \alias{get_k}
 \title{get_k}
 \usage{
-get_k(y1, y2, sigma, dist_method = "Euclidean")
+get_k(y1, y2, sigma, dist_method = dist_method)
 }
 \arguments{
 \item{y1}{- matrix}

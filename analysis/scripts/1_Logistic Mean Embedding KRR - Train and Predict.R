@@ -1,15 +1,10 @@
 ############### Logistic Mean Embedding KRR (and non-Logistic)
 ### Full process example with simulated data
-### Works with functions in FUNCTIONS_KRR_Logit_fit_predict_functions.R
 
-library("dplyr")
 library("corrplot")
 library("latex2exp")
 library("data.table")
 library("ggplot2")
-library("proxy")
-library("Matrix")
-# library("DistRegLMERR")
 
 #Parameters
 set.seed(sample(1:99999,1))
@@ -32,14 +27,6 @@ train_presence <- sim_data[["train_presence"]]
 test_data <- sim_data[["test_data"]] %>%
   lapply(., function(x) dplyr::select(x,-SITENO)) ## remove SITENO = workaround
 test_presence <- sim_data[["test_presence"]]
-
-## Used? SITENO here is an issue for build_K()
-# tbl_train_data <- rbindlist(train_data)
-# tbl_train_data$presence <- ifelse(tbl_train_data$SITENO == "Site", 1, 0)
-# tbl_train_presence <- tbl_train_data$presence
-# tbl_test_data <- rbindlist(test_data)
-# tbl_test_data$presence <- ifelse(tbl_test_data$SITENO == "Site", 1, 0)
-# tbl_test_presence <- tbl_test_data$presence
 
 ##### Logistic Mean Embedding KRR Model
 #### Build Kernel Matrix
