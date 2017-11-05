@@ -14,6 +14,10 @@ RUN . /etc/environment \
   && sudo apt-get update \
   && sudo apt-get install libudunits2-dev -y \
 
+  #setup R configs
+  RUN echo "r <- getOption('repos'); r['CRAN'] <- 'http://cran.us.r-project.org'; options(repos = r);" > ~/.Rprofile
+  RUN Rscript -e "install.packages('proxy')"
+
   # build this compendium package
   && R -e "devtools::install('/DistRegLMERR', dep=TRUE)" \
 
