@@ -1,5 +1,12 @@
-###### FROM my METRICS FUNCTIONS
-#### NEEDS REFRESH WITH UDATED KG CALC!!
+#' cohens_kappa
+#'
+#' @param TP - scalar
+#' @param TN - scalar
+#' @param FP - scalar
+#' @param FN - scalar
+#'
+#' @return scalar k
+#'
 cohens_kappa <- function(TP,TN,FP,FN){
   A <- TP
   B <- FP
@@ -12,12 +19,57 @@ cohens_kappa <- function(TP,TN,FP,FN){
   k <- (Po-Pe)/(1-Pe)
   return(k)
 }
-get_metric <- function(TP,TN,FP,FN,metric_type){
-  m <- metrics(TP,TN,FP,FN)
-  m <- m[[metric_type]]
-  return(m)
+
+#' CI_metrics
+#'
+#' @param TP - scalar
+#' @param TN - scalar
+#' @param FP - scalar
+#' @param FN - scalar
+#' @param a - alpha level
+#'
+#' @return list
+#'
+CI_metrics <- function(TP,TN,FP,FN,a=0.05){
+  # Calculate binomial CI (alpha = a) on Sensitivity (sites %)
+  p <- TP/(TP+FN) # Sensitivity
+  n <- TP + FN # Site cell count
+  a <- a # alpha level
+  z <- qnorm(1-(0.5*a),0,1) # z quantile formula from wikipedia
+  # asymptotic method
+  # CI_plus  <- p+(z*sqrt((1/n)*p*(1-p)))
+  # CI_minus <- p-(z*sqrt((1/n)*p*(1-p)))
+  # Wilson method
+  CI_plus  <- ((p+0.5*(z^2)/n) - (z*sqrt((p*(1-p)+0.25*(z^2)/n)/n)))/(1+(z^2)/n)
+  CI_minus <- ((p+0.5*(z^2)/n) + (z*sqrt((p*(1-p)+0.25*(z^2)/n)/n)))/(1+(z^2)/n)
+  Specificity <- TN/(FP+TN) # TNR
+  metrics <- list(
+    Sensitivity = p,
+    Specificity = Specificity,
+    CI_plus     = CI_plus,
+    CI_minus    = CI_minus,
+    KG_plus     = 1-((1-Specificity)/CI_plus),
+    KG_minus    = 1-((1-Specificity)/CI_minus),
+    Reach_plus  = 1-((1-CI_plus)/Specificity),
+    Reach_minus = 1-((1-CI_minus)/Specificity),
+    Indicative_plus  = CI_plus-(1-Specificity),
+    Indicative_minus = CI_minus-(1-Specificity)
+  )
+  return(metrics)
 }
-##### NEED TO UPDATE WITH NEW KG CALCs
+
+#' metrics
+#'
+#' @param TP - scalar
+#' @param TN - scalar
+#' @param FP - scalar
+#' @param FN - scalar
+#' @param a - alpha level
+#'
+#' @return list - metrics
+#' @importFrom boot logit
+#' @export
+#'
 metrics <- function(TP,TN,FP,FN){
   if (!requireNamespace("dplyr", quietly = TRUE)) {
     stop("dplyr needed for this function to work. Please install it.",
@@ -25,10 +77,6 @@ metrics <- function(TP,TN,FP,FN){
   }
   if (!requireNamespace("boot", quietly = TRUE)) {
     stop("boot needed for this function to work. Please install it.",
-         call. = FALSE)
-  }
-  if (!requireNamespace("pROC", quietly = TRUE)) {
-    stop("pROC needed for this function to work. Please install it.",
          call. = FALSE)
   }
   # metrics derived from TP,TN,FP, and FN
@@ -47,6 +95,8 @@ metrics <- function(TP,TN,FP,FN){
     Accuracy    = (TP+TN)/(TP+TN+FP+FN),
     Err_Rate    = (FP+FN)/(TP+TN+FP+FN),
     other       = (TN+FP)/(TP+TN+FP+FN), # % all area with no sites
+    Pm          = (TP+FP)/(TP+TN+FP+FN), # probability of site-likely (Verhagen 2007)
+    Pm_prime    = (FN+TN)/(TP+TN+FP+FN), # probability of site-unlikely (Verhagen 2007)
     Precision   = Precision, # PPV
     Recall      = Recall, # Sensitivity, TPR
     F_Measure   = (2*Precision*Recall)/(Precision+Recall),
@@ -64,6 +114,7 @@ metrics <- function(TP,TN,FP,FN){
     PPV         = TP/(TP+FP), # Precision
     NPV         = TN/(FN+TN),
     KG          = 1-((1-Specificity)/Sensitivity), # 1-(FPR/TPR)
+    KG2         = 1-(((TP+FP)/(TP+TN+FP+FN))/Sensitivity), # 1-(Pm/sens), correct way???, but double counts TP
     DOR         = (Sensitivity/(1-Specificity)/((1-Sensitivity)/Specificity)), # LRP/LRN
     log_DOR     = log10((Sensitivity/(1-Specificity)/((1-Sensitivity)/Specificity))),
     # D & S - https://en.wikipedia.org/wiki/Diagnostic_odds_ratio
@@ -74,7 +125,7 @@ metrics <- function(TP,TN,FP,FN){
     # http://aircconline.com/ijdkp/V5N2/5215ijdkp01.pdf
     Opp_Precision = ((TP+TN)/(TP+TN+FP+FN))-(abs(Specificity-Sensitivity)/(Specificity+Sensitivity)),
     # https://en.wikipedia.org/wiki/Precision_and_recall
-    # MCC         = (TP*TN-FP*FN)/sqrt((TP+FP)*(TP+FN)*(TN+FP)*(TN+FN)),
+    MCC         = (TP*TN-FP*FN)/sqrt((TP+FP)*(TP+FN)*(TN+FP)*(TN+FN)),
     Informedness  = Sensitivity+Specificity-1, #TSS, Younden's J
     Markedness    = (TP/(TP+FP))+(TN/(FN+TN))-1,
     # http://onlinelibrary.wiley.com/doi/10.1111/j.1365-2664.2006.01214.x/full
@@ -83,34 +134,55 @@ metrics <- function(TP,TN,FP,FN){
     # one minus % sites incorrect divided by % site not-likely background
     # also, 1 minus (% misclassifications / % non-site area)
     # Reach = TEST
-    Reach         = 1-((1-Sensitivity)/Specificity),
-    # Reach2        = 1-((1-(TP/(TP+FN)))/(TN/(FP+TN)))
+    Reach         = 1-((1-Sensitivity)/Specificity), # 1-(FNR/TNR)
+    Reach2        = 1-((1-Sensitivity)/((FN+TN)/(TP+TN+FP+FN))), # 1-(FNR/Pm`),
     ## From Verhagen(2007; 121)
     AFK           = suppressWarnings(sqrt(Sensitivity*((Sensitivity-(1-Specificity))/((TN+FP)/(TP+TN+FP+FN))))),
-    Indicative      = Sensitivity-(1-Specificity),
-    Indicative_norm = (Sensitivity-(1-Specificity))/((TN+FP)/(TP+TN+FP+FN)),
+    Indicative      = Sensitivity/(1-Specificity),
+    Indicative2     = Sensitivity/((TP+FP)/(TP+TN+FP+FN)), # TPR/Pm
+    Indicative_norm = (Sensitivity/(1-Specificity))/((TN+FP)/(TP+TN+FP+FN)),
+    Indicative_norm2 = (Sensitivity/((TP+FP)/(TP+TN+FP+FN)))/((TN+FP)/(TP+TN+FP+FN)),
     Brier         = mean((obs-pred)^2), # MSE for binary class problems
+    X1            = (TP/(TP+FP))/((TP+FN)/(TP+TN+FP+FN)), # PPV/Prev or Prec/Prev
+    X2            = (FN/(FN+TN))/((TP+FN)/(TP+TN+FP+FN)), # FOR/Prev
+    X3            = (FP/(TP+FP))/((TN+FP)/(TP+TN+FP+FN)), # FDR/other
+    X4            = (TN/(FN+TN))/((TN+FP)/(TP+TN+FP+FN)), # NPV/other
+    # Oehlert & Shea (2007)
+    PPG           = (TP/(TP+FP))/((TP+FN)/(TP+TN+FP+FN)), # PPV/Prev or Prec/Prev or X1
+    NPG           = (FN/(FN+TN))/((TP+FN)/(TP+TN+FP+FN)), # FOR/Prev or X2
     # adding more
     MAE           = mean(abs(pred-obs)),
-    RMSE          = sqrt(mean((pred-obs)^2))
-
+    RMSE          = sqrt(mean((pred-obs)^2)),
+    # mean of KG+Reach = Balance
+    Balance       = ((1-((1-Specificity)/Sensitivity))+
+                       (1-((1-Sensitivity)/Specificity)))/2,
+    Balance2       = ((1-(((TP+FP)/(TP+TN+FP+FN))/Sensitivity))+
+                        (1-((1-Sensitivity)/((FN+TN)/(TP+TN+FP+FN)))))/2
   )
   return(metrics)
 }
-make_xstats <- function(results){
-  library("pROC")
-  xstats <- group_by(results, rep, model) %>%
-    summarise(TP = sum(pred_cat == 1 & obs == 1, na.rm = TRUE),
-              FP = sum(pred_cat == 1 & obs == 0, na.rm = TRUE),
-              TN = sum(pred_cat == 0 & obs == 0, na.rm = TRUE),
-              FN = sum(pred_cat == 0 & obs == 1, na.rm = TRUE),
-              auc = pROC::auc(obs,pred, type = "linear")) %>%
-    group_by(rep) %>%
-    dplyr::mutate(Reach = get_metric(TP,TN,FP,FN,"Reach"),
-                  KG = get_metric(TP,TN,FP,FN,"KG"),
-                  Sensitivity = get_metric(TP,TN,FP,FN,"Sensitivity"),
-                  `1-Specificity` = 1-get_metric(TP,TN,FP,FN,"Specificity"),
-                  avg_metric = (KG + Reach)/2) %>%
-    data.frame()
-  return(xstats)
-}
+
+# make_xstats <- function(results){
+#   if (!requireNamespace("pROC", quietly = TRUE)) {
+#     stop("pROC needed for this function to work. Please install it.",
+#          call. = FALSE)
+#   }
+#   if (!requireNamespace("dplyr", quietly = TRUE)) {
+#     stop("dplyr needed for this function to work. Please install it.",
+#          call. = FALSE)
+#   }
+#   xstats <- group_by(results, rep, model) %>%
+#     summarise(TP = sum(pred_cat == 1 & obs == 1, na.rm = TRUE),
+#               FP = sum(pred_cat == 1 & obs == 0, na.rm = TRUE),
+#               TN = sum(pred_cat == 0 & obs == 0, na.rm = TRUE),
+#               FN = sum(pred_cat == 0 & obs == 1, na.rm = TRUE),
+#               auc = pROC::auc(obs,pred, type = "linear")) %>%
+#     group_by(rep) %>%
+#     dplyr::mutate(Reach = get_metric(TP,TN,FP,FN,"Reach"),
+#                   KG = get_metric(TP,TN,FP,FN,"KG"),
+#                   Sensitivity = get_metric(TP,TN,FP,FN,"Sensitivity"),
+#                   `1-Specificity` = 1-get_metric(TP,TN,FP,FN,"Specificity"),
+#                   avg_metric = (KG + Reach)/2) %>%
+#     data.frame()
+#   return(xstats)
+# }

@@ -4,31 +4,33 @@
 
 ### IDEA: in predict, limit examples/coefficients to those in neighborhood of test bag; local similaritiy
 
+library("dplyr")
 library("corrplot")
 library("latex2exp")
 library("data.table")
 library("ggplot2")
+library("DistRegLMERR")
 
 #Parameters
 # set.seed(3849)
 sigma = 1
-lambda = 0.25
+lambda = 0.11
 
 ### Data parameters
-N_back_bags = 10 # need to figure out better way to measure this
-N_sites     = 25
-background_site_balance = 1
-sample_fraction = 0.50
+N_back_bags = 5 # need to figure out better way to measure this
+N_sites     = 10
+background_site_balance = 2
+sample_fraction = 0.25
 train_test_split = 0.75
 confusion_matrix_cutoff = 0.5
-data_location = "data/r91_all_upland_section_6_regression_data_SITENO.csv"
+# data_location = "data/r91_all_upland_section_6_regression_data_SITENO.csv"
+data_location = "/Users/mattharris/Dropbox/R/PASS_regression/r91_all_upland_section_12_regression_data_SITENO.csv"
 
 ### Load Data
 # dat <- fread(data_location)
-dat <- data.frame(dat)
+# dat <- data.frame(dat)
 dat1 <- dplyr::select(dat,presence, SITENO,
-                      ed_h6, std_32c)
-# cd_h7, slpvr_16c, ed_h2, cd_conf, ed_h2, elev_2_conf,
+                      ed_h6, std_32c, ed_h7, slpvr_32c, ed_h2, cd_conf, ed_h2, elev_2_conf)
 # elev_2_strm, e_hyd_min, ed_drnh, elev_2_drainh,
 # tri_16c, cd_h5)
 ### Center and Standardize data
@@ -47,10 +49,11 @@ tbl_test_data           <- formatted_data[["tbl_test_data"]]
 tbl_test_presence       <- formatted_data[["tbl_test_presence"]]
 # all.equal(test_presence, ifelse(grepl(pattern="background", names(test_data)), 0, 1)) # for testing & reasurnace
 
-### Logistic Mean Embedding KRR Model
+## Logistic Mean Embedding KRR Model
 #### Build Kernel Matrix
-method_object <- pr_DB$get_entry("Euclidean")
+method_object <- proxy::pr_DB$get_entry("Euclidean")
 K <- build_K(train_data, train_data, sigma, dist_method = method_object)
+diag(K) <- 1
 #### Train
 train_log_pred <- KRR_logit_optim(K, train_presence, lambda, 1000, 0.001)
 # train_log_pred <- KRR_logit(K, train_presence, lambda)
@@ -73,9 +76,9 @@ TP <- sum(predicted_log$pred_cat == 1 & predicted_log$obs == 1, na.rm = TRUE)
 FP <- sum(predicted_log$pred_cat == 1 & predicted_log$obs == 0, na.rm = TRUE)
 TN <- sum(predicted_log$pred_cat == 0 & predicted_log$obs == 0, na.rm = TRUE)
 FN <- sum(predicted_log$pred_cat == 0 & predicted_log$obs == 1, na.rm = TRUE)
-metrics(TP,TN,FP,FN)$Reach
-metrics(TP,TN,FP,FN)$Sensitivity
-1-metrics(TP,TN,FP,FN)$Specificity
+suppressWarnings(metrics(TP,TN,FP,FN)$Informedness)
+suppressWarnings(metrics(TP,TN,FP,FN)$Sensitivity)
+suppressWarnings(1-metrics(TP,TN,FP,FN)$Specificity)
 
 ##### Plots
 ### Plot K Matrix
@@ -92,22 +95,23 @@ metrics(TP,TN,FP,FN)$Sensitivity
 #   ylim(c(0,1))
 ### Plot Prediction
 subtitle <- TeX('$1/(1 + exp(-\\frac{1}{n}\\sum{n}^{i=1}(K_g(x,x`)) + \\lambda ||f||^2_H))\n;\n K_g(x,x`) = K(\\mu_x,\\mu_{x`})$')
-ggplot(predicted_log, aes(x = as.factor(obs), y = pred,
+ggplot(predicted_log, aes(y = as.factor(obs), x = pred,
                           color = as.factor(obs))) +
-  geom_jitter(width = 0.2) +
+  geom_point(alpha = 0.5, position = position_jitter(w = 0, h = 0.3)) +
   scale_color_manual(values=c("blue","orange")) +
   theme_bw() +
-  ylim(c(0,1)) +
-  labs(y = "Predicted Probability",
-       x = "Site Presence",
-       title = "Mean Embedding Logistic Kernel Ridge Regression",
-       subtitle = subtitle) +
+  xlim(c(0,1)) +
+  # labs(y = "Predicted Probability",
+  #      x = "Site Presence",
+  #      title = "Mean Embedding Logistic Kernel Ridge Regression",
+  #      subtitle = subtitle) +
   theme(
     legend.position = "none",
     text=element_text(family="Trebuchet MS", size = 10),
     plot.title = element_text(size = 12, family = "TrebuchetMS-Bold")
   )
 
+inf_plot(predicted_log$pred, predicted_log$obs, threshold = 0.5)
 
 
 # d(x,y) = sqrt(K(x,x)  + K(y,y) - 2K(x,y))
