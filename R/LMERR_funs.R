@@ -2,7 +2,7 @@
 #' KRR_Logit
 #'
 #' @param K - matrix
-#' @param y - vecotr
+#' @param y - vector
 #' @param lambda - scaler
 #'
 #' @return list: `pred` - predicted probabiity of positive class, `alphas` - estimated coefficients
@@ -10,7 +10,6 @@
 #'
 KRR_logit <- function(K,y, lambda){
   #### Logistic KRR
-  # KRR_logit(K,presence)
   if(is.vector(K)){
     N = length(K)
   } else if(is.matrix(K)){
@@ -23,7 +22,7 @@ KRR_logit <- function(K,y, lambda){
   diagW = pi * (1 - pi)
   e = (y - pi) / diagW
   q = Kalpha + e
-  ident.N <- diag(rep(1,N)) # added by me
+  ident.N <- diag(rep(1,N))
   theSol = solve(K + lambda * ident.N, q)
   log_pred <- 1 / (1 + exp(-as.vector(K %*% theSol)))
   return(list(pred = log_pred, alphas = theSol))
@@ -41,9 +40,8 @@ KRR_logit <- function(K,y, lambda){
 #' @importFrom Matrix Diagonal
 #' @export
 #'
-KRR_logit_optim <- function(K, presence, lambda, maxiter = 100, tol = 0.01){
+KRR_logit_optim <- function(K, presence, lambda, maxiter = 100, tol = 0.01, verbose=1){
   # LOGISTIC - optimize alpha
-  # example: KRR_logit_optim(K,presence, 100, 0.01)
   if(is.vector(K)){
     N = length(K)# NOT SURE IF THIS WORKS WITH REST OF FUNCTION
   } else if(is.matrix(K)){
@@ -51,7 +49,7 @@ KRR_logit_optim <- function(K, presence, lambda, maxiter = 100, tol = 0.01){
   }
   alpha = rep(1/N, N) # initial value
   iter = 1
-  while (TRUE) {
+  while(TRUE) {
     Kalpha = as.vector(K %*% alpha)
     spec = 1 + exp(-Kalpha)
     pi = 1 / spec
@@ -60,14 +58,23 @@ KRR_logit_optim <- function(K, presence, lambda, maxiter = 100, tol = 0.01){
     q = Kalpha + e
     theSol = try(solve(K + lambda * Matrix::Diagonal(x=1/diagW), q))
     if (class(theSol) == "try-error") {
+      cat("Error in calculating solution.")
       break
     }
     alphan = as.vector(theSol)
+    if(verbose == 2){
+      cat("Step ", iter, ". Change in alpha parameters = ",
+          round(sum(abs(alphan - alpha)),4), "\n", sep = "")
+    }
     if (any(is.nan(alphan)) || all(abs(alphan - alpha) <= tol)) {
+      if(verbose %in% c(1,2)){
+        cat("Found solution in", iter, "steps.")
+      }
       break
     }
     else if (iter > maxiter) {
-      cat("klogreg:maxiter!")
+      cat("Maximum iterations for KRR Logit!", "\n",
+          "May be non-optimum solution.")
       break
     }
     else {
@@ -161,7 +168,6 @@ tri_swap <- function(m) {
 #' @export
 #'
 KRR_logit_predict <- function(test_data, train_data, alphas_pred, sigma, dist_method = dist_method, progress = TRUE){
-  # example: KRR_logit_predict(test_dat, train_dat, theSol, sigma)
   pred_yhat <- matrix(nrow = length(test_data), ncol = length(train_data))
   if(isTRUE(progress)){
     total_iter <- length(test_data) * length(train_data)

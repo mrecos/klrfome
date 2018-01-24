@@ -17,18 +17,20 @@ sigma = 1
 lambda = 0.11
 
 ### Data parameters
-N_back_bags = 5 # need to figure out better way to measure this
-N_sites     = 10
-background_site_balance = 2
-sample_fraction = 0.25
+N_back_bags = 50 # need to figure out better way to measure this
+N_sites     = 50
+background_site_balance = 1
+sample_fraction = 0.50
 train_test_split = 0.75
 confusion_matrix_cutoff = 0.5
 # data_location = "data/r91_all_upland_section_6_regression_data_SITENO.csv"
-data_location = "/Users/mattharris/Dropbox/R/PASS_regression/r91_all_upland_section_12_regression_data_SITENO.csv"
+# data_location = "/Users/mattharris/Dropbox/R/PASS_regression/r91_all_upland_section_12_regression_data_SITENO.csv"
+data_location = "C:/Users/matthew.d.harris/Dropbox/R/PASS_regression/r91_all_upland_section_12_regression_data_SITENO.csv"
+
 
 ### Load Data
 # dat <- fread(data_location)
-# dat <- data.frame(dat)
+dat <- data.frame(dat)
 dat1 <- dplyr::select(dat,presence, SITENO,
                       ed_h6, std_32c, ed_h7, slpvr_32c, ed_h2, cd_conf, ed_h2, elev_2_conf)
 # elev_2_strm, e_hyd_min, ed_drnh, elev_2_drainh,
@@ -55,7 +57,7 @@ method_object <- proxy::pr_DB$get_entry("Euclidean")
 K <- build_K(train_data, train_data, sigma, dist_method = method_object)
 diag(K) <- 1
 #### Train
-train_log_pred <- KRR_logit_optim(K, train_presence, lambda, 1000, 0.001)
+train_log_pred <- KRR_logit_optim(K, train_presence, lambda, 100, 0.001, verbose = 2)
 # train_log_pred <- KRR_logit(K, train_presence, lambda)
 alphas_pred   <- train_log_pred[["alphas"]]
 #### Predict
