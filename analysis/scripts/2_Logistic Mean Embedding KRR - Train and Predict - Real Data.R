@@ -1,3 +1,14 @@
+get_metrics <- function(dat, pred_cat, obs){
+  TP <- sum(dat$pred_cat == 1 & dat$obs == 1, na.rm = TRUE)
+  FP <- sum(dat$pred_cat == 1 & dat$obs == 0, na.rm = TRUE)
+  TN <- sum(dat$pred_cat == 0 & dat$obs == 0, na.rm = TRUE)
+  FN <- sum(dat$pred_cat == 0 & dat$obs == 1, na.rm = TRUE)
+  inf   <- suppressWarnings(metrics(TP,TN,FP,FN)$Informedness)
+  sens  <- suppressWarnings(metrics(TP,TN,FP,FN)$Sensitivity)
+  spec2 <- suppressWarnings(1-metrics(TP,TN,FP,FN)$Specificity)
+  list(inf, sens, spec2)
+}
+
 ############### Logistic Mean Embedding KRR (and non-Logistic)
 ### Works with functions in KRR_Logit_fit_predict_functions.R
 ### Full process example with REAL data
@@ -9,6 +20,7 @@ library("corrplot")
 library("latex2exp")
 library("data.table")
 library("ggplot2")
+library("e1071")         # for SVM comparison
 library("DistRegLMERR")
 
 #Parameters
@@ -74,13 +86,40 @@ predicted_log <- data.frame(pred = test_log_pred,
 group_by(predicted_log, obs) %>%
   summarize(mean_pred = mean(pred))
 # x <- confusionMatrix(predicted_log$pred_cat, predicted_log$obs, positive = "1")
-TP <- sum(predicted_log$pred_cat == 1 & predicted_log$obs == 1, na.rm = TRUE)
-FP <- sum(predicted_log$pred_cat == 1 & predicted_log$obs == 0, na.rm = TRUE)
-TN <- sum(predicted_log$pred_cat == 0 & predicted_log$obs == 0, na.rm = TRUE)
-FN <- sum(predicted_log$pred_cat == 0 & predicted_log$obs == 1, na.rm = TRUE)
-suppressWarnings(metrics(TP,TN,FP,FN)$Informedness)
-suppressWarnings(metrics(TP,TN,FP,FN)$Sensitivity)
-suppressWarnings(1-metrics(TP,TN,FP,FN)$Specificity)
+krr_metrics <- get_metrics(predicted_log)
+
+### compare to logit
+lr <- glm(presence ~ ., data = dplyr::select(tbl_train_data, -SITENO), family = "binomial")
+lr_pred <- predict(lr, newdata = tbl_test_data, type = "response")
+predicted_lr <- data.frame(pred = lr_pred,
+                            obs = tbl_test_presence,
+                            pred_cat = ifelse(lr_pred >= confusion_matrix_cutoff,1,0))
+### LR Performance Metrics
+group_by(predicted_lr, obs) %>%
+  summarize(mean_pred = mean(pred))
+# x <- confusionMatrix(predicted_lr$pred_cat, predicted_lr$obs, positive = "1")
+lr_metrics <- get_metrics(predicted_lr)
+
+### compare to SVM
+svm_mod <- svm(presence ~ .,
+               data = dplyr::select(tbl_train_data, -SITENO), cost = 0.001,
+               family = "binomial")
+svm_pred <- predict(svm_mod, newdata = tbl_test_data, type = "response")
+predicted_svm <- data.frame(pred = svm_pred,
+                            obs = tbl_test_presence,
+                            pred_cat = ifelse(svm_pred >= confusion_matrix_cutoff,1,0))
+### LR Performance Metrics
+group_by(predicted_vsm, obs) %>%
+  summarize(mean_pred = mean(pred))
+# x <- confusionMatrix(predicted_lr$pred_cat, predicted_lr$obs, positive = "1")
+svm_metrics <- get_metrics(predicted_svm)
+
+data.frame(metric = c("Informedness", "Sensitivity", "1-Specificity"),
+           KRR    = c(krr_metrics[[1]], krr_metrics[[2]], krr_metrics[[3]]),
+           LR     = c(lr_metrics[[1]], lr_metrics[[2]], lr_metrics[[3]]),
+           SVM    = c(svm_metrics[[1]], svm_metrics[[2]], svm_metrics[[3]])) %>%
+  mutate_if(is.numeric, round, 2)
+
 
 ##### Plots
 ### Plot K Matrix

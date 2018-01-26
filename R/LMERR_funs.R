@@ -58,7 +58,7 @@ KRR_logit_optim <- function(K, presence, lambda, maxiter = 100, tol = 0.01, verb
     q = Kalpha + e
     theSol = try(solve(K + lambda * Matrix::Diagonal(x=1/diagW), q))
     if (class(theSol) == "try-error") {
-      cat("Error in calculating solution.")
+      cat("Error in calculating solution.","\n")
       break
     }
     alphan = as.vector(theSol)
@@ -68,13 +68,13 @@ KRR_logit_optim <- function(K, presence, lambda, maxiter = 100, tol = 0.01, verb
     }
     if (any(is.nan(alphan)) || all(abs(alphan - alpha) <= tol)) {
       if(verbose %in% c(1,2)){
-        cat("Found solution in", iter, "steps.")
+        cat("Found solution in", iter, "steps.","\n")
       }
       break
     }
     else if (iter > maxiter) {
       cat("Maximum iterations for KRR Logit!", "\n",
-          "May be non-optimum solution.")
+          "May be non-optimum solution.","\n")
       break
     }
     else {
