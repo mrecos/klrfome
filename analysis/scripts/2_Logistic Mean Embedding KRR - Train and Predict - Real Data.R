@@ -41,7 +41,7 @@ data_location = "C:/Users/matthew.d.harris/Dropbox/R/PASS_regression/r91_all_upl
 
 
 ### Load Data
-# dat <- fread(data_location)
+dat <- fread(data_location)
 dat <- data.frame(dat)
 dat1 <- dplyr::select(dat,presence, SITENO,
                       ed_h6, std_32c, ed_h7, slpvr_32c, ed_h2, cd_conf, ed_h2, elev_2_conf)
@@ -78,6 +78,7 @@ test_log_pred <- KRR_logit_predict(test_data, train_data, alphas_pred, sigma, di
 ### Performance data frames
 train_log_pred_plot <- data.frame(pred = train_log_pred[["pred"]],
                                   obs = train_presence)
+
 predicted_log <- data.frame(pred = test_log_pred,
                             obs = test_presence,
                             pred_cat = ifelse(test_log_pred >= confusion_matrix_cutoff,1,0))

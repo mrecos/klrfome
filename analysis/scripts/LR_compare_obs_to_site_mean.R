@@ -18,6 +18,21 @@ logreg_helper <- function(dat_split){
     dplyr::select(.,-SITENO)
   lr <- glm(presence ~ ., data = lr_data, family = "binomial")
 }
+
+logreg2_helper <- function(dat_split, frac = 1){
+  lr_data <- dat_split$tbl_train_data
+  lr_presence <- lr_data %>%
+    filter(presence == 1) %>%
+    group_by(SITENO) %>%
+    summarise_all(mean)
+  lr_absence <- lr_data %>%
+    filter(presence == 0) %>%
+    sample_n(size = nrow(lr_presence)*frac)
+  lr_data <- rbind(lr_presence, lr_absence) %>%
+    dplyr::select(-SITENO)
+  lr <- glm(presence ~ ., data = lr_data, family = "binomial")
+}
+
 SVM_helper <- function(dat_split, cost = 0.001){
   svm_data <- dat_split$tbl_train_data %>%
     dplyr::select(.,-SITENO)
@@ -25,15 +40,7 @@ SVM_helper <- function(dat_split, cost = 0.001){
              data = svm_data, cost = cost,
              family = "binomial")
 }
-KRR_helper <- function(dat_split, sigma, lambda, dist_method){
-  krr_data <- dat_split$train_data
-  K <- build_K(krr_data, krr_data, sigma, dist_method = dist_method, progres = TRUE)
-  diag(K) <- 1
-  #### Train
-  krr <- KRR_logit_optim(K, dat_split$train_presence, lambda, 100, 0.001, verbose = 0)
-  return(krr)
-}
-predict_helper <- function(model,splits,model_type,confusion_matrix_cutoff=0.5){
+predict_helper <- function(model,splits,model_type,FPR=NULL,confusion_matrix_cutoff=0.5){
   if(model_type %in% c("LR","SVM")){
     newdata <- splits$tbl_test_data
     preds <- predict(model, newdata = newdata, type = "response")
@@ -49,6 +56,10 @@ predict_helper <- function(model,splits,model_type,confusion_matrix_cutoff=0.5){
     predicted <- data.frame(pred = preds,
                             obs  = splits$test_presence)
   }
+  #### CUT OFF CLASSIFICATION IS ITS OWN STEP
+  # if(is.numeric(FPR)){
+  #   confusion_matrix_cutoff <- get_cm_cutoff(predicted,FPR=FPR)
+  # }
   predicted$pred_cat <- ifelse(predicted$pred >= confusion_matrix_cutoff,1,0)
   return(predicted)
 }
@@ -56,18 +67,24 @@ get_AUC <- function(preds){
   roc_obj <- roc(preds$obs, preds$pred)
   AUC <- auc(roc_obj)
 }
+get_cm_cutoff <- function(preds,FPR=0.66){ #### <- SHOULD be FPR OF JUST BACKGROUND!!!!
+  ############ DOES NOT SEEM TO BE FIXING PREDICTIONS AT FPR - CONTINUE TO WORK!!!!!!!!!!!!
+  # FPR cutoff is not implimented at the moment, only AUC and 0.5 threshold measures
+  preds_sort <- preds[order(preds$pred, decreasing = T),"pred"]
+  cm_cutoff <- preds_sort[floor(length(preds_sort)*FPR)]
+}
 
 library("corrplot")
-library("pROC")
 library("data.table")
 library("tidyverse")
 library("e1071")         # for SVM comparison
 library("DistRegLMERR")
 library("future")
+library("pROC")
 
-method_object <- proxy::pr_DB$get_entry("Euclidean")
-sigma <- 1
-lambda <- 0.11
+# method_object <- proxy::pr_DB$get_entry("Euclidean")
+# sigma <- 1
+# lambda <- 0.11
 
 ### Data parameters
 N_back_bags = 50 # need to figure out better way to measure this
@@ -76,7 +93,7 @@ background_site_balance = 1
 sample_fraction = 0.50
 train_test_split = 0.75
 confusion_matrix_cutoff = 0.5
-
+#
 physioshed_ids <- c(1,2,6,8,12)
 
 for(z in seq_along(physioshed_ids)){
@@ -112,26 +129,20 @@ for(z in seq_along(physioshed_ids)){
       mutate(splits  = map(splits,  ~future::value(.x)))
     model_fits <- model_data %>%
       mutate(model_LR    = map(splits,     ~future::future(logreg_helper(.x))),
-             model_SVM   = map(splits,     ~future::future(SVM_helper(.x, cost = 0.001))),
-             model_KRR   = map(splits,     ~future::future(KRR_helper(.x, sigma, lambda, method_object)))) %>%
+             model_LR2   = map(splits,     ~future::future(logreg2_helper(.x, frac = 1)))) %>%
       mutate(model_LR    = map(model_LR,   ~future::value(.x)),
-             model_SVM   = map(model_SVM,  ~future::value(.x)),
-             model_KRR   = map(model_KRR,  ~future::value(.x)))
+             model_LR2   = map(model_LR2,  ~future::value(.x)))
     model_preds <- model_fits %>%
-      mutate(preds_LR    = map2(model_LR, splits, ~predict_helper(.x,.y,model_type="LR")),
-             preds_SVM   = map2(model_SVM, splits, ~predict_helper(.x,.y,model_type="SVM")),
-             preds_KRR   = map2(model_KRR, splits, ~predict_helper(.x,.y,model_type="KRR"))) %>%
+      mutate(preds_LR    = map2(model_LR,  splits, ~predict_helper(.x,.y,model_type="LR")),
+             preds_LR2   = map2(model_LR2, splits, ~predict_helper(.x,.y,model_type="LR"))) %>%
       dplyr::select(-splits)
     model_metrics <- model_preds %>%
-      mutate(AUC_LR      = map_dbl(preds_LR, get_AUC),
+      mutate(AUC_LR = map_dbl(preds_LR, get_AUC),
+             AUC_LR2 = map_dbl(preds_LR2, get_AUC),
              metric_LR   = map(preds_LR, get_metrics),
              inform_LR   = map_dbl(metric_LR,"Informedness"),
-             AUC_SVM     = map_dbl(preds_SVM, get_AUC),
-             metric_SVM  = map(preds_SVM, get_metrics),
-             inform_SVM  = map_dbl(metric_SVM,"Informedness"),
-             AUC_KRR     = map_dbl(preds_KRR, get_AUC),
-             metric_KRR  = map(preds_KRR, get_metrics),
-             inform_KRR  = map_dbl(metric_KRR,"Informedness"))
+             metric_LR2  = map(preds_LR2, get_metrics),
+             inform_LR2  = map_dbl(metric_LR2,"Informedness"))
 
     model_preds_strip <- model_preds %>%
       dplyr::select(-starts_with("model"))
@@ -143,6 +154,11 @@ for(z in seq_along(physioshed_ids)){
       gather(model, value, -id) %>%
       separate(model, into = c("metrics","model"), sep = "_")
 
+    ggplot(metrics_AUC_long, aes(x=model, y=value, color = model)) +
+      geom_boxplot(width=0.2)+
+      geom_jitter(width=0.1) +
+      theme_bw()
+
     metrics_threshold_long <- model_metrics_strip %>%
       select(-starts_with("inform"),-starts_with("AUC"),-params)  %>%
       mutate(metrics = map(metric_LR, names)) %>%
@@ -152,7 +168,7 @@ for(z in seq_along(physioshed_ids)){
       separate(model,into=c("a","model"),sep="_") %>%
       select(-a)
 
-    save_folder <- paste0(searches,"_KRR_LR_SVM_compare_r91U",physioshed_z)
+    save_folder <- paste0(searches,"_LR_cells_mean_compare_r91U",physioshed_z)
     if(!dir.exists(save_folder)){
       dir.create(save_folder)
     }
@@ -162,23 +178,24 @@ for(z in seq_along(physioshed_ids)){
     write.csv(metrics_threshold_long, file = file.path(save_folder,"metrics_threshold_long.csv"))
     write.csv(metrics_AUC_long, file = file.path(save_folder,"metrics_AUC_long.csv"))
 
-    model_metrics %>%
-      dplyr::select(inform_LR, inform_SVM, inform_KRR) %>%
-      summarise(mean_LR = mean(inform_LR),
-                mean_SVM = mean(inform_SVM),
-                mean_KRR = mean(inform_KRR),
-                sd_LR   = sd(inform_LR),
-                sd_SVM  = sd(inform_SVM),
-                sd_KRR  = sd(inform_KRR),
-                high_LR   = max(inform_LR),
-                high_SVM  = max(inform_SVM),
-                high_KRR  = max(inform_KRR),
-                low_LR   = min(inform_LR),
-                low_SVM  = min(inform_SVM),
-                low_KRR  = min(inform_KRR)) %>%
-      gather(metric, value)
-
-    rm(model_fits)
-    rm(dat)
-    gc()
+    # model_metrics %>%
+    #   dplyr::select(inform_LR, inform_LR2) %>%
+    #   summarise(median_LR = median(inform_LR),
+    #             median_LR2 = median(inform_LR2),
+    #             sd_LR   = sd(inform_LR),
+    #             sd_LR2  = sd(inform_LR2),
+    #             high_LR   = max(inform_LR),
+    #             high_LR2  = max(inform_LR2),
+    #             low_LR   = min(inform_LR),
+    #             low_LR2  = min(inform_LR2)) %>%
+    #   gather(metric, value)
+    #
+    # metrics_threshold_long %>%
+    #   rbind(metrics_AUC_long) %>%
+    #   filter(metrics %in% c("Informedness","Sensitivity","PPG","FPR","AUC")) %>%
+    #   ggplot(.,aes(x=model,y=value,group=model, color = model)) +
+    #   geom_boxplot(width = 0.2) +
+    #   geom_jitter(width=0.2)+
+    #   facet_wrap(~metrics, ncol=1, scales = "free") +
+    #   theme_bw()
 }
