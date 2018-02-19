@@ -146,10 +146,10 @@ for(z in seq_along(physioshed_ids)){
                                                                  Y_threshold = TRUE))) %>%
     dplyr::select(-splits)
   model_metrics <- model_preds %>%
-    mutate(AUC_LR  = map_dbl(preds_LR, get_AUC),
+    mutate(AUC_LR  = map_dbl(preds_LR,  get_AUC),
            AUC_LR2 = map_dbl(preds_LR2, get_AUC),
-           metric_LR   = map(preds_LR, get_metrics),
-           ROC_LR      = map(preds_LR, get_YJ_max_threshold),
+           metric_LR   = map(preds_LR,  get_metrics),
+           ROC_LR      = map(preds_LR,  get_YJ_max_threshold),
            metric_LR2  = map(preds_LR2, get_metrics),
            ROC_LR2     = map(preds_LR2, get_YJ_max_threshold))
 
