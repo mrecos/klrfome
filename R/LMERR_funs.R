@@ -100,7 +100,7 @@ KRR_logit_optim <- function(K, presence, lambda, maxiter = 100, tol = 0.01, verb
 #'
 get_k <- function(y1,y2,sigma, dist_method = dist_method){
   g = proxy::dist(as.matrix(y1),as.matrix(y2), method = dist_method,
-                  by_rows = TRUE, auto_convert_data_frames = FALSE) # speed bottle neck accordingn to profvis
+                  by_rows = TRUE, auto_convert_data_frames = FALSE) # speed bottle neck according to profvis
   ## my version
   g = exp(-g^2/(2*sigma^2)) # equal to exp(-sigma2*g^2) ; sigma2 = 1/(2*sigma^2)
   # g = exp(-(1/(2*sigma^2))*g^2) # equal to exp(-g^2/(2*sigma^2))
@@ -123,7 +123,7 @@ build_K <- function(y1,y2=y1,sigma, progress = TRUE, dist_method){
   # example: K <- build_K(x_data_norm, x_data_norm, sigma)
   K <- matrix(nrow = length(y1), ncol = length(y2))
   if(isTRUE(progress)){
-    total_iter <- sum(seq(length(y1)-1)) # only works for symetrical matri
+    total_iter <- sum(seq(length(y1)-1)) # only works for symetrical matricies
     pb <- txtProgressBar(min = 0, max = total_iter, style = 3)
   }
   iter <- 0
