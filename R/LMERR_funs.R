@@ -54,9 +54,15 @@ KRR_logit_optim <- function(K, presence, lambda, maxiter = 100, tol = 0.01, verb
     spec = 1 + exp(-Kalpha)
     pi = 1 / spec
     diagW = pi * (1 - pi)
-    e = (presence - pi) / diagW
-    q = Kalpha + e
-    theSol = try(solve(K + lambda * Matrix::Diagonal(x=1/diagW), q))
+    # e = (presence - pi) / diagW
+    # same as: Zhu & Hastie (2002:19)
+    # W^-1(y-pi); W = diag[pi(1 − pi)]N×N
+    # e = solve(as.matrix(Matrix::Diagonal(x=diagW))) %*% (presence - pi)
+    z = Kalpha + ((presence - pi) / diagW)
+    # same as: Zhu & Hastie (2002:19)
+    # z = (K_a alpha(k−1) + W^−1(y − pi)) or (y-pi)/W
+    # z = as.vector(K %*% alpha) + ((presence - pi) / diagW)
+    theSol = try(solve(K + lambda * Matrix::Diagonal(x=1/diagW), z))
     if (class(theSol) == "try-error") {
       cat("Error in calculating solution.","\n")
       break
@@ -168,7 +174,7 @@ tri_swap <- function(m) {
 #' @export
 #'
 KRR_logit_predict <- function(test_data, train_data, alphas_pred, sigma, dist_method = dist_method, progress = TRUE){
-  pred_yhat <- matrix(nrow = length(test_data), ncol = length(train_data))
+  kstark <- matrix(nrow = length(test_data), ncol = length(train_data))
   if(isTRUE(progress)){
     total_iter <- length(test_data) * length(train_data)
     pb <- txtProgressBar(min = 0, max = total_iter, style = 3)
@@ -179,12 +185,12 @@ KRR_logit_predict <- function(test_data, train_data, alphas_pred, sigma, dist_me
       g_i <- get_k(train_data[[i]],
                    test_data[[j]], sigma, dist_method)
       k_i <- round(mean(g_i),3)
-      pred_yhat[j,i] <- k_i
+      kstark[j,i] <- k_i
       if(isTRUE(progress)){setTxtProgressBar(pb, iter)}
       iter <- iter + 1
     }
   }
   if(isTRUE(progress)){close(pb)}
-  pred <- 1 / (1 + exp(-as.vector(pred_yhat %*% alphas_pred)))
+  pred <- 1 / (1 + exp(-as.vector(kstark %*% alphas_pred)))
   return(pred)
 }
