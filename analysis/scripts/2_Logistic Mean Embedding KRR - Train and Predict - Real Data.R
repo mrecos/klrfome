@@ -25,7 +25,7 @@ library("DistRegLMERR")
 
 #Parameters
 # set.seed(3849)
-sigma = 1
+sigma = 10
 lambda = 0.11
 
 ### Data parameters
@@ -33,18 +33,18 @@ N_back_bags = 50 # need to figure out better way to measure this
 N_sites     = 50
 background_site_balance = 1
 sample_fraction = 0.50
-train_test_split = 0.75
+train_test_split = 0.90
 confusion_matrix_cutoff = 0.5
 # data_location = "data/r91_all_upland_section_6_regression_data_SITENO.csv"
 # data_location = "/Users/mattharris/Dropbox/R/PASS_regression/r91_all_upland_section_12_regression_data_SITENO.csv"
-data_location = "C:/Users/matthew.d.harris/Dropbox/R/PASS_regression/r91_all_upland_section_12_regression_data_SITENO.csv"
+data_location = "C:/Users/matthew.d.harris/Dropbox/R/PASS_regression/r91_all_upland_section_6_regression_data_SITENO.csv"
 
 
 ### Load Data
 dat <- fread(data_location)
 dat <- data.frame(dat)
 dat1 <- dplyr::select(dat,presence, SITENO,
-                      ed_h6, std_32c, ed_h7, slpvr_32c, ed_h2, cd_conf, ed_h2, elev_2_conf)
+                      ed_h6, std_32c, cd_h7, slpvr_16c, ed_h2, cd_conf, elev_2_conf)
 # elev_2_strm, e_hyd_min, ed_drnh, elev_2_drainh,
 # tri_16c, cd_h5)
 ### Center and Standardize data

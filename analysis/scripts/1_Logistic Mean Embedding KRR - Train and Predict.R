@@ -10,7 +10,7 @@ library("DistRegLMERR")
 
 #Parameters
 set.seed(sample(1:99999,1))
-sigma = 2
+sigma = 0.1
 lambda = 0.015
 
 ### Simulate Training Data
@@ -35,7 +35,7 @@ test_presence <- sim_data[["test_presence"]]
 method_object <- proxy::pr_DB$get_entry("Euclidean")
 K <- build_K(train_data, sigma = sigma, dist_method = method_object)
 #### Train
-train_log_pred <- KRR_logit_optim(K, train_presence, lambda, 500, 0.01)
+train_log_pred <- KRR_logit_optim(K, train_presence, lambda, 100, 0.01)
 alphas_pred   <- train_log_pred[["alphas"]]
 #### Predict
 test_log_pred <- KRR_logit_predict(test_data, train_data, alphas_pred, sigma, dist_method = method_object)
