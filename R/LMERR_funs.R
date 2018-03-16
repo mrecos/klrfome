@@ -137,7 +137,7 @@ build_K <- function(y1,y2=y1,sigma, progress = TRUE, dist_method){
     for(j in i:length(y2)){  ## index to i so that only does upper triangle (only for square matrix!)
       # print(paste0(i, " : ", j))
       g <- get_k(y1[[i]], y2[[j]], sigma, dist_method)
-      k <- round(mean(g),3)
+      k <- round(mean(g, na.rm = TRUE),3)
       K[i,j] <- k
       if(isTRUE(progress)){setTxtProgressBar(pb, iter)}
       iter <- iter + 1
@@ -184,7 +184,7 @@ KRR_logit_predict <- function(test_data, train_data, alphas_pred, sigma, dist_me
     for(i in 1:length(train_data)){
       g_i <- get_k(train_data[[i]],
                    test_data[[j]], sigma, dist_method)
-      k_i <- round(mean(g_i),3)
+      k_i <- round(mean(g_i, na.rm = TRUE),3)
       kstark[j,i] <- k_i
       if(isTRUE(progress)){setTxtProgressBar(pb, iter)}
       iter <- iter + 1
