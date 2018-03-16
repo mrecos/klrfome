@@ -5,7 +5,7 @@
 #' @param train_test_split - scaler
 #' @param background_site_balance - scaler
 #'
-#' @return - list of various ways to arrange site data
+#' @return - list of various ways to arrange site data and mean/sd of data
 #' @import dplyr
 #' @export
 #'
@@ -15,7 +15,9 @@ format_site_data <- function(dat, N_sites, train_test_split, background_site_bal
          call. = FALSE)
   }
   variables <- setdiff(colnames(dat1), c("presence", "SITENO"))
-  dat1   <- data.frame(apply(dat1[, variables],2,scale))
+  means  <- sapply(dat1[variables], mean, na.rm=T)
+  sds    <- sapply(dat1[variables], sd, na.rm=T)
+  dat1   <- data.frame(apply(dat1[, variables],2,scale))  # should be scaled on only training data mean/sd
   dat1   <- cbind(dat1, dat[,c("presence","SITENO")])
   ## Reduce number of sites to N_sites
   sites <- filter(dat1, presence == 1)
@@ -70,5 +72,7 @@ format_site_data <- function(dat, N_sites, train_test_split, background_site_bal
               tbl_train_data = tbl_train_data,
               tbl_train_presence = tbl_train_presence,
               tbl_test_data = tbl_test_data,
-              tbl_test_presence = tbl_test_presence))
+              tbl_test_presence = tbl_test_presence,
+              means = means,
+              sds = sds))
 }
