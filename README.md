@@ -4,8 +4,8 @@
 PRE-RELEASE
 ===========
 
-DistRegLMERR - Logisitic Mean Embeddings Ridge Regression (LMERR) for the Distribution Regression problem.
-----------------------------------------------------------------------------------------------------------
+DistRegLMERR - Distribution Regression with Kernel Logistic Regression on Mean Embeddings.
+------------------------------------------------------------------------------------------
 
 ### SAA 2018 Abstract
 
@@ -19,7 +19,7 @@ A model of Distribution Regression using Kernel Logistic Regression (KLR) on Mea
 
 Please cite this compendium as:
 
-> Harris, Matthew D., (2017). *Logisitic Mean Embeddings Ridge Regression (LMERR) for the Distribution Regression problem.*. Accessed 10 Sep 2017. Online at <https://doi.org/10.5281/zenodo.888409>
+> Harris, Matthew D., (2017). *Distribution Regression with Kernel Logistic Regression on Mean Embeddings*. Accessed 10 Sep 2017. Online at <https://doi.org/10.5281/zenodo.888409>
 
 ### Installation
 
