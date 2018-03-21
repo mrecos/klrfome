@@ -16,7 +16,7 @@ format_site_data(dat, N_sites, train_test_split, background_site_balance)
 \item{background_site_balance}{- scaler}
 }
 \value{
-- list of various ways to arrange site data
+- list of various ways to arrange site data and mean/sd of data
 }
 \description{
 format_site_data

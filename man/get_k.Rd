@@ -7,13 +7,13 @@
 get_k(y1, y2, sigma, dist_method = dist_method)
 }
 \arguments{
-\item{y1}{- matrix}
+\item{y1}{- [NxP] Matrix of data from bag i}
 
-\item{y2}{- matrix}
+\item{y2}{- [NxP] Matrix of data from bag j}
 
-\item{sigma}{- scaler}
+\item{sigma}{- [scaler] smoothing hyperparameters for RBF kernel}
 
-\item{dist_method}{- object or character string}
+\item{dist_method}{- [object] distance method from proxy package, e.g. proxy::pr_DB$get_entry("Euclidean")}
 }
 \value{
 Matrix G

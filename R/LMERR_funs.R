@@ -66,10 +66,10 @@ KLR <- function(K, presence, lambda, maxiter = 100, tol = 0.01, verbose=1){
 
 #' get_k
 #'
-#' @param y1 - matrix
-#' @param y2 - matrix
-#' @param sigma - scaler
-#' @param dist_method - object or character string
+#' @param y1 - [NxP] Matrix of data from bag i
+#' @param y2 - [NxP] Matrix of data from bag j
+#' @param sigma - [scaler] smoothing hyperparameters for RBF kernel
+#' @param dist_method - [object] distance method from proxy package, e.g. proxy::pr_DB$get_entry("Euclidean")
 #'
 #' @return Matrix G
 #' @importFrom proxy dist
@@ -87,11 +87,11 @@ get_k <- function(y1,y2,sigma, dist_method = dist_method){
 
 #' build_k
 #'
-#' @param y1 - Matrix
-#' @param y2 - Matrix
-#' @param sigma - scaler
-#' @param progress - logical
-#' @param dist_method - option passed to get_k for `dist_method`
+#' @param y1 - [NxP] Matrix of data from bag i
+#' @param y2 - [NxP] Matrix of data from bag j
+#' @param sigma - [scaler] smoothing hyperparameters for RBF kernel
+#' @param progress - [logical] False = no progress bar; 1 = show progress bar
+#' @param dist_method - [object] distance method from proxy package, e.g. proxy::pr_DB$get_entry("Euclidean")
 #'
 #' @return - matrix K
 #' @export
@@ -132,19 +132,19 @@ tri_swap <- function(m) {
 }
 
 
-#' KRR_logit_predict
+#' KLR_predict
 #'
-#' @param test_data - data.frame or matrix
-#' @param train_data - data.frame or matrix
-#' @param alphas_pred - numeric vector
-#' @param sigma - scaler
-#' @param dist_method - object or character string
-#' @param progress - logical
+#' @param test_data - [list] Training data used to create similarity kernel matrix
+#' @param train_data - [list] Testing data to predict class
+#' @param alphas_pred - [vector] Numeric vector of alpha parameters from KLR function
+#' @param sigma - [scaler] Smoothing parameter for RBF kernel
+#' @param progress - [logical] False = no progress bar; 1 = show progress bar
+#' @param dist_method - [object] distance method from proxy package, e.g. proxy::pr_DB$get_entry("Euclidean")
 #'
-#' @return - numeric vector - predicted probabiity of positive class
+#' @return - [vector] - predicted probabiity of positive class
 #' @export
 #'
-KRR_logit_predict <- function(test_data, train_data, alphas_pred, sigma, dist_method = dist_method, progress = TRUE){
+KLR_predict <- function(test_data, train_data, alphas_pred, sigma, dist_method = dist_method, progress = TRUE){
   kstark <- matrix(nrow = length(test_data), ncol = length(train_data))
   if(isTRUE(progress)){
     total_iter <- length(test_data) * length(train_data)
