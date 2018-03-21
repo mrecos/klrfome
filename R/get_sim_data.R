@@ -1,19 +1,19 @@
 #' get_sim_data
 #'
-#' @param sites_var1_mean - scaler
-#' @param sites_var1_sd - scaler
-#' @param sites_var2_mean - scaler
-#' @param sites_var2_sd - scaler
-#' @param backg_var1_mean - scaler
-#' @param backg_var1_sd - scaler
-#' @param backg_var2_mean - scaler
-#' @param backg_var2_sd - scaler
-#' @param site_samples - scaler
-#' @param N_site_bags - scaler
-#' @param background_site_balance - scaler
-#' @param test_train_split - scaler
+#' @param sites_var1_mean - [scaler] mean of variable 1 for sites
+#' @param sites_var1_sd - [scaler] sd of variable 1 for sites
+#' @param sites_var2_mean - [scaler] mean of variable 2 for sites
+#' @param sites_var2_sd - [scaler] sd of variable 2 for sites
+#' @param backg_var1_mean - [scaler] mean of variable 1 for background
+#' @param backg_var1_sd - [scaler] sd of variable 1 for background
+#' @param backg_var2_mean - [scaler] mean of variable 2 for background
+#' @param backg_var2_sd - [scaler] sd of variable 2 for background
+#' @param site_samples - [scaler] Number of sites to include in simulated data
+#' @param N_site_bags - [scaler] Number of background groups to use in simulated data
+#' @param background_site_balance - [scaler] Ratio of site to bacground groups
+#' @param test_train_split - [scaler] Percent of simulated sites in include in training set
 #'
-#' @return - data.frame of simulated site data
+#' @return - data.frame and list of simulated training and test set data
 #' @import dplyr
 #' @export
 #'

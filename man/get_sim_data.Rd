@@ -11,32 +11,32 @@ get_sim_data(sites_var1_mean = 50, sites_var1_sd = 10,
   test_train_split = 0.75)
 }
 \arguments{
-\item{sites_var1_mean}{- scaler}
+\item{sites_var1_mean}{- [scaler] mean of variable 1 for sites}
 
-\item{sites_var1_sd}{- scaler}
+\item{sites_var1_sd}{- [scaler] sd of variable 1 for sites}
 
-\item{sites_var2_mean}{- scaler}
+\item{sites_var2_mean}{- [scaler] mean of variable 2 for sites}
 
-\item{sites_var2_sd}{- scaler}
+\item{sites_var2_sd}{- [scaler] sd of variable 2 for sites}
 
-\item{backg_var1_mean}{- scaler}
+\item{backg_var1_mean}{- [scaler] mean of variable 1 for background}
 
-\item{backg_var1_sd}{- scaler}
+\item{backg_var1_sd}{- [scaler] sd of variable 1 for background}
 
-\item{backg_var2_mean}{- scaler}
+\item{backg_var2_mean}{- [scaler] mean of variable 2 for background}
 
-\item{backg_var2_sd}{- scaler}
+\item{backg_var2_sd}{- [scaler] sd of variable 2 for background}
 
-\item{site_samples}{- scaler}
+\item{site_samples}{- [scaler] Number of sites to include in simulated data}
 
-\item{N_site_bags}{- scaler}
+\item{N_site_bags}{- [scaler] Number of background groups to use in simulated data}
 
-\item{background_site_balance}{- scaler}
+\item{background_site_balance}{- [scaler] Ratio of site to bacground groups}
 
-\item{test_train_split}{- scaler}
+\item{test_train_split}{- [scaler] Percent of simulated sites in include in training set}
 }
 \value{
-- data.frame of simulated site data
+- data.frame and list of simulated training and test set data
 }
 \description{
 get_sim_data

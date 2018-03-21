@@ -1,9 +1,9 @@
 #' format_site_data
 #'
-#' @param dat - data.frame
-#' @param N_sites - scaler
-#' @param train_test_split - scaler
-#' @param background_site_balance - scaler
+#' @param dat - [data.frame] A data.frame of presence and absence records. Column "presence" must contain presence/absence as 1/0, and column "SITENO" contains the grouping variable.
+#' @param N_sites - [scaler] The number of sites to randomly select
+#' @param train_test_split - [scaler] a float from 0 to 1 indicating the percent of N_sites to be used as training data.
+#' @param background_site_balance - [scaler] Integer > 0 indicating how many background groups per site group
 #'
 #' @return - list of various ways to arrange site data and mean/sd of data
 #' @import dplyr

@@ -7,13 +7,13 @@
 format_site_data(dat, N_sites, train_test_split, background_site_balance)
 }
 \arguments{
-\item{dat}{- data.frame}
+\item{dat}{- [data.frame] A data.frame of presence and absence records. Column "presence" must contain presence/absence as 1/0, and column "SITENO" contains the grouping variable.}
 
-\item{N_sites}{- scaler}
+\item{N_sites}{- [scaler] The number of sites to randomly select}
 
-\item{train_test_split}{- scaler}
+\item{train_test_split}{- [scaler] a float from 0 to 1 indicating the percent of N_sites to be used as training data.}
 
-\item{background_site_balance}{- scaler}
+\item{background_site_balance}{- [scaler] Integer > 0 indicating how many background groups per site group}
 }
 \value{
 - list of various ways to arrange site data and mean/sd of data
