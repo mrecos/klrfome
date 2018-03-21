@@ -20,7 +20,7 @@ for(j in seq_along(model_name)){
     threshold_i <- data.frame(pred = model_pred[[j]],
                                 obs = model_test_presence[[j]],
                                 pred_cat = ifelse(model_pred[[j]] >= threshold[i],1,0),
-                                rep = z,
+                                #rep = z, ### <- what is z?
                                 model = model_name[j],
                               cutoff = threshold[i])
     threshold_class <- rbind(threshold_class, threshold_i)
@@ -44,10 +44,10 @@ for(j in seq_along(model_name)){
                   FPR = get_metric(TP,TN,FP,FN,"FPR"),
                   TPR = get_metric(TP,TN,FP,FN,"TPR")) %>%
     data.frame()
-  
+
   # kstats_plot <- dplyr::select(kstats, cutoff, Kappa, FPR) %>%
   #   gather(metric, value, -cutoff)
-  
+
   # ggplot(data = kstats, aes(x = FPR, y = TPR)) + # y = TPR or Kappa
   #   geom_line(color = "red") +
   #   geom_line(data = data.frame(x = c(0,1), y = c(0,1)),
@@ -55,12 +55,12 @@ for(j in seq_along(model_name)){
   #   theme_bw() +
   #   scale_x_continuous(breaks=seq(0,1,0.05)) +
   #   scale_y_continuous(breaks=seq(0,1,0.05))
-  
+
   all_kstats <- rbind(all_kstats, kstats)
-}    
+}
 
 
-ggplot(data = all_kstats, aes(x = FPR, y = TPR, 
+ggplot(data = all_kstats, aes(x = FPR, y = TPR,
                           group = model)) + # y = TPR or Kappa
   geom_line(aes(color = model)) +
   geom_line(data = data.frame(x = c(0,1), y = c(0,1), model = "Random"),
