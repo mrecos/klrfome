@@ -24,6 +24,15 @@ A model of Distribution Regression using Kernel Logistic Regression (KLR) on Mea
 
 ![](https://github.com/mrecos/DistRegLMERR/blob/master/analysis/images/KLR_map.jpg?raw=true)
 
+### Package
+
+This packaage contains the functions neccesary to compute Kernel Linear Regression (KLR) on mean kernel embeddings, functions for preparing site and background data, and a function for simulate archaeological site location data.
+
+
+*   build_K - Function takes list of traning data, scalar value for `sigma` hyperparameter, and a distance method to compute a mean embedding similarity kernel. This kernel is a pair-wise (N x N) matrix of the mean similarity between the attirbutes describing each site location and background group.
+*   KLR - Function takes the similarity kenrel matrix `K`, a vector of presence/absence coded as `1` ro `0`, and a scalar value for the `lambda` regularizing hyperparameter; optionally values for maximum iterations and threshold. This function performs Kernel Logistic Regression (KLR) via Iterative Reweighted Least Squares (IRLS). The objective is to approximate a set of parameters that minimize the negative likelihood of the parameters given the data and response. This function returns a list of `pred`, the estimated response (probability of site-presence) for the training data, and `alphas`, the approximated parameters from the IRLS algortithm.
+*   KLR_predict - Function takes a list of the training data, a list of the testing data, a vector of the approximated `alphas` parameters, a scalar value for the `sigma` kernel hyperparameter, and a distance method. This function predicts the probability of site presence for new oberservations based on the training data and `alphas` parameters. This is accomplished by building the `k*k` kernel matrix as the similarity between the training test data then computing the inverse logit of `k*k %*% alphas`. The output is the predicted probability of site presence for each traning data example.
+
 
 ### Citation
 
