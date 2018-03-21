@@ -1,46 +1,17 @@
-
-#' KRR_Logit
+#' KLR
 #'
-#' @param K - matrix
-#' @param y - vector
-#' @param lambda - scaler
-#'
-#' @return list: `pred` - predicted probabiity of positive class, `alphas` - estimated coefficients
-#' @export
-#'
-KRR_logit <- function(K,y, lambda){
-  #### Logistic KRR
-  if(is.vector(K)){
-    N = length(K)
-  } else if(is.matrix(K)){
-    N = nrow(K)
-  }
-  alpha = rep(1/N, N)
-  Kalpha = as.vector(K %*% alpha)
-  spec = 1 + exp(-Kalpha)
-  pi = 1 / spec
-  diagW = pi * (1 - pi)
-  e = (y - pi) / diagW
-  q = Kalpha + e
-  ident.N <- diag(rep(1,N))
-  theSol = solve(K + lambda * ident.N, q)
-  log_pred <- 1 / (1 + exp(-as.vector(K %*% theSol)))
-  return(list(pred = log_pred, alphas = theSol))
-}
-
-#' KRR_logit_optim
-#'
-#' @param K - matrix
-#' @param presence - vector
-#' @param lambda - scaler
-#' @param maxiter - integer
-#' @param tol - double
+#' @param K - [NxN] Mean embedding kernel matrix
+#' @param presence - [vector] or presence = 1 or absence = 0
+#' @param lambda - [scaler] Ridge regularization parameter
+#' @param maxiter - [integer] Maximum iterations for IRLS algorithm
+#' @param tol - [double] The convergence tolerance
+#' @param verbose - [scaler] 0 = No notice; 1 = Reports the number of steps until convergence; 2 = Reports each iteration
 #'
 #' @return list: `pred` - predicted probabiity of positive class, `alphas` - estimated coefficients
 #' @importFrom Matrix Diagonal
 #' @export
 #'
-KRR_logit_optim <- function(K, presence, lambda, maxiter = 100, tol = 0.01, verbose=1){
+KLR <- function(K, presence, lambda, maxiter = 100, tol = 0.01, verbose=1){
   # LOGISTIC - optimize alpha
   if(is.vector(K)){
     N = length(K)# NOT SURE IF THIS WORKS WITH REST OF FUNCTION
@@ -62,12 +33,12 @@ KRR_logit_optim <- function(K, presence, lambda, maxiter = 100, tol = 0.01, verb
     # same as: Zhu & Hastie (2002:19)
     # z = (K_a alpha(k−1) + W^−1(y − pi)) or (y-pi)/W
     # z = as.vector(K %*% alpha) + ((presence - pi) / diagW)
-    theSol = try(solve(K + lambda * Matrix::Diagonal(x=1/diagW), z))
-    if (class(theSol) == "try-error") {
+    alpha_new = try(solve(K + lambda * Matrix::Diagonal(x=1/diagW), z))
+    if (class(alpha_new) == "try-error") {
       cat("Error in calculating solution.","\n")
       break
     }
-    alphan = as.vector(theSol)
+    alphan = as.vector(alpha_new)
     if(verbose == 2){
       cat("Step ", iter, ". Change in alpha parameters = ",
           round(sum(abs(alphan - alpha)),4), "\n", sep = "")
@@ -88,8 +59,8 @@ KRR_logit_optim <- function(K, presence, lambda, maxiter = 100, tol = 0.01, verb
       iter = iter + 1
     }
   }
-  log_pred <-  1 / (1 + exp(-as.vector(K %*% theSol)))
-  return(list(pred = log_pred, alphas = theSol))
+  log_pred <-  1 / (1 + exp(-as.vector(K %*% alpha_new)))
+  return(list(pred = log_pred, alphas = alpha_new))
 }
 
 
