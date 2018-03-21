@@ -10,7 +10,7 @@ library("DistRegLMERR")
 
 #Parameters
 set.seed(sample(1:99999,1))
-sigma = 0.1
+sigma = 0.10
 lambda = 0.015
 
 ### Simulate Training Data
