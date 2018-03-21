@@ -69,7 +69,7 @@ method_object <- proxy::pr_DB$get_entry("Euclidean")
 K <- build_K(train_data, train_data, sigma, dist_method = method_object)
 diag(K) <- 1
 #### Train
-train_log_pred <- KRR_logit_optim(K, train_presence, lambda, 100, 0.001, verbose = 2)
+train_log_pred <- KLR(K, train_presence, lambda, 100, 0.001, verbose = 2)
 # train_log_pred <- KRR_logit(K, train_presence, lambda)
 alphas_pred   <- train_log_pred[["alphas"]]
 #### Predict

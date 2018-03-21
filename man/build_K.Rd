@@ -7,15 +7,15 @@
 build_K(y1, y2 = y1, sigma, progress = TRUE, dist_method)
 }
 \arguments{
-\item{y1}{- Matrix}
+\item{y1}{- [NxP] Matrix of data from bag i}
 
-\item{y2}{- Matrix}
+\item{y2}{- [NxP] Matrix of data from bag j}
 
-\item{sigma}{- scaler}
+\item{sigma}{- [scaler] smoothing hyperparameters for RBF kernel}
 
-\item{progress}{- logical}
+\item{progress}{- [logical] False = no progress bar; 1 = show progress bar}
 
-\item{dist_method}{- option passed to get_k for `dist_method`}
+\item{dist_method}{- [object] distance method from proxy package, e.g. proxy::pr_DB$get_entry("Euclidean")}
 }
 \value{
 - matrix K

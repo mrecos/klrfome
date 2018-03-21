@@ -18,8 +18,8 @@ sim_data <- get_sim_data(sites_var1_mean = 50, sites_var1_sd = 10,
                          sites_var2_mean = 3,   sites_var2_sd   = 2,
                          backg_var1_mean = 60, backg_var1_sd   = 12,
                          backg_var2_mean = 4,   backg_var2_sd   = 2.25,
-             site_samples    = 100,
-             N_site_bags     = 10,
+             site_samples    = 300,
+             N_site_bags     = 300,
              background_site_balance = 1,
              test_train_split = 0.50)
 
@@ -35,10 +35,10 @@ test_presence <- sim_data[["test_presence"]]
 method_object <- proxy::pr_DB$get_entry("Euclidean")
 K <- build_K(train_data, sigma = sigma, dist_method = method_object)
 #### Train
-train_log_pred <- KRR_logit_optim(K, train_presence, lambda, 100, 0.01)
+train_log_pred <- KLR(K, train_presence, lambda, 100, 0.01)
 alphas_pred   <- train_log_pred[["alphas"]]
 #### Predict
-test_log_pred <- KRR_logit_predict(test_data, train_data, alphas_pred, sigma, dist_method = method_object)
+test_log_pred <- KLR_predict(test_data, train_data, alphas_pred, sigma, dist_method = method_object)
 
 ##### Plots
 ## response of training data
