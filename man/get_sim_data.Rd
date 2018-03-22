@@ -7,7 +7,7 @@
 get_sim_data(site_samples, N_site_bags, sites_var1_mean = 50,
   sites_var1_sd = 10, sites_var2_mean = 3, sites_var2_sd = 2,
   backg_var1_mean = 100, backg_var1_sd = 20, backg_var2_mean = 6,
-  backg_var2_sd = 3, background_site_balance = 1, test_train_split = 0.75)
+  backg_var2_sd = 3, background_site_balance = 1)
 }
 \arguments{
 \item{site_samples}{- [scaler] Number of sites to include in simulated data}
@@ -31,8 +31,6 @@ get_sim_data(site_samples, N_site_bags, sites_var1_mean = 50,
 \item{backg_var2_sd}{- [scaler] sd of variable 2 for background}
 
 \item{background_site_balance}{- [scaler] Ratio of site to bacground groups}
-
-\item{test_train_split}{- [scaler] Percent of simulated sites in include in training set}
 }
 \value{
 - data.frame and list of simulated training and test set data
