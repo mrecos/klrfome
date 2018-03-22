@@ -26,9 +26,20 @@ A model of Distribution Regression using Kernel Logistic Regression (KLR) on Mea
 
 ![](https://github.com/mrecos/klrfome/blob/master/analysis/images/KLR_map.jpg?raw=true)
 
-### Package
+### Example
+
+```{r example1, eval = FALSE}
+# install.packages("devtools")
+devtools::install_github("mrecos/klrfome")
+```
+
+
+
+### Main Package Functions
 
 This package contains the functions necessary to compute Kernel Linear Regression (KLR) on mean kernel embeddings, functions for preparing site and background data, and a function for simulate archaeological site location data.
+
+#### Fitting and Predicting 
 
 
 *   `build_K` - Function takes list of training data, scalar value for `sigma` hyperparameter, and a distance method to compute a mean embedding similarity kernel. This kernel is a pair-wise (N x N) matrix of the mean similarity between the attributes describing each site location and background group.
@@ -36,9 +47,24 @@ This package contains the functions necessary to compute Kernel Linear Regressio
 *   `KLR_predict` - Function takes a list of the training data, a list of the testing data, a vector of the approximated `alphas` parameters, a scalar value for the `sigma` kernel hyperparameter, and a distance method. This function predicts the probability of site presence for new observations based on the training data and `alphas` parameters. This is accomplished by building the `k*k` kernel matrix as the similarity between the training test data then computing the inverse logit of `k*k %*% alphas`. The output is the predicted probability of site presence for each training data example.
 
 
+#### Data Formatting
+
 
 *   `format_site_data` - Function takes a `data.frame` of presence/background observations. The column `presence` indicated site presence of background as `1` or `0` respectively. The `SITENO` column indicates either a site identifier or `background`. The remaining columns should be measurements of environmental or cultural variables for modeling similarity. It is expected that each site will have multiple rows indicating multiple measurements of environmental variables from within the site boundary or land form. The function centers and scales the predictor variables, sub-samples the data into training and test sets, and re-formats the data as both tabular format and list format for both training and test data sets. Importantly, the function makes sure that no single site is in both the training and test set. No test sites are used to train the model. Also returned is the mean and standard deviation of the data so that new data can be center and scaled to the same parameters.
 *   `get_sim_data` - Function takes a mean and SD for two simulated predictor variables for each of sites and background. With archaeological site data being a protected data set in many settings (including this project), it cannot be freely shared. However, it is difficult to implement this model without properly format data. This function simulates archaeological site data and background environmental data for testing or tuning of this model. The concept of the function is to simulate two predictor variables for both sites and background. The inputs to the function (defaults provided) control how similar or different the site data is from the background. The model can be tested on simulated site data that is very similar to the background or very different; the model behaves accordingly.  The output of the function is formatted in the same way as the `format_site_data` function.
+
+
+#### Calculating Performance Metrics
+
+
+*   `metrics` -
+
+
+#### Plotting
+
+
+*   `K_corrplot` - 
+
 
 ### Citation
 

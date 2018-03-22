@@ -21,7 +21,7 @@ library("latex2exp")
 library("data.table")
 library("ggplot2")
 library("e1071")         # for SVM comparison
-library("DistRegLMERR")
+library("klrfome")
 
 #Parameters
 # set.seed(3849)
@@ -52,7 +52,8 @@ variables <- setdiff(colnames(dat1), c("presence", "SITENO"))
 dat1   <- data.frame(apply(dat1[, variables],2,scale))
 dat1   <- cbind(dat1, dat[,c("presence","SITENO")])
 ## Reduce number of sites to N_sites
-formatted_data <- format_site_data(dat1, N_sites, train_test_split, background_site_balance)
+formatted_data <- format_site_data(dat1, N_sites, train_test_split, background_site_balance,
+                                   sample_fraction = sample_fraction)
 train_data              <- formatted_data[["train_data"]]
 test_data               <- formatted_data[["test_data"]]
 train_presence          <- formatted_data[["train_presence"]]
