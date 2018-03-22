@@ -17,7 +17,9 @@
 #' @import dplyr
 #' @export
 #'
-get_sim_data <- function(sites_var1_mean = 50,
+get_sim_data <- function(site_samples,
+                         N_site_bags,
+                         sites_var1_mean = 50,
                          sites_var1_sd   = 10,
                          sites_var2_mean = 3,
                          sites_var2_sd   = 2,
@@ -25,8 +27,6 @@ get_sim_data <- function(sites_var1_mean = 50,
                          backg_var1_sd   = 20,
                          backg_var2_mean = 6,
                          backg_var2_sd   = 3,
-                         site_samples    = 400,
-                         N_site_bags     = 0,
                          background_site_balance = 1,
                          test_train_split = 0.75){
   if (!requireNamespace("dplyr", quietly = TRUE)) {
@@ -34,7 +34,7 @@ get_sim_data <- function(sites_var1_mean = 50,
          call. = FALSE)
   }
   back_samples <- site_samples*background_site_balance
-  N_site_bags <- site_samples/10
+  # N_site_bags <- site_samples/10
   sites <- data.frame(var1 = rnorm(site_samples,sites_var1_mean,sites_var1_sd),
                       var2 = rnorm(site_samples,sites_var2_mean,sites_var2_sd),
                       SITENO = "Site")

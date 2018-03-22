@@ -4,7 +4,8 @@
 \alias{format_site_data}
 \title{format_site_data}
 \usage{
-format_site_data(dat, N_sites, train_test_split, background_site_balance)
+format_site_data(dat, N_sites, train_test_split, background_site_balance,
+  sample_fraction)
 }
 \arguments{
 \item{dat}{- [data.frame] A data.frame of presence and absence records. Column "presence" must contain presence/absence as 1/0, and column "SITENO" contains the grouping variable.}

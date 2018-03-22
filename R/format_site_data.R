@@ -9,18 +9,19 @@
 #' @import dplyr
 #' @export
 #'
-format_site_data <- function(dat, N_sites, train_test_split, background_site_balance){
+format_site_data <- function(dat, N_sites, train_test_split, background_site_balance,
+                             sample_fraction){
   if (!requireNamespace("dplyr", quietly = TRUE)) {
     stop("dplyr needed for this function to work. Please install it.",
          call. = FALSE)
   }
-  variables <- setdiff(colnames(dat1), c("presence", "SITENO"))
-  means  <- sapply(dat1[variables], mean, na.rm=T)
-  sds    <- sapply(dat1[variables], sd, na.rm=T)
-  dat1   <- data.frame(apply(dat1[, variables],2,scale))  # should be scaled on only training data mean/sd
-  dat1   <- cbind(dat1, dat[,c("presence","SITENO")])
+  variables <- setdiff(colnames(dat), c("presence", "SITENO"))
+  means  <- sapply(dat[variables], mean, na.rm=T)
+  sds    <- sapply(dat[variables], sd, na.rm=T)
+  dat_c   <- data.frame(apply(dat[, variables],2,scale))  # should be scaled on only training data mean/sd
+  dat   <- cbind(dat_c, dat[,c("presence","SITENO")])
   ## Reduce number of sites to N_sites
-  sites <- filter(dat1, presence == 1)
+  sites <- filter(dat, presence == 1)
   site_names <- unique(sites$SITENO)
   N_sites_index <- sample(site_names, N_sites)
   sites <- filter(sites, SITENO %in% N_sites_index)
@@ -29,10 +30,10 @@ format_site_data <- function(dat, N_sites, train_test_split, background_site_bal
   train_sites <- filter(sites, SITENO %in% sites_train_index)
   test_sites  <- filter(sites, !SITENO %in% sites_train_index)
   ### Split Background Data
-  train_background <- filter(dat1, presence == 0) %>%
+  train_background <- filter(dat, presence == 0) %>%
     sample_n(nrow(train_sites) * background_site_balance, replace = TRUE) %>%
     mutate(presence = 0)
-  test_background <- filter(dat1, presence == 0) %>%
+  test_background <- filter(dat, presence == 0) %>%
     sample_n(nrow(test_sites) * background_site_balance, replace = TRUE) %>%
     mutate(presence = 0)
   ### Tablular data - REDUCE BY [sample_fraction]

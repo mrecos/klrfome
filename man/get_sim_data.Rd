@@ -4,13 +4,16 @@
 \alias{get_sim_data}
 \title{get_sim_data}
 \usage{
-get_sim_data(sites_var1_mean = 50, sites_var1_sd = 10,
-  sites_var2_mean = 3, sites_var2_sd = 2, backg_var1_mean = 100,
-  backg_var1_sd = 20, backg_var2_mean = 6, backg_var2_sd = 3,
-  site_samples = 400, N_site_bags = 0, background_site_balance = 1,
-  test_train_split = 0.75)
+get_sim_data(site_samples, N_site_bags, sites_var1_mean = 50,
+  sites_var1_sd = 10, sites_var2_mean = 3, sites_var2_sd = 2,
+  backg_var1_mean = 100, backg_var1_sd = 20, backg_var2_mean = 6,
+  backg_var2_sd = 3, background_site_balance = 1, test_train_split = 0.75)
 }
 \arguments{
+\item{site_samples}{- [scaler] Number of sites to include in simulated data}
+
+\item{N_site_bags}{- [scaler] Number of background groups to use in simulated data}
+
 \item{sites_var1_mean}{- [scaler] mean of variable 1 for sites}
 
 \item{sites_var1_sd}{- [scaler] sd of variable 1 for sites}
@@ -26,10 +29,6 @@ get_sim_data(sites_var1_mean = 50, sites_var1_sd = 10,
 \item{backg_var2_mean}{- [scaler] mean of variable 2 for background}
 
 \item{backg_var2_sd}{- [scaler] sd of variable 2 for background}
-
-\item{site_samples}{- [scaler] Number of sites to include in simulated data}
-
-\item{N_site_bags}{- [scaler] Number of background groups to use in simulated data}
 
 \item{background_site_balance}{- [scaler] Ratio of site to bacground groups}
 
