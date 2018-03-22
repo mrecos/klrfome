@@ -1,11 +1,11 @@
 #' cohens_kappa
 #'
-#' @param TP - scalar
-#' @param TN - scalar
-#' @param FP - scalar
-#' @param FN - scalar
+#' @param TP - [scalar] True Positives
+#' @param TN - [scalar] True Negatives
+#' @param FP - [scalar] False Positives
+#' @param FN - [scalar] False Negatives
 #'
-#' @return scalar k
+#' @return [scalar] Cohen's Kappa
 #'
 cohens_kappa <- function(TP,TN,FP,FN){
   A <- TP
@@ -22,11 +22,11 @@ cohens_kappa <- function(TP,TN,FP,FN){
 
 #' CI_metrics
 #'
-#' @param TP - scalar
-#' @param TN - scalar
-#' @param FP - scalar
-#' @param FN - scalar
-#' @param a - alpha level
+#' @param TP - [scalar] True Positives
+#' @param TN - [scalar] True Negatives
+#' @param FP - [scalar] False Positives
+#' @param FN - [scalar] False Negatives
+#' @param a - [scalar] alpha level
 #'
 #' @return list
 #'
@@ -50,8 +50,6 @@ CI_metrics <- function(TP,TN,FP,FN,a=0.05){
     CI_minus    = CI_minus,
     KG_plus     = 1-((1-Specificity)/CI_plus),
     KG_minus    = 1-((1-Specificity)/CI_minus),
-    Reach_plus  = 1-((1-CI_plus)/Specificity),
-    Reach_minus = 1-((1-CI_minus)/Specificity),
     Indicative_plus  = CI_plus-(1-Specificity),
     Indicative_minus = CI_minus-(1-Specificity)
   )
@@ -60,13 +58,13 @@ CI_metrics <- function(TP,TN,FP,FN,a=0.05){
 
 #' metrics
 #'
-#' @param TP - scalar
-#' @param TN - scalar
-#' @param FP - scalar
-#' @param FN - scalar
-#' @param a - alpha level
+#' @param TP - [scalar] True Positives
+#' @param TN - [scalar] True Negatives
+#' @param FP - [scalar] False Positives
+#' @param FN - [scalar] False Negatives
+#' @param a - [scalar] alpha level
 #'
-#' @return list - metrics
+#' @return [list] - list of all metrics
 #' @importFrom boot logit
 #' @export
 #'
@@ -80,7 +78,6 @@ metrics <- function(TP,TN,FP,FN){
          call. = FALSE)
   }
   # metrics derived from TP,TN,FP, and FN
-  ### "Summary" scores
   # Sens, Spec, Precision, Recall calculated here and reused below
   Sensitivity <- TP/(TP+FN) # TPR, Recall
   Specificity <- TN/(FP+TN) # TNR
@@ -101,6 +98,8 @@ metrics <- function(TP,TN,FP,FN){
     Recall      = Recall, # Sensitivity, TPR
     F_Measure   = (2*Precision*Recall)/(Precision+Recall),
     Geo_Mean    = sqrt(TP*TN),
+    MAE           = mean(abs(pred-obs)),
+    RMSE          = sqrt(mean((pred-obs)^2)),
     FPR         = 1 - Specificity, #Fall-Out
     FNR         = 1 - Sensitivity,
     TPR         = Sensitivity, # Sensitivity, Recall
@@ -114,14 +113,13 @@ metrics <- function(TP,TN,FP,FN){
     PPV         = TP/(TP+FP), # Precision
     NPV         = TN/(FN+TN),
     KG          = 1-((1-Specificity)/Sensitivity), # 1-(FPR/TPR)
-    KG2         = 1-(((TP+FP)/(TP+TN+FP+FN))/Sensitivity), # 1-(Pm/sens), correct way???, but double counts TP
+    KG2         = 1-(((TP+FP)/(TP+TN+FP+FN))/Sensitivity), # 1-(Pm/sens)
     DOR         = (Sensitivity/(1-Specificity)/((1-Sensitivity)/Specificity)), # LRP/LRN
     log_DOR     = log10((Sensitivity/(1-Specificity)/((1-Sensitivity)/Specificity))),
     # D & S - https://en.wikipedia.org/wiki/Diagnostic_odds_ratio
     D           = boot::logit(Sensitivity) - boot::logit(1-Specificity),
     S           = boot::logit(Sensitivity) + boot::logit(1-Specificity),
     Kappa       = cohens_kappa(TP,TN,FP,FN),
-    # Kappa agrees with http://terpconnect.umd.edu/~dchoy/thesis/Kappa/#
     # http://aircconline.com/ijdkp/V5N2/5215ijdkp01.pdf
     Opp_Precision = ((TP+TN)/(TP+TN+FP+FN))-(abs(Specificity-Sensitivity)/(Specificity+Sensitivity)),
     # https://en.wikipedia.org/wiki/Precision_and_recall
@@ -129,13 +127,6 @@ metrics <- function(TP,TN,FP,FN){
     Informedness  = Sensitivity+Specificity-1, #TSS, Younden's J
     Markedness    = (TP/(TP+FP))+(TN/(FN+TN))-1,
     # http://onlinelibrary.wiley.com/doi/10.1111/j.1365-2664.2006.01214.x/full
-    # TSS         = Sensitivity+Specificity-1 #Informedness
-    # TEST = 1-(FNR/Spec) or 1-(FNR/TNR)
-    # one minus % sites incorrect divided by % site not-likely background
-    # also, 1 minus (% misclassifications / % non-site area)
-    # Reach = TEST
-    Reach         = 1-((1-Sensitivity)/Specificity), # 1-(FNR/TNR)
-    Reach2        = 1-((1-Sensitivity)/((FN+TN)/(TP+TN+FP+FN))), # 1-(FNR/Pm`),
     ## From Verhagen(2007; 121)
     AFK           = suppressWarnings(sqrt(Sensitivity*((Sensitivity-(1-Specificity))/((TN+FP)/(TP+TN+FP+FN))))),
     Indicative      = Sensitivity/(1-Specificity),
@@ -150,9 +141,6 @@ metrics <- function(TP,TN,FP,FN){
     # Oehlert & Shea (2007)
     PPG           = (TP/(TP+FP))/((TP+FN)/(TP+TN+FP+FN)), # PPV/Prev or Prec/Prev or X1
     NPG           = (FN/(FN+TN))/((TP+FN)/(TP+TN+FP+FN)), # FOR/Prev or X2
-    # adding more
-    MAE           = mean(abs(pred-obs)),
-    RMSE          = sqrt(mean((pred-obs)^2)),
     # mean of KG+Reach = Balance
     Balance       = ((1-((1-Specificity)/Sensitivity))+
                        (1-((1-Sensitivity)/Specificity)))/2,
@@ -161,28 +149,3 @@ metrics <- function(TP,TN,FP,FN){
   )
   return(metrics)
 }
-
-# make_xstats <- function(results){
-#   if (!requireNamespace("pROC", quietly = TRUE)) {
-#     stop("pROC needed for this function to work. Please install it.",
-#          call. = FALSE)
-#   }
-#   if (!requireNamespace("dplyr", quietly = TRUE)) {
-#     stop("dplyr needed for this function to work. Please install it.",
-#          call. = FALSE)
-#   }
-#   xstats <- group_by(results, rep, model) %>%
-#     summarise(TP = sum(pred_cat == 1 & obs == 1, na.rm = TRUE),
-#               FP = sum(pred_cat == 1 & obs == 0, na.rm = TRUE),
-#               TN = sum(pred_cat == 0 & obs == 0, na.rm = TRUE),
-#               FN = sum(pred_cat == 0 & obs == 1, na.rm = TRUE),
-#               auc = pROC::auc(obs,pred, type = "linear")) %>%
-#     group_by(rep) %>%
-#     dplyr::mutate(Reach = get_metric(TP,TN,FP,FN,"Reach"),
-#                   KG = get_metric(TP,TN,FP,FN,"KG"),
-#                   Sensitivity = get_metric(TP,TN,FP,FN,"Sensitivity"),
-#                   `1-Specificity` = 1-get_metric(TP,TN,FP,FN,"Specificity"),
-#                   avg_metric = (KG + Reach)/2) %>%
-#     data.frame()
-#   return(xstats)
-# }

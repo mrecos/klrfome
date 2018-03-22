@@ -1,8 +1,8 @@
 #' K_corrplot
 #'
-#' @param K - Matrix
-#' @param train_data - data.frame
-#' @param clusters - integer
+#' @param [K] - Similarity Kernel Matrix
+#' @param [list] - training data
+#' @param [scalar] - clusters
 #'
 #' @return - a plot
 #' @export

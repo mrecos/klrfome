@@ -7,15 +7,15 @@
 CI_metrics(TP, TN, FP, FN, a = 0.05)
 }
 \arguments{
-\item{TP}{- scalar}
+\item{TP}{- [scalar] True Positives}
 
-\item{TN}{- scalar}
+\item{TN}{- [scalar] True Negatives}
 
-\item{FP}{- scalar}
+\item{FP}{- [scalar] False Positives}
 
-\item{FN}{- scalar}
+\item{FN}{- [scalar] False Negatives}
 
-\item{a}{- alpha level}
+\item{a}{- [scalar] alpha level}
 }
 \value{
 list

@@ -7,16 +7,16 @@
 cohens_kappa(TP, TN, FP, FN)
 }
 \arguments{
-\item{TP}{- scalar}
+\item{TP}{- [scalar] True Positives}
 
-\item{TN}{- scalar}
+\item{TN}{- [scalar] True Negatives}
 
-\item{FP}{- scalar}
+\item{FP}{- [scalar] False Positives}
 
-\item{FN}{- scalar}
+\item{FN}{- [scalar] False Negatives}
 }
 \value{
-scalar k
+[scalar] Cohen's Kappa
 }
 \description{
 cohens_kappa

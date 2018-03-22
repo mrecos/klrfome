@@ -7,11 +7,11 @@
 K_corrplot(K, train_data, clusters = 4)
 }
 \arguments{
-\item{K}{- Matrix}
+\item{[K]}{- Similarity Kernel Matrix}
 
-\item{train_data}{- data.frame}
+\item{[list]}{- training data}
 
-\item{clusters}{- integer}
+\item{[scalar]}{- clusters}
 }
 \value{
 - a plot
