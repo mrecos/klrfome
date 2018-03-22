@@ -1,14 +1,14 @@
-Package: DistRegLMERR
-Title: Logisitic Mean Embeddings Ridge Regression (LMERR) for the Distribution Regression problem.
+Package: klrfome
+Title: Kernel Logistic Regression with Focal Mean Embeddings
 Version: 0.0.0.9000
 Authors@R: person("Matthew", "Harris", email = "mr.ecos@gmail.com", role = c("aut", "cre"))
-Description: Implementation of Logisitic Mean Embeddings Ridge Regression (LMERR) for the Distribution Regression problem.
+Description: Implementation of Kernel Logistic Regression on Focal Mean Embeddings for archaeological site location sensitivity modeling.
 Depends: R (>= 3.4.0)
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-URL: https://github.com/mrecos/DistRegLMERR
-BugReports: https://github.com/mrecos/DistRegLMERR/issues
+URL: https://github.com/mrecos/klrfome
+BugReports: https://github.com/mrecos/klrfome/issues
 Imports: 
   proxy,
   Matrix

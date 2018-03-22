@@ -66,7 +66,6 @@ predicted_log <- data.frame(pred = test_log_pred,
                             obs = test_presence)
 # group_by(predicted_log, obs) %>%
 #   summarize(mean_pred = mean(pred))
-subtitle <- TeX('$1/(1 + exp(-\\frac{1}{n}\\sum{n}^{i=1}(K_g(x,x`)) + \\lambda ||f||^2_H))\n;\n K_g(x,x`) = K(\\mu_x,\\mu_{x`})$')
 ggplot(predicted_log, aes(x = as.factor(obs), y = pred,
                           color = as.factor(obs))) +
   geom_jitter(width = 0.2) +
@@ -76,7 +75,7 @@ ggplot(predicted_log, aes(x = as.factor(obs), y = pred,
   labs(y = "Predicted Probability",
        x = "Site Presence",
        title = "Mean Embedding Logistic Kernel Ridge Regression",
-       subtitle = subtitle) +
+       subtitle = "") +
   theme(
     legend.position = "none",
     text=element_text(family="Trebuchet MS", size = 10),
