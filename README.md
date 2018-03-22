@@ -1,6 +1,8 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.888409.svg)](https://doi.org/10.5281/zenodo.888409) [![Build Status](https://travis-ci.org/mrecos/DistRegLMERR.svg?branch=master)](https://travis-ci.org/mrecos/DistRegLMERR)
 
+![](https://github.com/mrecos/klrfome/blob/master/klrfoam_hex.png?raw=true)
+
 PRE-RELEASE
 ===========
 
