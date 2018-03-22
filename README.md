@@ -4,7 +4,7 @@
 PRE-RELEASE
 ===========
 
-KLRFoME - Kernel Logistic Regression with Focal Mean Embeddings
+klrfome - Kernel Logistic Regression with Focal Mean Embeddings
 ---------------------------------------------------------------
 
 ### SAA 2018 Abstract
@@ -30,7 +30,7 @@ This package contains the functions necessary to compute Kernel Linear Regressio
 
 Please cite this compendium as:
 
-> Harris, Matthew D., (2017). *Distribution Regression with Kernel Logistic Regression on Mean Embeddings*. Accessed 10 Sep 2017. Online at <https://doi.org/10.5281/zenodo.888409>
+> Harris, Matthew D., (2017). *klrfome - Kernel Logistic Regression with Focal Mean Embeddings*. Accessed 10 Sep 2017. Online at <https://doi.org/10.5281/zenodo.888409>
 
 ### Installation
 
