@@ -4,8 +4,8 @@
 PRE-RELEASE
 ===========
 
-DistRegLMERR - Distribution Regression with Kernel Logistic Regression on Mean Embeddings.
-------------------------------------------------------------------------------------------
+KLR-FoME - Kernel Logistic Regression with Focal Mean Embeddings
+----------------------------------------------------------------
 
 ### SAA 2018 Abstract
 
@@ -13,7 +13,7 @@ A model of Distribution Regression using Kernel Logistic Regression (KLR) on Mea
 
 -   Note: Changes from original abstract; 1) change of terms to Kernel Logistic Regression (KLR); and 2) deemphasized Bayesian approach as it is a work in progress. The repo contains working Stan code for probabilistic models, but they are not ready for prime-time.
 
-![](https://github.com/mrecos/DistRegLMERR/blob/master/analysis/images/KLR_map.jpg?raw=true)
+![](https://github.com/mrecos/klr-fome/blob/master/analysis/images/KLR_map.jpg?raw=true)
 
 ### Package
 
