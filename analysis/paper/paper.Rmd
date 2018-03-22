@@ -31,12 +31,12 @@ knitr::opts_chunk$set(
   fig.path = "../figures/"
 )
 
-library(DistRegLMERR)
+library(klrfome)
 ```
 
 # Introduction
 
-Here is a citation [@Marwick2017]
+> Harris, Matthew D., (2017). *klrfome - Kernel Logistic Regression with Focal Mean Embeddings*. Accessed 10 Sep 2017. Online at <https://doi.org/10.5281/zenodo.888409>
 
 # Background
 

@@ -38,7 +38,7 @@ You can install DistRegLMERR from github with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("mrecos/DistRegLMERR")
+devtools::install_github("mrecos/klrfome")
 ```
 
 ### Licenses
