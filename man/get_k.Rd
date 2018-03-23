@@ -4,7 +4,7 @@
 \alias{get_k}
 \title{get_k}
 \usage{
-get_k(y1, y2, sigma, dist_method = dist_method)
+get_k(y1, y2, sigma)
 }
 \arguments{
 \item{y1}{- [NxP] Matrix of data from bag i}
@@ -12,8 +12,6 @@ get_k(y1, y2, sigma, dist_method = dist_method)
 \item{y2}{- [NxP] Matrix of data from bag j}
 
 \item{sigma}{- [scaler] smoothing hyperparameters for RBF kernel}
-
-\item{dist_method}{- [object] distance method from proxy package, e.g. proxy::pr_DB$get_entry("Euclidean")}
 }
 \value{
 Matrix G

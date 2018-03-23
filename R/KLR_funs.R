@@ -69,15 +69,15 @@ KLR <- function(K, presence, lambda, maxiter = 100, tol = 0.01, verbose=1){
 #' @param y1 - [NxP] Matrix of data from bag i
 #' @param y2 - [NxP] Matrix of data from bag j
 #' @param sigma - [scaler] smoothing hyperparameters for RBF kernel
-#' @param dist_method - [object] distance method from proxy package, e.g. proxy::pr_DB$get_entry("Euclidean")
 #'
 #' @return Matrix G
-#' @importFrom proxy dist
+#' @importFrom rdist cdist
 #' @export
 #'
-get_k <- function(y1,y2,sigma, dist_method = dist_method){
-  g = proxy::dist(as.matrix(y1),as.matrix(y2), method = dist_method,
-                  by_rows = TRUE, auto_convert_data_frames = FALSE) # speed bottle neck according to profvis
+get_k <- function(y1,y2,sigma){
+  # g = proxy::dist(as.matrix(y1),as.matrix(y2), method = dist_method,
+  #                 by_rows = TRUE, auto_convert_data_frames = FALSE) # speed bottle neck according to profvis
+  g = rdist::cdist(as.matrix(y1),as.matrix(y2), metric="euclidean")
   ## my version
   g = exp(-g^2/(2*sigma^2)) # equal to exp(-sigma2*g^2) ; sigma2 = 1/(2*sigma^2)
   # g = exp(-(1/(2*sigma^2))*g^2) # equal to exp(-g^2/(2*sigma^2))
@@ -91,12 +91,11 @@ get_k <- function(y1,y2,sigma, dist_method = dist_method){
 #' @param y2 - [NxP] Matrix of data from bag j
 #' @param sigma - [scaler] smoothing hyperparameters for RBF kernel
 #' @param progress - [logical] False = no progress bar; 1 = show progress bar
-#' @param dist_method - [object] distance method from proxy package, e.g. proxy::pr_DB$get_entry("Euclidean")
 #'
 #' @return - matrix K
 #' @export
 #'
-build_K <- function(y1,y2=y1,sigma, progress = TRUE, dist_method){
+build_K <- function(y1,y2=y1,sigma, progress = TRUE){
   # example: K <- build_K(x_data_norm, x_data_norm, sigma)
   K <- matrix(nrow = length(y1), ncol = length(y2))
   if(isTRUE(progress)){
@@ -107,7 +106,7 @@ build_K <- function(y1,y2=y1,sigma, progress = TRUE, dist_method){
   for(i in 1:length(y1)){
     for(j in i:length(y2)){  ## index to i so that only does upper triangle (only for square matrix!)
       # print(paste0(i, " : ", j))
-      g <- get_k(y1[[i]], y2[[j]], sigma, dist_method)
+      g <- get_k(y1[[i]], y2[[j]], sigma)
       k <- round(mean(g, na.rm = TRUE),3)
       K[i,j] <- k
       if(isTRUE(progress)){setTxtProgressBar(pb, iter)}
@@ -139,12 +138,11 @@ tri_swap <- function(m) {
 #' @param alphas_pred - [vector] Numeric vector of alpha parameters from KLR function
 #' @param sigma - [scaler] Smoothing parameter for RBF kernel
 #' @param progress - [logical] False = no progress bar; 1 = show progress bar
-#' @param dist_method - [object] distance method from proxy package, e.g. proxy::pr_DB$get_entry("Euclidean")
 #'
 #' @return - [vector] - predicted probabiity of positive class
 #' @export
 #'
-KLR_predict <- function(test_data, train_data, alphas_pred, sigma, dist_method = dist_method, progress = TRUE){
+KLR_predict <- function(test_data, train_data, alphas_pred, sigma, progress = TRUE){
   kstark <- matrix(nrow = length(test_data), ncol = length(train_data))
   if(isTRUE(progress)){
     total_iter <- length(test_data) * length(train_data)
@@ -154,7 +152,7 @@ KLR_predict <- function(test_data, train_data, alphas_pred, sigma, dist_method =
   for(j in 1:length(test_data)){
     for(i in 1:length(train_data)){
       g_i <- get_k(train_data[[i]],
-                   test_data[[j]], sigma, dist_method)
+                   test_data[[j]], sigma)
       k_i <- round(mean(g_i, na.rm = TRUE),3)
       kstark[j,i] <- k_i
       if(isTRUE(progress)){setTxtProgressBar(pb, iter)}

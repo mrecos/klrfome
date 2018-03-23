@@ -4,8 +4,7 @@
 \alias{KLR_predict}
 \title{KLR_predict}
 \usage{
-KLR_predict(test_data, train_data, alphas_pred, sigma,
-  dist_method = dist_method, progress = TRUE)
+KLR_predict(test_data, train_data, alphas_pred, sigma, progress = TRUE)
 }
 \arguments{
 \item{test_data}{- [list] Training data used to create similarity kernel matrix}
@@ -15,8 +14,6 @@ KLR_predict(test_data, train_data, alphas_pred, sigma,
 \item{alphas_pred}{- [vector] Numeric vector of alpha parameters from KLR function}
 
 \item{sigma}{- [scaler] Smoothing parameter for RBF kernel}
-
-\item{dist_method}{- [object] distance method from proxy package, e.g. proxy::pr_DB$get_entry("Euclidean")}
 
 \item{progress}{- [logical] False = no progress bar; 1 = show progress bar}
 }

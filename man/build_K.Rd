@@ -4,7 +4,7 @@
 \alias{build_K}
 \title{build_k}
 \usage{
-build_K(y1, y2 = y1, sigma, progress = TRUE, dist_method)
+build_K(y1, y2 = y1, sigma, progress = TRUE)
 }
 \arguments{
 \item{y1}{- [NxP] Matrix of data from bag i}
@@ -14,8 +14,6 @@ build_K(y1, y2 = y1, sigma, progress = TRUE, dist_method)
 \item{sigma}{- [scaler] smoothing hyperparameters for RBF kernel}
 
 \item{progress}{- [logical] False = no progress bar; 1 = show progress bar}
-
-\item{dist_method}{- [object] distance method from proxy package, e.g. proxy::pr_DB$get_entry("Euclidean")}
 }
 \value{
 - matrix K

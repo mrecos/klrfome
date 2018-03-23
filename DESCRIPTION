@@ -10,7 +10,7 @@ LazyData: true
 URL: https://github.com/mrecos/klrfome
 BugReports: https://github.com/mrecos/klrfome/issues
 Imports: 
-  proxy,
+  rdist,
   Matrix
 Suggests:
   boot,

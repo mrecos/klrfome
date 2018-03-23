@@ -1,6 +1,3 @@
-############### Logistic Mean Embedding KRR (and non-Logistic)
-### Full process example with simulated data
-
 library("dplyr")
 library("corrplot")
 library("ggplot2")
@@ -22,13 +19,12 @@ test_presence <- formatted_data[["test_presence"]]
 
 ##### Logistic Mean Embedding KRR Model
 #### Build Kernel Matrix
-method_object <- proxy::pr_DB$get_entry("Euclidean")
-K <- build_K(train_data, sigma = sigma, dist_method = method_object)
+K <- build_K(train_data, sigma = sigma)
 #### Train
 train_log_pred <- KLR(K, train_presence, lambda, 100, 0.01)
 alphas_pred   <- train_log_pred[["alphas"]]
 #### Predict
-test_log_pred <- KLR_predict(test_data, train_data, alphas_pred, sigma, dist_method = method_object)
+test_log_pred <- KLR_predict(test_data, train_data, alphas_pred, sigma)
 
 ### Plot K Matrix
 K_corrplot(K,train_data,clusters=4)

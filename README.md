@@ -27,6 +27,7 @@ library("klrfome")
 ```
 
 ``` r
+
 #Parameters
 set.seed(31337)
 sigma = 0.5
@@ -41,16 +42,14 @@ train_presence <- formatted_data[["train_presence"]]
 test_data <- formatted_data[["test_data"]]
 test_presence <- formatted_data[["test_presence"]]
 
-##### Kernel Logistic Regression on Mean Embeddings Model
+##### Logistic Mean Embedding KRR Model
 #### Build Kernel Matrix
-method_object <- proxy::pr_DB$get_entry("Euclidean")
-K <- build_K(train_data, sigma = sigma, dist_method = method_object, progress = FALSE)
+K <- build_K(train_data, sigma = sigma, progress = FALSE)
 #### Train
-train_log_pred <- KLR(K, train_presence, lambda, 100, 0.01)
+train_log_pred <- KLR(K, train_presence, lambda)
 #> Found solution in 4 steps.
 #### Predict
-test_log_pred <- KLR_predict(test_data, train_data, train_log_pred[["alphas"]], 
-                             sigma, dist_method = method_object, progress = FALSE)
+test_log_pred <- KLR_predict(test_data, train_data, train_log_pred[["alphas"]], sigma, progress = FALSE)
 
 ### Plot K Matrix
 K_corrplot(K,train_data,clusters=4)
@@ -67,7 +66,7 @@ ggplot(predicted_log, aes(x = as.factor(obs), y = pred, color = as.factor(obs)))
   theme_bw() +
   ylim(c(0,1)) +
   labs(y = "Predicted Probability", x = "Site Presence",
-       title = "Kernel Logistic Regression on Mean Embeddings",
+       title = "Kernel Logistic Regression",
        subtitle = "test set predictions; simulated data") +
   theme(
     legend.position = "none"
