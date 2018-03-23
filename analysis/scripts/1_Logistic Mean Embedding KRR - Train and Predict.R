@@ -12,7 +12,7 @@ sigma = 0.5
 lambda = 0.1
 
 ### Simulate Training Data
-sim_data <- get_sim_data2(site_samples = 500, N_site_bags = 50)
+sim_data <- get_sim_data(site_samples = 800, N_site_bags = 75)
 formatted_data <- format_site_data(sim_data, N_sites=10, train_test_split=0.8, 
                                    sample_fraction = 0.9, background_site_balance=1)
 train_data <- formatted_data[["train_data"]] 
@@ -34,19 +34,14 @@ test_log_pred <- KLR_predict(test_data, train_data, alphas_pred, sigma, dist_met
 K_corrplot(K,train_data,clusters=4)
 
 ### Plot Prediction
-predicted_log <- data.frame(pred = test_log_pred,
-                            obs = test_presence)
-ggplot(predicted_log, aes(x = as.factor(obs), y = pred,
-                          color = as.factor(obs))) +
-  geom_jitter(width = 0.2) +
-  scale_color_manual(values=c("blue","orange")) +
+predicted_log <- data.frame(pred = test_log_pred, obs = test_presence)
+ggplot(predicted_log, aes(x = as.factor(obs), y = pred, color = as.factor(obs))) +
+  geom_jitter(width = 0.1) +
   theme_bw() +
   ylim(c(0,1)) +
-  labs(y = "Predicted Probability",
-       x = "Site Presence",
-       title = "Mean Embedding Logistic Kernel Ridge Regression",
-       subtitle = "") +
+  labs(y = "Predicted Probability", x = "Site Presence",
+       title = "Kernel Logistic Regression",
+       subtitle = "test set predictions; simulated data") +
   theme(
-    legend.position = "none",
-    plot.title = element_text(size = 12)
+    legend.position = "none"
   )
