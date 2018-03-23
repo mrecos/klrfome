@@ -9,8 +9,7 @@
 #' @import dplyr
 #' @export
 #'
-format_site_data <- function(dat, N_sites, train_test_split, background_site_balance,
-                             sample_fraction){
+format_site_data <- function(dat, N_sites, train_test_split, background_site_balance, sample_fraction){
   if (!requireNamespace("dplyr", quietly = TRUE)) {
     stop("dplyr needed for this function to work. Please install it.",
          call. = FALSE)
@@ -20,6 +19,7 @@ format_site_data <- function(dat, N_sites, train_test_split, background_site_bal
   sds    <- sapply(dat[variables], sd, na.rm=T)
   dat_c   <- data.frame(apply(dat[, variables],2,scale))  # should be scaled on only training data mean/sd
   dat   <- cbind(dat_c, dat[,c("presence","SITENO")])
+  N_back_bags <- N_sites * background_site_balance
   ## Reduce number of sites to N_sites
   sites <- filter(dat, presence == 1)
   site_names <- unique(sites$SITENO)
