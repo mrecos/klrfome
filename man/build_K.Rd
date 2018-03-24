@@ -4,7 +4,7 @@
 \alias{build_K}
 \title{build_k}
 \usage{
-build_K(y1, y2 = y1, sigma, progress = TRUE)
+build_K(y1, y2 = y1, sigma, progress = TRUE, dist_metric = "euclidean")
 }
 \arguments{
 \item{y1}{- [NxP] Matrix of data from bag i}
@@ -14,6 +14,8 @@ build_K(y1, y2 = y1, sigma, progress = TRUE)
 \item{sigma}{- [scaler] smoothing hyperparameters for RBF kernel}
 
 \item{progress}{- [logical] False = no progress bar; 1 = show progress bar}
+
+\item{dist_metric}{[character] One of the distance methods from rdist::cdist. Default = "euclidean". see ?rdist::cdist}
 }
 \value{
 - matrix K

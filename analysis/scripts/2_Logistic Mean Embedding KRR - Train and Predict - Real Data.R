@@ -25,15 +25,15 @@ library("klrfome")
 
 #Parameters
 # set.seed(3849)
-sigma = 10
+sigma = 1
 lambda = 0.11
 
 ### Data parameters
-N_back_bags = 50 # need to figure out better way to measure this
-N_sites     = 50
+N_back_bags = 10 # need to figure out better way to measure this
+N_sites     = 10
 background_site_balance = 1
-sample_fraction = 0.50
-train_test_split = 0.90
+sample_fraction = 0.25
+train_test_split = 0.80
 confusion_matrix_cutoff = 0.5
 # data_location = "data/r91_all_upland_section_6_regression_data_SITENO.csv"
 # data_location = "/Users/mattharris/Dropbox/R/PASS_regression/r91_all_upland_section_12_regression_data_SITENO.csv"
@@ -66,20 +66,16 @@ tbl_test_presence       <- formatted_data[["tbl_test_presence"]]
 
 ## Logistic Mean Embedding KRR Model
 #### Build Kernel Matrix
-method_object <- proxy::pr_DB$get_entry("Euclidean")
-K <- build_K(train_data, train_data, sigma, dist_method = method_object)
+K <- build_K(train_data, train_data, sigma)
 diag(K) <- 1
 #### Train
 train_log_pred <- KLR(K, train_presence, lambda, 100, 0.001, verbose = 2)
-# train_log_pred <- KRR_logit(K, train_presence, lambda)
-alphas_pred   <- train_log_pred[["alphas"]]
 #### Predict
-test_log_pred <- KRR_logit_predict(test_data, train_data, alphas_pred, sigma, dist_method = method_object)
+test_log_pred <- KLR_predict(test_data, train_data, train_log_pred[["alphas"]], sigma)
 
 ### Performance data frames
 train_log_pred_plot <- data.frame(pred = train_log_pred[["pred"]],
                                   obs = train_presence)
-
 predicted_log <- data.frame(pred = test_log_pred,
                             obs = test_presence,
                             pred_cat = ifelse(test_log_pred >= confusion_matrix_cutoff,1,0))
@@ -111,7 +107,7 @@ predicted_svm <- data.frame(pred = svm_pred,
                             obs = tbl_test_presence,
                             pred_cat = ifelse(svm_pred >= confusion_matrix_cutoff,1,0))
 ### LR Performance Metrics
-group_by(predicted_vsm, obs) %>%
+group_by(predicted_svm, obs) %>%
   summarize(mean_pred = mean(pred))
 # x <- confusionMatrix(predicted_lr$pred_cat, predicted_lr$obs, positive = "1")
 svm_metrics <- get_metrics(predicted_svm)
@@ -131,35 +127,17 @@ data.frame(metric = c("Informedness", "Sensitivity", "1-Specificity"),
 # corrplot::corrplot(K,tl.cex = 0.5, tl.col = "black",
 #                    order="hclust", col=col3(10), cl.lim=c(0,1),
 #                    addrect = 6)
-# ### Plot Fit
-# ggplot(train_log_pred_plot, aes(x = obs, y = pred)) +
-#   geom_jitter(width=0.05) +
-#   theme_bw() +
-#   ylim(c(0,1))
-### Plot Prediction
-subtitle <- TeX('$1/(1 + exp(-\\frac{1}{n}\\sum{n}^{i=1}(K_g(x,x`)) + \\lambda ||f||^2_H))\n;\n K_g(x,x`) = K(\\mu_x,\\mu_{x`})$')
-ggplot(predicted_log, aes(y = as.factor(obs), x = pred,
-                          color = as.factor(obs))) +
-  geom_point(alpha = 0.5, position = position_jitter(w = 0, h = 0.3)) +
-  scale_color_manual(values=c("blue","orange")) +
+
+ggplot(predicted_log, aes(x = as.factor(obs), y = pred, color = as.factor(obs))) +
+  geom_jitter(width = 0.1) +
   theme_bw() +
-  xlim(c(0,1)) +
-  # labs(y = "Predicted Probability",
-  #      x = "Site Presence",
-  #      title = "Mean Embedding Logistic Kernel Ridge Regression",
-  #      subtitle = subtitle) +
+  ylim(c(0,1)) +
+  labs(y = "Predicted Probability", x = "Site Presence",
+       title = "Kernel Logistic Regression",
+       subtitle = "test set predictions; simulated data") +
   theme(
-    legend.position = "none",
-    text=element_text(family="Trebuchet MS", size = 10),
-    plot.title = element_text(size = 12, family = "TrebuchetMS-Bold")
+    legend.position = "none"
   )
-
-inf_plot(predicted_log$pred, predicted_log$obs, threshold = 0.5)
-
-
-# d(x,y) = sqrt(K(x,x)  + K(y,y) - 2K(x,y))
-
-
 
 
 

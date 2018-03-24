@@ -4,7 +4,7 @@
 \alias{get_k}
 \title{get_k}
 \usage{
-get_k(y1, y2, sigma)
+get_k(y1, y2, sigma, dist_metric = "euclidean")
 }
 \arguments{
 \item{y1}{- [NxP] Matrix of data from bag i}
@@ -12,6 +12,8 @@ get_k(y1, y2, sigma)
 \item{y2}{- [NxP] Matrix of data from bag j}
 
 \item{sigma}{- [scaler] smoothing hyperparameters for RBF kernel}
+
+\item{dist_metric}{[character] One of the distance methods from rdist::cdist. Default = "euclidean". see ?rdist::cdist}
 }
 \value{
 Matrix G

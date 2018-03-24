@@ -4,7 +4,8 @@
 \alias{KLR_predict}
 \title{KLR_predict}
 \usage{
-KLR_predict(test_data, train_data, alphas_pred, sigma, progress = TRUE)
+KLR_predict(test_data, train_data, alphas_pred, sigma, progress = TRUE,
+  dist_metric = "euclidean")
 }
 \arguments{
 \item{test_data}{- [list] Training data used to create similarity kernel matrix}
@@ -16,6 +17,8 @@ KLR_predict(test_data, train_data, alphas_pred, sigma, progress = TRUE)
 \item{sigma}{- [scaler] Smoothing parameter for RBF kernel}
 
 \item{progress}{- [logical] False = no progress bar; 1 = show progress bar}
+
+\item{dist_metric}{[character] One of the distance methods from rdist::cdist. Default = "euclidean". see ?rdist::cdist}
 }
 \value{
 - [vector] - predicted probabiity of positive class

@@ -69,16 +69,14 @@ KLR <- function(K, presence, lambda, maxiter = 100, tol = 0.01, verbose=1){
 #' @param y1 - [NxP] Matrix of data from bag i
 #' @param y2 - [NxP] Matrix of data from bag j
 #' @param sigma - [scaler] smoothing hyperparameters for RBF kernel
+#' @param dist_metric [character] One of the distance methods from rdist::cdist. Default = "euclidean". see ?rdist::cdist
 #'
 #' @return Matrix G
 #' @importFrom rdist cdist
 #' @export
 #'
-get_k <- function(y1,y2,sigma){
-  # g = proxy::dist(as.matrix(y1),as.matrix(y2), method = dist_method,
-  #                 by_rows = TRUE, auto_convert_data_frames = FALSE) # speed bottle neck according to profvis
-  g = rdist::cdist(as.matrix(y1),as.matrix(y2), metric="euclidean")
-  ## my version
+get_k <- function(y1,y2,sigma, dist_metric = "euclidean"){
+  g = rdist::cdist(as.matrix(y1),as.matrix(y2), metric=dist_metric)
   g = exp(-g^2/(2*sigma^2)) # equal to exp(-sigma2*g^2) ; sigma2 = 1/(2*sigma^2)
   # g = exp(-(1/(2*sigma^2))*g^2) # equal to exp(-g^2/(2*sigma^2))
   return(g)
@@ -91,11 +89,12 @@ get_k <- function(y1,y2,sigma){
 #' @param y2 - [NxP] Matrix of data from bag j
 #' @param sigma - [scaler] smoothing hyperparameters for RBF kernel
 #' @param progress - [logical] False = no progress bar; 1 = show progress bar
+#' @param dist_metric [character] One of the distance methods from rdist::cdist. Default = "euclidean". see ?rdist::cdist
 #'
 #' @return - matrix K
 #' @export
 #'
-build_K <- function(y1,y2=y1,sigma, progress = TRUE){
+build_K <- function(y1, y2=y1, sigma, progress = TRUE, dist_metric = "euclidean"){
   # example: K <- build_K(x_data_norm, x_data_norm, sigma)
   K <- matrix(nrow = length(y1), ncol = length(y2))
   if(isTRUE(progress)){
@@ -106,7 +105,7 @@ build_K <- function(y1,y2=y1,sigma, progress = TRUE){
   for(i in 1:length(y1)){
     for(j in i:length(y2)){  ## index to i so that only does upper triangle (only for square matrix!)
       # print(paste0(i, " : ", j))
-      g <- get_k(y1[[i]], y2[[j]], sigma)
+      g <- get_k(y1[[i]], y2[[j]], sigma, dist_metric = dist_metric)
       k <- round(mean(g, na.rm = TRUE),3)
       K[i,j] <- k
       if(isTRUE(progress)){setTxtProgressBar(pb, iter)}
@@ -138,11 +137,12 @@ tri_swap <- function(m) {
 #' @param alphas_pred - [vector] Numeric vector of alpha parameters from KLR function
 #' @param sigma - [scaler] Smoothing parameter for RBF kernel
 #' @param progress - [logical] False = no progress bar; 1 = show progress bar
+#' @param dist_metric [character] One of the distance methods from rdist::cdist. Default = "euclidean". see ?rdist::cdist
 #'
 #' @return - [vector] - predicted probabiity of positive class
 #' @export
 #'
-KLR_predict <- function(test_data, train_data, alphas_pred, sigma, progress = TRUE){
+KLR_predict <- function(test_data, train_data, alphas_pred, sigma, progress = TRUE, dist_metric = "euclidean"){
   kstark <- matrix(nrow = length(test_data), ncol = length(train_data))
   if(isTRUE(progress)){
     total_iter <- length(test_data) * length(train_data)
@@ -152,7 +152,7 @@ KLR_predict <- function(test_data, train_data, alphas_pred, sigma, progress = TR
   for(j in 1:length(test_data)){
     for(i in 1:length(train_data)){
       g_i <- get_k(train_data[[i]],
-                   test_data[[j]], sigma)
+                   test_data[[j]], sigma, dist_metric = dist_metric)
       k_i <- round(mean(g_i, na.rm = TRUE),3)
       kstark[j,i] <- k_i
       if(isTRUE(progress)){setTxtProgressBar(pb, iter)}
