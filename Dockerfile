@@ -17,6 +17,7 @@ RUN . /etc/environment \
   # build this compendium package
   && R -e "install.packages('corrplot')"\
   && R -e "install.packages('dplyr')"\
+  && R -e "install.packages('rdist')"\
   && R -e "install.packages('boot')"\
   && R -e "install.packages('pROC')"\
   && R -e "devtools::install('/klrfome', dep=TRUE)" \
