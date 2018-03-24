@@ -27,12 +27,13 @@ library("klrfome")
 # set.seed(3849)
 sigma = 1
 lambda = 0.11
+dist_metric = "euclidean"
 
 ### Data parameters
-N_back_bags = 10 # need to figure out better way to measure this
-N_sites     = 10
+N_back_bags = 50 # need to figure out better way to measure this
+N_sites     = 50
 background_site_balance = 1
-sample_fraction = 0.25
+sample_fraction = 0.5
 train_test_split = 0.80
 confusion_matrix_cutoff = 0.5
 # data_location = "data/r91_all_upland_section_6_regression_data_SITENO.csv"
@@ -66,12 +67,13 @@ tbl_test_presence       <- formatted_data[["tbl_test_presence"]]
 
 ## Logistic Mean Embedding KRR Model
 #### Build Kernel Matrix
-K <- build_K(train_data, train_data, sigma)
+K <- build_K(train_data, train_data, sigma, dist_metric = dist_metric)
 diag(K) <- 1
 #### Train
 train_log_pred <- KLR(K, train_presence, lambda, 100, 0.001, verbose = 2)
 #### Predict
-test_log_pred <- KLR_predict(test_data, train_data, train_log_pred[["alphas"]], sigma)
+test_log_pred <- KLR_predict(test_data, train_data, train_log_pred[["alphas"]], 
+                             sigma, dist_metric = dist_metric)
 
 ### Performance data frames
 train_log_pred_plot <- data.frame(pred = train_log_pred[["pred"]],
@@ -129,7 +131,7 @@ data.frame(metric = c("Informedness", "Sensitivity", "1-Specificity"),
 #                    addrect = 6)
 
 ggplot(predicted_log, aes(x = as.factor(obs), y = pred, color = as.factor(obs))) +
-  geom_jitter(width = 0.1) +
+  geom_jitter(width = 0.1, alpha = 0.15) +
   theme_bw() +
   ylim(c(0,1)) +
   labs(y = "Predicted Probability", x = "Site Presence",
