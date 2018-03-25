@@ -47,8 +47,7 @@ test_presence <- formatted_data[["test_presence"]]
 #### Build Kernel Matrix
 K <- build_K(train_data, sigma = sigma, dist_metric = dist_metric, progress = FALSE)
 #### Train
-train_log_pred <- KLR(K, train_presence, lambda, 100, 0.01)
-#> Found solution in 4 steps.
+train_log_pred <- KLR(K, train_presence, lambda, 100, 0.01, verbose = 0)
 #### Predict
 test_log_pred <- KLR_predict(test_data, train_data, dist_metric = dist_metric,
                              train_log_pred[["alphas"]], sigma, progress = FALSE)
@@ -76,6 +75,79 @@ ggplot(predicted_log, aes(x = as.factor(obs), y = pred, color = as.factor(obs)))
 ```
 
 ![](README-sim_data-2.png)
+
+``` r
+
+### Save parameters for later prediction
+params <- list(train_data = train_data,
+               alphas_pred = train_log_pred[["alphas"]],
+               sigma = sigma,
+               lambda = lambda,
+               vars = vars,
+               means = formatted_data$means,
+               sds = formatted_data$sds)
+```
+
+``` r
+library("NLMR")
+#> Warning: package 'NLMR' was built under R version 3.4.4
+library("rasterVis")
+#> Loading required package: raster
+#> Loading required package: sp
+#> Warning: package 'sp' was built under R version 3.4.4
+#> 
+#> Attaching package: 'raster'
+#> The following object is masked from 'package:ggplot2':
+#> 
+#>     calc
+#> The following object is masked from 'package:dplyr':
+#> 
+#>     select
+#> Loading required package: lattice
+#> Loading required package: latticeExtra
+#> Loading required package: RColorBrewer
+#> 
+#> Attaching package: 'latticeExtra'
+#> The following object is masked from 'package:ggplot2':
+#> 
+#>     layer
+cols = 100
+rows = 100
+ngb = 3
+
+### Create simulated environmental rasters
+s_var1r <- nlm_gaussianfield(cols,rows, autocorr_range = 20)
+s_var1 <- rescale_raster(s_var1r, 50, 10) 
+s_var2 <- rescale_raster(s_var1r, 3, 2) 
+b_var1r <- nlm_gaussianfield(cols,rows,autocorr_range = 20)
+b_var1 <- rescale_raster(b_var1r, 100, 20) 
+b_var2 <- rescale_raster(b_var1r, 6, 3) 
+### Create a site-present trend surface
+trend_coords <- sim_trend(cols, rows, n = 3)
+coords <- trend_coords$coords
+trend <- trend_coords$trend
+inv_trend <- abs(1-trend)
+var1 <- (s_var1 * trend) + (b_var1 * inv_trend)
+var2 <- (s_var2 * trend) + (b_var2 * inv_trend)
+### Create raster stack of simulated variables
+pred_var_stack <- raster::stack(var1, var2)
+names(pred_var_stack) <- c("var1","var2")
+plot(pred_var_stack)
+```
+
+![](README-predict_rasters-1.png)
+
+``` r
+### scale rasters to training data
+pred_var_stack_scaled <- scale_prediction_rasters(pred_var_stack, params, verbose = 0)
+### Predict raster (single chunk) 
+pred_rast <- KLR_raster_predict(pred_var_stack_scaled, ngb =15, params, progress = FALSE)
+### plot with simulated sites
+rasterVis::levelplot(pred_rast, margin = FALSE, ,par.settings=viridisTheme()) +
+  layer(sp.points(sp.points(SpatialPoints(coords), pch=15, cex = 3, col = "red")), columns=1)
+```
+
+![](README-predict_rasters-2.png)
 
 ### Main Package Functions
 
