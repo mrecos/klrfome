@@ -1,7 +1,7 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.888409.svg)](https://doi.org/10.5281/zenodo.888409) [![Build Status](https://travis-ci.org/mrecos/klrfome.svg?branch=master)](https://travis-ci.org/mrecos/klrfome)
 
-![](https://github.com/mrecos/klrfome/blob/master/klrfome_hex.png?raw=true)
+![](https://github.com/mrecos/klrfome/blob/master/KLR_fome_hex_med.png?raw=true)
 
 PRE-RELEASE
 ===========
@@ -90,30 +90,13 @@ params <- list(train_data = train_data,
 
 ``` r
 library("NLMR")
-#> Warning: package 'NLMR' was built under R version 3.4.4
 library("rasterVis")
-#> Loading required package: raster
-#> Loading required package: sp
-#> Warning: package 'sp' was built under R version 3.4.4
-#> 
-#> Attaching package: 'raster'
-#> The following object is masked from 'package:ggplot2':
-#> 
-#>     calc
-#> The following object is masked from 'package:dplyr':
-#> 
-#>     select
-#> Loading required package: lattice
-#> Loading required package: latticeExtra
-#> Loading required package: RColorBrewer
-#> 
-#> Attaching package: 'latticeExtra'
-#> The following object is masked from 'package:ggplot2':
-#> 
-#>     layer
+```
+
+``` r
 cols = 100
 rows = 100
-ngb = 3
+ngb = 7
 
 ### Create simulated environmental rasters
 s_var1r <- nlm_gaussianfield(cols,rows, autocorr_range = 20)
@@ -141,7 +124,7 @@ plot(pred_var_stack)
 ### scale rasters to training data
 pred_var_stack_scaled <- scale_prediction_rasters(pred_var_stack, params, verbose = 0)
 ### Predict raster (single chunk) 
-pred_rast <- KLR_raster_predict(pred_var_stack_scaled, ngb =15, params, progress = FALSE)
+pred_rast <- KLR_raster_predict(pred_var_stack_scaled, ngb = ngb, params, progress = FALSE)
 ### plot with simulated sites
 rasterVis::levelplot(pred_rast, margin = FALSE, ,par.settings=viridisTheme()) +
   layer(sp.points(sp.points(SpatialPoints(coords), pch=15, cex = 3, col = "red")), columns=1)
