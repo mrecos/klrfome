@@ -6,8 +6,8 @@
 PRE-RELEASE
 ===========
 
-klrfome - Kernel Logistic Regression with Focal Mean Embeddings
----------------------------------------------------------------
+klrfome - Kernel Logistic Regression on Focal Mean Embeddings
+-------------------------------------------------------------
 
 ### SAA 2018 Abstract
 
@@ -16,6 +16,21 @@ A model of Distribution Regression using Kernel Logistic Regression (KLR) on Mea
 -   Note: Changes from original abstract; 1) change of terms to Kernel Logistic Regression (KLR); and 2) deemphasized Bayesian approach as it is a work in progress. The repo contains working Stan code for probabilistic models, but they are not ready for prime-time.
 
 ![](https://github.com/mrecos/klrfome/blob/master/analysis/images/KLR_map.jpg?raw=true)
+
+### Citation
+
+Please cite this compendium as:
+
+> Harris, Matthew D., (2017). *klrfome - Kernel Logistic Regression with Focal Mean Embeddings*. Accessed 10 Sep 2017. Online at <https://doi.org/10.5281/zenodo.888409>
+
+### Installation
+
+You can install DistRegLMERR from github with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("mrecos/klrfome")
+```
 
 ### Example
 
@@ -154,21 +169,6 @@ This package contains the functions necessary to compute Kernel Linear Regressio
 #### Plotting
 
 -   `K_corrplot` -
-
-### Citation
-
-Please cite this compendium as:
-
-> Harris, Matthew D., (2017). *klrfome - Kernel Logistic Regression with Focal Mean Embeddings*. Accessed 10 Sep 2017. Online at <https://doi.org/10.5281/zenodo.888409>
-
-### Installation
-
-You can install DistRegLMERR from github with:
-
-``` r
-# install.packages("devtools")
-devtools::install_github("mrecos/klrfome")
-```
 
 ### Licenses
 
