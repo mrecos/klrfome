@@ -15,9 +15,9 @@ Imports:
   raster,
   dplyr,
   NLMR,
-  doParallel
+  doParallel,
+  corrplot
 Suggests:
   boot,
-  corrplot,
   pROC,
 RoxygenNote: 6.0.1
