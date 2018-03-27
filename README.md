@@ -1,7 +1,7 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.888409.svg)](https://doi.org/10.5281/zenodo.888409) [![Build Status](https://travis-ci.org/mrecos/klrfome.svg?branch=master)](https://travis-ci.org/mrecos/klrfome)
 
-![](https://github.com/mrecos/klrfome/blob/master/KLR_fome_hex_med.png?raw=true)
+![](https://github.com/mrecos/klrfome/blob/master/hex_stickers/KLR_fome_hex_med.png?raw=true)
 
 PRE-RELEASE
 ===========
@@ -21,7 +21,7 @@ A model of Distribution Regression using Kernel Logistic Regression (KLR) on Mea
 
 Please cite this compendium as:
 
-> Harris, Matthew D., (2017). *klrfome - Kernel Logistic Regression with Focal Mean Embeddings*. Accessed 10 Sep 2017. Online at <https://doi.org/10.5281/zenodo.888409>
+> Harris, Matthew D., (2017). *klrfome - Kernel Logistic Regression on Focal Mean Embeddings*. Accessed 10 Sep 2017. Online at <https://doi.org/10.5281/zenodo.888409>
 
 ### Installation
 
@@ -38,6 +38,8 @@ devtools::install_github("mrecos/klrfome")
 library("dplyr")
 library("corrplot")
 library("ggplot2")
+library("NLMR")
+library("rasterVis")
 library("klrfome")
 ```
 
@@ -62,7 +64,12 @@ test_presence <- formatted_data[["test_presence"]]
 #### Build Kernel Matrix
 K <- build_K(train_data, sigma = sigma, dist_metric = dist_metric, progress = FALSE)
 #### Train
-train_log_pred <- KLR(K, train_presence, lambda, 100, 0.01, verbose = 0)
+train_log_pred <- KLR(K, train_presence, lambda, 100, 0.01, verbose = 2)
+#> Step 1. Change in alpha parameters = 18.1676
+#> Step 2. Change in alpha parameters = 3.8603
+#> Step 3. Change in alpha parameters = 0.3817
+#> Step 4. Change in alpha parameters = 0.0042
+#> Found solution in 4 steps.
 #### Predict
 test_log_pred <- KLR_predict(test_data, train_data, dist_metric = dist_metric,
                              train_log_pred[["alphas"]], sigma, progress = FALSE)
@@ -71,7 +78,7 @@ test_log_pred <- KLR_predict(test_data, train_data, dist_metric = dist_metric,
 K_corrplot(K,train_data,clusters=4)
 ```
 
-![](README-sim_data-1.png)
+![](README_images/README-sim_data-1.png)
 
 ``` r
 
@@ -89,7 +96,7 @@ ggplot(predicted_log, aes(x = as.factor(obs), y = pred, color = as.factor(obs)))
   )
 ```
 
-![](README-sim_data-2.png)
+![](README_images/README-sim_data-2.png)
 
 ``` r
 
@@ -101,11 +108,6 @@ params <- list(train_data = train_data,
                vars = vars,
                means = formatted_data$means,
                sds = formatted_data$sds)
-```
-
-``` r
-library("NLMR")
-library("rasterVis")
 ```
 
 ``` r
@@ -133,19 +135,20 @@ names(pred_var_stack) <- c("var1","var2")
 plot(pred_var_stack)
 ```
 
-![](README-predict_rasters-1.png)
+![](README_images/README-predict_rasters-1.png)
 
 ``` r
 ### scale rasters to training data
 pred_var_stack_scaled <- scale_prediction_rasters(pred_var_stack, params, verbose = 0)
 ### Predict raster (single chunk) 
-pred_rast <- KLR_raster_predict(pred_var_stack_scaled, ngb = ngb, params, progress = FALSE)
+pred_rast <- KLR_raster_predict(pred_var_stack_scaled, ngb = ngb, params, split = FALSE, ppside = NULL,
+                                progress = FALSE, parallel = FALSE)
 ### plot with simulated sites
-rasterVis::levelplot(pred_rast, margin = FALSE, ,par.settings=viridisTheme()) +
-  layer(sp.points(sp.points(SpatialPoints(coords), pch=15, cex = 3, col = "red")), columns=1)
+rasterVis::levelplot(pred_rast, margin = FALSE, par.settings=viridisTheme()) +
+  layer(sp.points(sp.points(SpatialPoints(coords), pch=15, cex = 2.25, col = "red")), columns=1)
 ```
 
-![](README-predict_rasters-2.png)
+![](README_images/README-predict_rasters-2.png)
 
 ### Main Package Functions
 
