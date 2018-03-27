@@ -14,10 +14,10 @@ Imports:
   Matrix,
   raster,
   dplyr,
-  NLMR
+  NLMR,
+  doParallel
 Suggests:
   boot,
   corrplot,
   pROC,
-  doParallel
 RoxygenNote: 6.0.1

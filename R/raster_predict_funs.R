@@ -146,6 +146,10 @@ KLR_raster_predict <- function(rast_stack, ngb, params, split = FALSE, ppside = 
       for(i in seq_along(split_stack)){
         cat("Predicting for block", i, "of", length(split_stack),"\n")
         pred_rast_i <- klrfome::KLR_predict_each(split_stack[[i]], ngb, params, progress)
+        ### HERE SHOULD BE THE OPTION FOR 'RETURN LIST' or 'SAVE', 
+        # pred_block_i <- KLR_predict_each(split_stack[[i]], ngb, params, progress)
+        # writeRaster(pred_block_i,filename=file.path("c:/Temp/tif", paste("SplitRas",i,".tif",sep="")),
+        #             format="GTiff",datatype="FLT4S",overwrite=FALSE)
         pred_rast_list[[i]] <- pred_rast_i
       }
     }
