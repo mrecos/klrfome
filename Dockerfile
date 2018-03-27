@@ -1,8 +1,8 @@
 # get the base image, the rocker/verse has R, RStudio and pandoc
-FROM rocker/verse:3.4.0
+FROM rocker/verse
 
 # required
-MAINTAINER Your Name <mr.ecos@gmail.com@somewhere.com>
+MAINTAINER Your Name <mr.ecos@gmail.com>
 
 COPY . /klrfome
 
