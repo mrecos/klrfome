@@ -4,7 +4,7 @@ library("ggplot2")
 library("klrfome")
 
 #Parameters
-set.seed(1337)
+set.seed(31337)
 sigma = 0.5
 lambda = 0.1
 dist_metric = "euclidean"

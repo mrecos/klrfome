@@ -30,7 +30,7 @@ A model of Distribution Regression using Kernel Logistic Regression (KLR) on Mea
 
 Please cite this compendium as:
 
-> Harris, Matthew D., (2017). *klrfome - Kernel Logistic Regression with Focal Mean Embeddings*. Accessed 10 Sep 2017. Online at <https://doi.org/10.5281/zenodo.888409>
+> Harris, Matthew D., (2017). *klrfome - Kernel Logistic Regression on Focal Mean Embeddings*. Accessed 10 Sep 2017. Online at <https://doi.org/10.5281/zenodo.888409>
 
 ### Installation
 
