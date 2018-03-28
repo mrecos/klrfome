@@ -40,8 +40,10 @@ KLR <- function(K, presence, lambda, maxiter = 100, tol = 0.01, verbose=1){
     }
     alphan = as.vector(alpha_new)
     if(verbose == 2){
-      cat("Step ", iter, ". Change in alpha parameters = ",
-          round(sum(abs(alphan - alpha)),4), "\n", sep = "")
+      cat("Step ", iter, ". Absolute Relative Approximate Error = ",
+          # round(sum(abs((alphan - alpha)/alphan))*100, 4), "\n", sep = "")
+          round(abs(sum(alphan - alpha)/sum(alphan))*100, 4), "\n", sep = "")
+      
     }
     if (any(is.nan(alphan)) || all(abs(alphan - alpha) <= tol)) {
       if(verbose %in% c(1,2)){

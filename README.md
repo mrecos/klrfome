@@ -62,12 +62,13 @@ test_presence <- formatted_data[["test_presence"]]
 #### Build Kernel Matrix
 K <- build_K(train_data, sigma = sigma, dist_metric = dist_metric, progress = FALSE)
 #### Train
-train_log_pred <- KLR(K, train_presence, lambda, 100, 0.01, verbose = 2)
-#> Step 1. Change in alpha parameters = 18.1676
-#> Step 2. Change in alpha parameters = 3.8603
-#> Step 3. Change in alpha parameters = 0.3817
-#> Step 4. Change in alpha parameters = 0.0042
-#> Found solution in 4 steps.
+train_log_pred <- KLR(K, train_presence, lambda, 100, 0.001, verbose = 2)
+#> Step 1. Absolute Relative Approximate Error = 125.6576
+#> Step 2. Absolute Relative Approximate Error = 12.488
+#> Step 3. Absolute Relative Approximate Error = 0.322
+#> Step 4. Absolute Relative Approximate Error = 0.0369
+#> Step 5. Absolute Relative Approximate Error = 0
+#> Found solution in 5 steps.
 #### Predict
 test_log_pred <- KLR_predict(test_data, train_data, dist_metric = dist_metric,
                              train_log_pred[["alphas"]], sigma, progress = FALSE)

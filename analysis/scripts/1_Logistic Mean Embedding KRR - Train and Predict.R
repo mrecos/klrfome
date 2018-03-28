@@ -22,7 +22,7 @@ test_presence <- formatted_data[["test_presence"]]
 #### Build Kernel Matrix
 K <- build_K(train_data, sigma = sigma, dist_metric = dist_metric)
 #### Train
-train_log_pred <- KLR(K, train_presence, lambda, 100, 0.01)
+train_log_pred <- KLR(K, train_presence, lambda, 100, 0.001, verbose = 2)
 #### Predict
 test_log_pred <- KLR_predict(test_data, train_data, dist_metric = dist_metric,
                              train_log_pred[["alphas"]], sigma)
