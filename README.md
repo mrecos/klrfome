@@ -112,7 +112,7 @@ params <- list(train_data = train_data,
 ``` r
 cols = 100
 rows = 100
-ngb = 7
+ngb = 5
 
 ### Create simulated environmental rasters
 s_var1r <- nlm_gaussianfield(cols,rows, autocorr_range = 20)
@@ -148,6 +148,45 @@ rasterVis::levelplot(pred_rast, margin = FALSE, par.settings=viridisTheme()) +
 ```
 
 ![](README_images/README-predict_rasters-2.png)
+
+### Now with parallel processing!
+
+#### and ability to split large study areas into blocks for prediction (working on edge effects...)
+
+``` r
+library("doParallel")
+#> Warning: package 'doParallel' was built under R version 3.4.4
+#> Loading required package: foreach
+#> Loading required package: iterators
+#> Loading required package: parallel
+### create and register parallel backend
+cl <- makeCluster(detectCores())
+doParallel::registerDoParallel(cl)
+
+### Use same KLR_raster_predict function with parallel = TRUE
+pred_rast_list <- KLR_raster_predict(pred_var_stack_scaled, ngb = ngb, params, split = TRUE, ppside = 5,
+                                   progress = FALSE, parallel = TRUE, output = "list",
+                                   save_loc = NULL, overwrite = TRUE)
+#> Splitting rasters into blocks 
+#> Predicting splits in parallel on 8 cores
+### Merge list back to a single raster
+pred_rast <-  do.call(merge, pred_rast_list)
+### plot with simulated sites
+rasterVis::levelplot(pred_rast, margin = FALSE, par.settings=viridisTheme()) +
+  layer(sp.points(sp.points(SpatialPoints(coords), pch=15, cex = 2.25, col = "red")), columns=1)
+```
+
+![](README_images/README-multi-proc-1.png)
+
+``` r
+
+### Or set output = "save" to save each prediction block out to a folder as a GeoTiff # not run
+# pred_rast_list <- KLR_raster_predict(pred_var_stack_scaled, ngb = ngb, params, split = TRUE, ppside = 5,
+#                                    progress = FALSE, parallel = TRUE, output = "save",
+#                                    save_loc = "c:/Temp/tif", overwrite = TRUE)
+
+stopCluster(cl)
+```
 
 ### Main Package Functions
 
