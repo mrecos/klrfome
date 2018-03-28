@@ -5,7 +5,8 @@
 \title{KLR_raster_predict}
 \usage{
 KLR_raster_predict(rast_stack, ngb, params, split = FALSE, ppside = NULL,
-  progress = TRUE, parallel = FALSE)
+  progress = TRUE, parallel = FALSE, output = "list", save_loc = NULL,
+  overwrite = FALSE)
 }
 \arguments{
 \item{rast_stack}{}
@@ -21,6 +22,12 @@ KLR_raster_predict(rast_stack, ngb, params, split = FALSE, ppside = NULL,
 \item{progress}{}
 
 \item{parallel}{}
+
+\item{output}{[string] either 'list' or 'save'. If 'list', returns list of predicted blocks. If 'save', blocks are saved to save_loc as GeoTiff}
+
+\item{save_loc}{[string] Location to save raster blocks (GeoTiff). Uses getwd() is NULL}
+
+\item{overwrite}{[logical] TRUE will overwrite saved raster GeoTiffs in save_loc}
 }
 \value{
 [raster]

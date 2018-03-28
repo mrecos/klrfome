@@ -23,7 +23,7 @@ Please cite this compendium as:
 
 ### Installation
 
-You can install DistRegLMERR from github with:
+You can install klrfome from github with:
 
 ``` r
 # install.packages("devtools")

@@ -113,6 +113,9 @@ split_raster_stack <- function(rast_stack, ppside, split=TRUE){
 #' @param ppside 
 #' @param progress 
 #' @param parallel 
+#' @param output [string] either 'list' or 'save'. If 'list', returns list of predicted blocks. If 'save', blocks are saved to save_loc as GeoTiff
+#' @param save_loc [string] Location to save raster blocks (GeoTiff). Uses getwd() is NULL
+#' @param overwrite [logical] TRUE will overwrite saved raster GeoTiffs in save_loc
 #'
 #' @import foreach
 #' @import doParallel
@@ -121,43 +124,71 @@ split_raster_stack <- function(rast_stack, ppside, split=TRUE){
 #'
 
 KLR_raster_predict <- function(rast_stack, ngb, params, split = FALSE, ppside = NULL, 
-                               progress = TRUE, parallel = FALSE){
-  if(!isTRUE(split) & is.null(ppside)){
+                               progress = TRUE, parallel = FALSE, output = "list",
+                               save_loc = NULL, overwrite = FALSE){
+  if(isTRUE(parallel) & foreach::getDoParRegistered() == FALSE){
+    stop("You must make and register a parallel cluster with' doParallel' package","\n")
+  }
+  if(!isTRUE(split) & is.null(ppside)){ # default settings
     if(isTRUE(parallel)){
-      message("Parallel only works with split == TRUE and ppside > 1. Continuing without parallel","\n")
+      message("Parallel only works when split == TRUE and ppside > 1. Continuing without parallel","\n")
     }
     pred_rast <- klrfome::KLR_predict_each(rast_stack, ngb, params, progress)
     return(pred_rast)
-  } else if(isTRUE(split) & !is.null(ppside)){
+  } else if(isTRUE(split) & !is.null(ppside)){ # split & ppside == TRUE
+    if(!(output %in% c("list","save"))){ # check for output to be set
+      stop("In order to use split the raster, you need to set output = to 'list' or 'save' & 'save_loc","\n")
+    }
     cat("Splitting rasters into blocks","\n")
     split_stack <- klrfome::split_raster_stack(rast_stack, ppside)
-    if(isTRUE(parallel)){
-      if(foreach::getDoParRegistered() == FALSE){
-        stop("You must make and register a parallel cluster with' doParallel' package","\n")
-      }
+    if(isTRUE(parallel)){ # split, ppside, and parallel = TRUE
       cat("Predicting splits in parallel on",getDoParWorkers(),"cores","\n")
-      pred_rast_list = foreach(i=seq_along(split_stack), .inorder = TRUE,
-                               .packages=c('klrfome','raster')) %dopar% {
-                                 klrfome::KLR_predict_each(split_stack[[i]], ngb, params, progress)
-                               }
-    } else if(!isTRUE(parallel)){
-      cat("You should really consider using doParallel package to use your multiple core!","\n")
+      if(output == "list"){ # split, ppside, parallel, and list output
+        pred_rast_list = foreach(i=seq_along(split_stack), .inorder = TRUE, .verbose = progress,
+                                 .packages=c('klrfome','raster')) %dopar% {
+                                   klrfome::KLR_predict_each(split_stack[[i]], ngb, params, progress)
+                                 }
+        return(pred_rast_list)
+      } else if(output == "save"){ # split, ppside, parallel, and save output
+        message("Predicting blocks in parallel and saving to 'save_loc'")
+        if(is.null(save_loc)){
+          message("save_loc not set, saving to working directory")
+          save_loc <- getwd()
+        }
+        foreach(i=seq_along(split_stack), .inorder = TRUE, .verbose = progress,
+                .packages=c('klrfome','raster')) %dopar% {
+                  pred_rast_i <- KLR_predict_each(split_stack[[i]], ngb, params, progress)
+                  writeRaster(pred_rast_i, filename=file.path(save_loc, paste("prediction_block_",i,".tif",sep="")),
+                              format="GTiff",datatype="FLT4S",overwrite = overwrite)
+                }
+      }
+    } else if(!isTRUE(parallel)){ # split, ppside == TRUE, no parallel
+      cat("You should really consider using doParallel package to use your multiple cores!","\n")
+      if(output == "save" & is.null(save_loc)){
+        message("save_loc not set, saving to working directory")
+        save_loc <- getwd()
+      }
       pred_rast_list <- vector(mode = "list", length = length(split_stack))
       for(i in seq_along(split_stack)){
         cat("Predicting for block", i, "of", length(split_stack),"\n")
         pred_rast_i <- klrfome::KLR_predict_each(split_stack[[i]], ngb, params, progress)
-        ### HERE SHOULD BE THE OPTION FOR 'RETURN LIST' or 'SAVE', 
-        # pred_block_i <- KLR_predict_each(split_stack[[i]], ngb, params, progress)
-        # writeRaster(pred_block_i,filename=file.path("c:/Temp/tif", paste("SplitRas",i,".tif",sep="")),
-        #             format="GTiff",datatype="FLT4S",overwrite=FALSE)
-        pred_rast_list[[i]] <- pred_rast_i
+        if(output == "list"){ # split, ppside, no parallel, list output
+          pred_rast_list[[i]] <- pred_rast_i
+        } else if(output == "save"){ # split, ppside, no parallel, save output
+          writeRaster(pred_rast_i, filename=file.path(save_loc, paste("prediction_block_",i,".tif",sep="")),
+                      format="GTiff",datatype="FLT4S",overwrite = overwrite)
+        }
+      }
+      if(output == "list"){
+        return(pred_rast_list)
       }
     }
-    return(pred_rast_list)
-  } else if(isTRUE(split) & is.null(ppside)){
+    # return(pred_rast_list)
+  } else if(isTRUE(split) & is.null(ppside)){ # split, ppside is NULL
     message("If you want to split the raster predictions, please provide a ppside > 1","\n")
   }
 }
+
 
 #' KLR_predict_each
 #'
