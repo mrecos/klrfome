@@ -13,6 +13,7 @@ RUN . /etc/environment \
   # e.g. need this for ggforce::geom_sina
   && sudo apt-get update \
   && sudo apt-get install libudunits2-dev -y \
+  && sudo apt-get install libgeos-dev \ # for rgeos package
 
   # build this compendium package
   && R -e "install.packages('corrplot')"\
