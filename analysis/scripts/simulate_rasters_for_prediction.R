@@ -126,7 +126,7 @@ library("klrfome")
 
 cols = 50
 rows = 50
-ngb = 3
+ngb = 5
 
 params <- list(train_data = train_data,
                alphas_pred = train_log_pred[["alphas"]],
