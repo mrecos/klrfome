@@ -4,6 +4,8 @@
 <p align="center">
 <img width="326" height="134" src="https://github.com/mrecos/klrfome/blob/master/klrfome_logo/KLR-black.png?raw=true">
 </p>
+
+
 klrfome - Kernel Logistic Regression on Focal Mean Embeddings
 -------------------------------------------------------------
 
