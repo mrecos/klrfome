@@ -149,9 +149,7 @@ rasterVis::levelplot(pred_rast, margin = FALSE, par.settings=viridisTheme()) +
 
 ![](README_images/README-predict_rasters-2.png)
 
-### Now with parallel processing!
-
-#### and ability to split large study areas into blocks for prediction (working on edge effects...)
+### Now with parallel processing by splitting the raster into blocks!
 
 ``` r
 library("doParallel")
@@ -164,9 +162,9 @@ cl <- makeCluster(detectCores())
 doParallel::registerDoParallel(cl)
 
 ### Use same KLR_raster_predict function with parallel = TRUE
-pred_rast_list <- KLR_raster_predict(pred_var_stack_scaled, ngb = ngb, params, split = TRUE, ppside = 5,
+pred_rast_list <- KLR_raster_predict2(pred_var_stack_scaled, ngb = ngb, params, split = TRUE, ppside = 5,
                                    progress = FALSE, parallel = TRUE, output = "list",
-                                   save_loc = NULL, overwrite = TRUE)
+                                   save_loc = NULL, overwrite = TRUE, cols = cols, rows = rows)
 #> Splitting rasters into blocks 
 #> Predicting splits in parallel on 8 cores
 ### Merge list back to a single raster
