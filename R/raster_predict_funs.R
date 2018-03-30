@@ -72,6 +72,7 @@ scale_prediction_rasters <- function(pred_var_stack, params, verbose = 1){
   return(pred_var_stack_scaled)
 }
 
+
 #' split_raster_stack
 #'
 #' @param rast_stack 
@@ -79,11 +80,12 @@ scale_prediction_rasters <- function(pred_var_stack, params, verbose = 1){
 #' @param split 
 #'
 #' @importFrom raster rasterToPolygons extent crop ncell aggregate
+#' @importFrom rgeos gBuffer
 #' @return [raster]
 #' @export
 #'
 
-split_raster_stack <- function(rast_stack, ppside, split=TRUE){
+split_raster_stack <- function(rast_stack, ppside, ngb, split=TRUE){
   # modified from - https://stackoverflow.com/questions/29784829/r-raster-package-split-image-into-multiples
   h        <- ceiling(ncol(rast_stack)/ppside)
   v        <- ceiling(nrow(rast_stack)/ppside)
@@ -94,14 +96,38 @@ split_raster_stack <- function(rast_stack, ppside, split=TRUE){
     agg[]    <- 1:ncell(agg)
     agg_poly <- raster::rasterToPolygons(agg)
     names(agg_poly) <- rep("polis", length(names(agg_poly)))
+    ## adds collar to allow focal window function to be accuracte at the margins
+    exp_agg <- rgeos::gBuffer(agg_poly, byid = TRUE, 
+                              width = ngb, joinStyle = "mitre", mitreLimit = ngb)
     r_list <- list()
     for(i in 1:raster::ncell(agg)){
-      e1          <- raster::extent(agg_poly[agg_poly$polis==i,])
+      e1          <- raster::extent(exp_agg[exp_agg$polis==i,])
       crop_rasters_i <- raster::crop(rast_stack,e1)
       r_list[[i]] <- crop_rasters_i
     }
   }
   return(r_list)
+}
+
+
+#' crop_raster_collar
+#'
+#' @param pred_rast [raster] predicted raster
+#' @param ngb [scalar] square neighborhodd size in cells
+#' 
+#' @importFrom raster crop extent
+#' @return [raster]
+#' @export
+#'
+
+crop_raster_collar <- function(pred_rast, ngb, cols, rows){
+  ext_i <- extent(pred_rast)
+  xmin_i <- ifelse(ext_i[1] == 0, 0, ext_i[1]+ngb)
+  xmax_i <- ifelse(ext_i[2] == cols, cols, ext_i[2]-ngb)
+  ymin_i <- ifelse(ext_i[3] == 0, 0, ext_i[3]+ngb)
+  ymax_i <- ifelse(ext_i[4] == rows, rows, ext_i[4]-ngb)
+  crop_ext <- raster::extent(xmin_i,xmax_i,ymin_i,ymax_i)
+  pred_rast_crop <- raster::crop(pred_rast, crop_ext)
 }
 
 #' KLR_raster_predict
@@ -125,7 +151,7 @@ split_raster_stack <- function(rast_stack, ppside, split=TRUE){
 
 KLR_raster_predict <- function(rast_stack, ngb, params, split = FALSE, ppside = NULL, 
                                progress = TRUE, parallel = FALSE, output = "list",
-                               save_loc = NULL, overwrite = FALSE){
+                               save_loc = NULL, overwrite = FALSE, cols, rows){
   if(isTRUE(parallel) & foreach::getDoParRegistered() == FALSE){
     stop("You must make and register a parallel cluster with' doParallel' package","\n")
   }
@@ -140,13 +166,14 @@ KLR_raster_predict <- function(rast_stack, ngb, params, split = FALSE, ppside = 
       stop("In order to use split the raster, you need to set output = to 'list' or 'save' & 'save_loc","\n")
     }
     cat("Splitting rasters into blocks","\n")
-    split_stack <- klrfome::split_raster_stack(rast_stack, ppside)
+    split_stack <- klrfome::split_raster_stack(rast_stack, ppside, ngb, split=TRUE)
     if(isTRUE(parallel)){ # split, ppside, and parallel = TRUE
       cat("Predicting splits in parallel on",getDoParWorkers(),"cores","\n")
       if(output == "list"){ # split, ppside, parallel, and list output
         pred_rast_list = foreach(i=seq_along(split_stack), .inorder = TRUE, .verbose = progress,
                                  .packages=c('klrfome','raster')) %dopar% {
-                                   klrfome::KLR_predict_each(split_stack[[i]], ngb, params, progress)
+                                   pred_rast_i <- klrfome::KLR_predict_each(split_stack[[i]], ngb, params, progress)
+                                   crop_raster_collar(pred_rast_i, ngb, cols, rows)
                                  }
         return(pred_rast_list)
       } else if(output == "save"){ # split, ppside, parallel, and save output
@@ -158,6 +185,7 @@ KLR_raster_predict <- function(rast_stack, ngb, params, split = FALSE, ppside = 
         foreach(i=seq_along(split_stack), .inorder = TRUE, .verbose = progress,
                 .packages=c('klrfome','raster')) %dopar% {
                   pred_rast_i <- KLR_predict_each(split_stack[[i]], ngb, params, progress)
+                  pred_rast_i <- crop_raster_collar(pred_rast_i, ngb, cols, rows)
                   writeRaster(pred_rast_i, filename=file.path(save_loc, paste("prediction_block_",i,".tif",sep="")),
                               format="GTiff",datatype="FLT4S",overwrite = overwrite)
                 }
@@ -172,6 +200,8 @@ KLR_raster_predict <- function(rast_stack, ngb, params, split = FALSE, ppside = 
       for(i in seq_along(split_stack)){
         cat("Predicting for block", i, "of", length(split_stack),"\n")
         pred_rast_i <- klrfome::KLR_predict_each(split_stack[[i]], ngb, params, progress)
+        # deal with edge effects of blocking
+        pred_rast_i <- crop_raster_collar(pred_rast_i, ngb, cols, rows)
         if(output == "list"){ # split, ppside, no parallel, list output
           pred_rast_list[[i]] <- pred_rast_i
         } else if(output == "save"){ # split, ppside, no parallel, save output
@@ -188,7 +218,6 @@ KLR_raster_predict <- function(rast_stack, ngb, params, split = FALSE, ppside = 
     message("If you want to split the raster predictions, please provide a ppside > 1","\n")
   }
 }
-
 
 #' KLR_predict_each
 #'

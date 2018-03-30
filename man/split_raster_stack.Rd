@@ -4,7 +4,7 @@
 \alias{split_raster_stack}
 \title{split_raster_stack}
 \usage{
-split_raster_stack(rast_stack, ppside, split = TRUE)
+split_raster_stack(rast_stack, ppside, ngb, split = TRUE)
 }
 \arguments{
 \item{rast_stack}{}

@@ -6,7 +6,7 @@
 \usage{
 KLR_raster_predict(rast_stack, ngb, params, split = FALSE, ppside = NULL,
   progress = TRUE, parallel = FALSE, output = "list", save_loc = NULL,
-  overwrite = FALSE)
+  overwrite = FALSE, cols, rows)
 }
 \arguments{
 \item{rast_stack}{}
