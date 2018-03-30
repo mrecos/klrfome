@@ -1,7 +1,7 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.888409.svg)](https://doi.org/10.5281/zenodo.888409) [![Build Status](https://travis-ci.org/mrecos/klrfome.svg?branch=master)](https://travis-ci.org/mrecos/klrfome)
 
-![](https://github.com/mrecos/klrfome/blob/master/hex_stickers/KLR_fome_hex_med.png?raw=true)
+![](https://github.com/mrecos/klrfome/blob/master/klrfome_logo/KLR-black.png?raw=true)
 
 klrfome - Kernel Logistic Regression on Focal Mean Embeddings
 =============================================================
