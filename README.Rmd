@@ -27,7 +27,10 @@ The purpose of this package is to solve the *Distribution Regression* problem fo
 To achieve this goal, the package fits a Kernel Logistic Regression (KLR) model onto a mean embedding similarity matrix and predicts as a roving focal function of varying window size. The name of the package is derived from this approach; **K**ernel **L**ogistic **R**egression on **FO**cal **M**ean **E**mbeddings (**klrfome**) pronounced *clear foam*.
 
 
-![](https://github.com/mrecos/klrfome/blob/master/analysis/images/KLR_map.jpg?raw=true)
+<p align="left">
+<img width="400" height="400" src="https://github.com/mrecos/klrfome/blob/master/analysis/images/KLR_map.jpg?raw=true">
+</p>
+
 
 ### Citation
 
@@ -45,24 +48,34 @@ devtools::install_github("mrecos/klrfome")
 ```
 
 
-### Example
+## Example workflow on simulated data (Try me!)
 
+#### Libraries
 ```{r packages, message=FALSE, warning=FALSE, paged.print=FALSE}
-library("dplyr")
-library("corrplot")
-library("ggplot2")
-library("NLMR")
-library("rasterVis")
-library("klrfome")
+library("dplyr")     # for programming control
+library("corrplot")  # for plotting similarity matrix
+library("ggplot2")   # for plotting results
+library("NLMR")      # for creating simulated landscapes
+library("rasterVis") # for plotting simulated lan
+library("klrfome")   # for modeling
 ```
-```{r sim_data}
 
+
+#### Set hyperparameters and load simulated site location data
+In this block, the random `seed`, `sigma` and `lambda` hyperparameters, and the `dist_metric` are all set. The `sigma` parameter controls how "close" observations must be to be considered similar. Closeness in this context is defined in the 'feature space', but in geographic or measurement space. At a higher `sigma` more distant observations can still be considered similar. The `lambda` hyperparameter controls the regularization in the KLR model by penalizing large coefficients. This means that the higher the `lambda` penalty, the closer the model will shrink its `alpha` parameters closer to zero, thereby reducing the influence of any one or group of observations on the overall model.
+```{r params}
 #Parameters
 set.seed(1337)
 sigma = 0.5
 lambda = 0.1
 dist_metric = "euclidean"
+```
 
+
+#### Simulate site data and format
+Archaeological site data is protected information that can not often be shared. It is a major impediment to open archaeological research. In this package I created a function to simulate archaeological site data so that people can test the package and see how to format their site data. The `get_sim_data` function simulates `N_site_bags` number of sites from `site_sample` number of observations for two environmental variables. The variables are normal with a mean and standard deviation; well-discriminated defaults are provided. The function simulates by site-present and environmental background classes with different means and SD's for the two variables. The returned object is a `list` that contains the data in a `list` format for use in the `KLR` functions, but also a `table` format for use in most other modeling functions. This is so that you can compare model results on the same data.
+
+```{r sim_data}
 ### Simulate Training Data
 sim_data <- get_sim_data(site_samples = 800, N_site_bags = 75)
 formatted_data <- format_site_data(sim_data, N_sites=10, train_test_split=0.8,
@@ -71,20 +84,26 @@ train_data <- formatted_data[["train_data"]]
 train_presence <- formatted_data[["train_presence"]]
 test_data <- formatted_data[["test_data"]]
 test_presence <- formatted_data[["test_presence"]]
+```
 
+
+#### Build Similarilty kernel, fit KLR model, and predict on training set
+The first step in modeling these data is to build the similarity kernel with `build_k`. The output is a pairwise similarity matrix for each element of the list you give it, in this case `training_data`. The object `K` is the NxN similarity matrix of the mean similarity between the multivariate distance of each site and background list element. These elements are often referred to as *laballed bags* because they are a collection of measurements with a presence or absence label. The second step is to fit the `KLR` model with the `KLR` function. The `KLR` fit function is a key component of this package. The function fits a KLR model using Iterative Re-weighted Least Squares (IRLS). `Verbose = 2` shows the convergence of the algorithm. The output of this function is a `list` of the alpha parameters (for prediction) and predicted probability of site-present for the `train_data` set. Finally, the `KLR_predict` function uses the `train_data` and `alphas` to predict the probability of site-presence for new `test_data`. The similarity matrix can be visualized with `corrplot`, the predicted site-presence probability for simulated site-present and background test data can be viewed as a `ggplot`, and finally the parameters of the model are saved to a `list` to be used for predicting on a study area raster stack.
+
+```{r fit_model}
 ##### Logistic Mean Embedding KRR Model
 #### Build Kernel Matrix
 K <- build_K(train_data, sigma = sigma, dist_metric = dist_metric, progress = FALSE)
-#### Train
+#### Train KLR model
 train_log_pred <- KLR(K, train_presence, lambda, 100, 0.001, verbose = 2)
-#### Predict
+#### Predict KLR model on test data
 test_log_pred <- KLR_predict(test_data, train_data, dist_metric = dist_metric,
                              train_log_pred[["alphas"]], sigma, progress = FALSE)
 
 ### Plot K Matrix
 K_corrplot(K,train_data,clusters=4)
 
-### Plot Prediction
+### Plot Test Set Prediction
 predicted_log <- data.frame(pred = test_log_pred, obs = test_presence)
 ggplot(predicted_log, aes(x = as.factor(obs), y = pred, color = as.factor(obs))) +
   geom_jitter(width = 0.1) +
@@ -107,32 +126,38 @@ params <- list(train_data = train_data,
                sds = formatted_data$sds)
 ```
 
+
+#### Predicting on a raster stack
+This package can be used to predict on tabular data as above, but a more practical approach is to predict directly on a set of raster layers representing the predictor variables. Most of the code below is there for creating a simulated landscape that has some fidelity to the training data. For real-world examples, the prediction starts with a raster stack of predictor variable rasters. Form there the function `scale_prediction_rasters` center and scales the values of the rasters to that of the train_data. Having data that is centered at zero and scaled to z-scores is critical in measuring the distance between observations. Further, it is critical that the test data (raster stack) is scaled to the same values as the training data or the predictions will be invalid. Once scaled, the raster stack is sent to the `KLR_raster_predict` function for prediction. The prediction function requires a scaled raster stack of the same variables used to train the model, the `ngb` value that specifies the x and y dimension of the focal window, and finally the list of params from the trained model. The setting on `KLR_raster_predict` shown here are predicting over the entire raster at once and not in parallel. The `KLR_raster_predict` function has options for splitting the prediction into a number of squares and predicting on each of those. Further, each split raster block can be assigned to a different core on your computer to compute in parallel. This is because prediction is a time consuming process and it is often helpful to split the computation into more manageable blocks. Oh, and you can set it to return the predicted blocks as a list of raster (all in memory) or to save each block as a GeoTiff after it is predicted. A version of parallel processing is shown in the next code section.
 ```{r predict_rasters}
-cols = 100
-rows = 100
+### width and hieght of roving focal window (required)
 ngb = 5
 
-### Create simulated environmental rasters
+### Create simulated environmental rasters  (sim data only) ####
+### Number of rows and columns in simulated rasters (sim data only)
+cols = 100
+rows = 100
 s_var1r <- nlm_gaussianfield(cols,rows, autocorr_range = 20)
 s_var1 <- rescale_raster(s_var1r, 50, 10) 
 s_var2 <- rescale_raster(s_var1r, 3, 2) 
 b_var1r <- nlm_gaussianfield(cols,rows,autocorr_range = 20)
 b_var1 <- rescale_raster(b_var1r, 100, 20) 
 b_var2 <- rescale_raster(b_var1r, 6, 3) 
-### Create a site-present trend surface
+### Create a site-present trend surface  (sim data only)
 trend_coords <- sim_trend(cols, rows, n = 3)
 coords <- trend_coords$coords
 trend <- trend_coords$trend
 inv_trend <- abs(1-trend)
 var1 <- (s_var1 * trend) + (b_var1 * inv_trend)
 var2 <- (s_var2 * trend) + (b_var2 * inv_trend)
-### Create raster stack of simulated variables
+#### end simulated data creation ####
+
+### Create raster stack of predictor variables
 pred_var_stack <- raster::stack(var1, var2)
 names(pred_var_stack) <- c("var1","var2")
-plot(pred_var_stack)
 ### scale rasters to training data
 pred_var_stack_scaled <- scale_prediction_rasters(pred_var_stack, params, verbose = 0)
-### Predict raster (single chunk) 
+### Predict raster (single chunk, not in parallel) 
 pred_rast <- KLR_raster_predict(pred_var_stack_scaled, ngb = ngb, params, split = FALSE, ppside = NULL,
                                 progress = FALSE, parallel = FALSE)
 ### plot with simulated sites
@@ -142,7 +167,7 @@ rasterVis::levelplot(pred_rast, margin = FALSE, par.settings=viridisTheme()) +
 ```
 
 
-### Now with parallel processing by splitting the raster into blocks!
+### Predicting in parallel/multi-core
 ```{r multi-proc}
 library("doParallel")
 ### create and register parallel backend
