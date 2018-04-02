@@ -16,7 +16,8 @@ Imports:
   dplyr,
   NLMR,
   doParallel,
-  corrplot
+  corrplot,
+  rgeos
 Suggests:
   boot,
   pROC,
