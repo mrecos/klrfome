@@ -54,8 +54,6 @@ devtools::install_github("mrecos/klrfome")
 
 #### Libraries
 ```{r packages, message=FALSE, warning=FALSE, paged.print=FALSE}
-library("dplyr")     # for programming control
-library("corrplot")  # for plotting similarity matrix
 library("ggplot2")   # for plotting results
 library("NLMR")      # for creating simulated landscapes
 library("rasterVis") # for plotting simulated lan
@@ -123,7 +121,6 @@ params <- list(train_data = train_data,
                alphas_pred = train_log_pred[["alphas"]],
                sigma = sigma,
                lambda = lambda,
-               vars = vars,
                means = formatted_data$means,
                sds = formatted_data$sds)
 ```
@@ -140,10 +137,10 @@ cols = 100
 rows = 100
 
 ### Create simulated environmental rasters  (sim data only) ####
-s_var1r <- nlm_gaussianfield(cols,rows, autocorr_range = 20)
+s_var1r <- NLMR::nlm_gaussianfield(cols,rows, autocorr_range = 20)
 s_var1 <- rescale_raster(s_var1r, 50, 10) 
 s_var2 <- rescale_raster(s_var1r, 3, 2) 
-b_var1r <- nlm_gaussianfield(cols,rows,autocorr_range = 20)
+b_var1r <- NLMR::nlm_gaussianfield(cols,rows,autocorr_range = 20)
 b_var1 <- rescale_raster(b_var1r, 100, 20) 
 b_var2 <- rescale_raster(b_var1r, 6, 3) 
 ### Create a site-present trend surface  (sim data only)
