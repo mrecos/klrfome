@@ -32,6 +32,10 @@ devtools::install_github("mrecos/klrfome")
 Example workflow on simulated data (Try me!)
 --------------------------------------------
 
+<p align="left">
+<img 
+src="https://github.com/mrecos/klrfome/blob/master/README_images/KLRfome_dataflow.png?raw=true">
+</p>
 #### Libraries
 
 ``` r
