@@ -14,6 +14,7 @@ RUN . /etc/environment \
   && sudo apt-get update \
   && sudo apt-get install libudunits2-dev -y \
   && sudo apt-get install libgeos-dev -y\
+  && sudo apt-get install libgdal1-dev -y\
 
   # build this compendium package
   && R -e "install.packages('corrplot')"\
