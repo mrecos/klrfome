@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 
 
 
-## klrfome - Kernel Logistic Regression on Focal Mean Embeddings
+#### klrfome - Kernel Logistic Regression on Focal Mean Embeddings
 
 
 
@@ -36,7 +36,7 @@ To achieve this goal, the package fits a Kernel Logistic Regression (KLR) model 
 
 ### Citation
 
-Please cite this compendium as:
+Please cite this package as:
 
 > Harris, Matthew D., (2017). *klrfome - Kernel Logistic Regression on Focal Mean Embeddings*. Accessed 10 Sep 2017. Online at <https://doi.org/10.5281/zenodo.1211182>
 
@@ -57,6 +57,8 @@ devtools::install_github("mrecos/klrfome")
 src="https://github.com/mrecos/klrfome/blob/master/README_images/KLRfome_dataflow.png?raw=true">
 </p>
 
+
+In brief, the process below is 1) take a table of observations of two or more environmental variables within known sites and across the background of the study area; 2) use `format_data()` to convert that table to a list and under-sample the background data to a desired ratio (each group of observations with a site or background area are referred o in the ML literature as "bags"); 3) use `build_k()` function with the `sigma` hyperparameter and distance (default `euclidean`) to create a similarity matrix between all site and background bags; 4) the similarity matrix is the object that the kernel logistic regression model `klr()` function uses to fit its parameters. Steps 3 and 4 are where this method detracts most from traditional regression, but it is also what sets this method apart. unlike most regression that fits a model to a table of measurements, this approach fits a model to a matrix of similarities between all of the units of analysis (sites and background areas).
 
 #### Libraries
 ```{r packages, message=FALSE, warning=FALSE, paged.print=FALSE}
