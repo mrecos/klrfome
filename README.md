@@ -136,6 +136,12 @@ params <- list(train_data = train_data,
 
 #### Predicting on a raster stack
 
+<p align="left">
+<img 
+src="https://github.com/mrecos/klrfome/blob/master/README_images/KLRfome_prediction.png?raw=true">
+</p>
+
+
 This package can be used to predict on tabular data as above, but a more practical approach is to predict directly on a set of raster layers representing the predictor variables. Most of the code below is there for creating a simulated landscape that has some fidelity to the training data. For real-world examples, the prediction starts with a raster stack of predictor variable rasters. Form there the function `scale_prediction_rasters` center and scales the values of the rasters to that of the train\_data. Having data that is centered at zero and scaled to z-scores is critical in measuring the distance between observations. Further, it is critical that the test data (raster stack) is scaled to the same values as the training data or the predictions will be invalid. Once scaled, the raster stack is sent to the `KLR_raster_predict` function for prediction. The prediction function requires a scaled raster stack of the same variables used to train the model, the `ngb` value that specifies the x and y dimension of the focal window, and finally the list of params from the trained model. The setting on `KLR_raster_predict` shown here are predicting over the entire raster at once and not in parallel. The `KLR_raster_predict` function has options for splitting the prediction into a number of squares and predicting on each of those. Further, each split raster block can be assigned to a different core on your computer to compute in parallel. This is because prediction is a time consuming process and it is often helpful to split the computation into more manageable blocks. Oh, and you can set it to return the predicted blocks as a list of raster (all in memory) or to save each block as a GeoTiff after it is predicted. A version of parallel processing is shown in the next code section.
 
 ``` r
