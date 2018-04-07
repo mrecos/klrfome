@@ -14,6 +14,7 @@ knitr::opts_chunk$set(
 [![Build Status](https://travis-ci.org/mrecos/klrfome.svg?branch=master)](https://travis-ci.org/mrecos/klrfome)
 
 
+
 <p align="center">
   <img width="326" height="134" src="https://github.com/mrecos/klrfome/blob/master/klrfome_logo/KLR-black.png?raw=true">
 </p>
@@ -51,6 +52,7 @@ devtools::install_github("mrecos/klrfome")
 
 
 ## Example workflow on simulated data (Try me!)
+
 
 <p align="left">
 <img 

@@ -4,11 +4,7 @@
 <p align="center">
 <img width="326" height="134" src="https://github.com/mrecos/klrfome/blob/master/klrfome_logo/KLR-black.png?raw=true">
 </p>
-
-
 #### klrfome - Kernel Logistic Regression on Focal Mean Embeddings
-
--------------------------------------------------------------
 
 The purpose of this package is to solve the *Distribution Regression* problem for archaeological site location modeling; or any other data for that matter. The aim of Distribution Regression is to map a single scalar outcome (e.g. presence/absence; 0/1) to a distribution of features. This is opposed to typical regression where you have one observation mapping a single outcome to a single set of features/predictors. For example, an archaeological site is singularly defined as either present or absent, however the area within the sites boundary is not singularly defined by any one measurement. The area with an archaeology site is defined by an infinite distribution of measurements. Modeling this in traditional terms means either collapsing that distribution to a single measurement or pretending that a site is actually a series of adjacent, but independent measurements. The methods developed for this package take a different view instead by modeling the distribution of measurements from within a single site on a scale of similarity to the distribution of measurements on other sites and the environmental background in general. This method avoids collapsing measurements and promotes the assumption of independence from within a site to between sites. By doing so, this approach models a richer description of the landscape in a more intuitive sense of similarity.
 
@@ -39,7 +35,7 @@ Example workflow on simulated data (Try me!)
 <img 
 src="https://github.com/mrecos/klrfome/blob/master/README_images/KLRfome_dataflow.png?raw=true">
 </p>
-In brief, the process below is 1) take a table of observations of two or more environmental variables within known sites and across the background of the study area; 2) use `format_data()` to convert that table to a list and under-sample the background data to a desired ratio (each group of observations with a site or background area are referred o in the ML literature as "bags"); 3) use `build_k()` function with the `sigma` hyperparameter and distance (default `euclidean`) to create a similarity matrix between all site and background bags; 4) the similarity matrix is the object that the kernel logistic regression model uses to fit its parameters. Steps 3 and 4 are where this method detracts most from traditional regression, but it is also what sets this method apart. unlike most regression that fits a model to a table of measurements, this approach fits a model to a matrix of similarities between all of the units of analysis (sites and background areas).
+In brief, the process below is 1) take a table of observations of two or more environmental variables within known sites and across the background of the study area; 2) use `format_data()` to convert that table to a list and under-sample the background data to a desired ratio (each group of observations with a site or background area are referred o in the ML literature as "bags"); 3) use `build_k()` function with the `sigma` hyperparameter and distance (default `euclidean`) to create a similarity matrix between all site and background bags; 4) the similarity matrix is the object that the kernel logistic regression model `klr()` function uses to fit its parameters. Steps 3 and 4 are where this method detracts most from traditional regression, but it is also what sets this method apart. unlike most regression that fits a model to a table of measurements, this approach fits a model to a matrix of similarities between all of the units of analysis (sites and background areas).
 
 #### Libraries
 
