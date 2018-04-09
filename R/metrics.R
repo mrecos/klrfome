@@ -1,3 +1,48 @@
+#' make_quads
+#'
+#' @param pred - [vector] Predicted probabilities.
+#' @param obs - [vector] Observed presence/absence as 1/0
+#'
+#' @return [vector] TP, FP, TN, FN names vector
+#' @export
+#'
+make_quads <- function(pred,obs){
+  TP = sum(pred == 1 & obs == 1, na.rm = TRUE)
+  FP = sum(pred == 1 & obs == 0, na.rm = TRUE)
+  TN = sum(pred == 0 & obs == 0, na.rm = TRUE)
+  FN = sum(pred == 0 & obs == 1, na.rm = TRUE)
+  return("TP"=TP,"FP"=FP,"TN"=TN,"FN"=FN)
+}
+
+#' CM_quads
+#'
+#' @param dat - [data.frame] Table with two columns, "pred" and "presence". "pred" is the predicted probability. "presence" is the observed presence/absence as 1/0.
+#' @param threshold - [scalar or vector] a scalar or vector of one or more thresholds at which to evaluate the Confusion Matrix quadrants.
+#'
+#' @return [data.frame] Confusion Matrix quatrants at one or more threshold values.
+#'
+#' @importFrom dplyr group_by summarise
+#' @export
+#' 
+CM_quads <- function(dat,threshold = 0.5){
+  threshold_class <- NULL
+  for(i in seq_along(threshold)){
+    threshold_i <- data.frame(pred = dat$pred,
+                              obs = dat$presence,
+                              pred_cat = ifelse(model_pred$pred >= threshold[i],1,0),
+                              Threshold = threshold[i])
+    threshold_class <- rbind(threshold_class, threshold_i)
+  }
+  kstats <- threshold_class %>%
+    dplyr::group_by(Threshold) %>%
+    dplyr::summarise(TP = sum(pred_cat == 1 & obs == 1, na.rm = TRUE),
+                     FP = sum(pred_cat == 1 & obs == 0, na.rm = TRUE),
+                     TN = sum(pred_cat == 0 & obs == 0, na.rm = TRUE),
+                     FN = sum(pred_cat == 0 & obs == 1, na.rm = TRUE))
+  return(kstats)
+}
+
+
 #' cohens_kappa
 #'
 #' @param TP - [scalar] True Positives
@@ -123,7 +168,7 @@ metrics <- function(TP,TN,FP,FN){
     # http://aircconline.com/ijdkp/V5N2/5215ijdkp01.pdf
     Opp_Precision = ((TP+TN)/(TP+TN+FP+FN))-(abs(Specificity-Sensitivity)/(Specificity+Sensitivity)),
     # https://en.wikipedia.org/wiki/Precision_and_recall
-    MCC         = (TP*TN-FP*FN)/sqrt((TP+FP)*(TP+FN)*(TN+FP)*(TN+FN)),
+    MCC         = suppressWarnings((TP*TN-FP*FN)/sqrt((TP+FP)*(TP+FN)*(TN+FP)*(TN+FN))),
     Informedness  = Sensitivity+Specificity-1, #TSS, Younden's J
     Markedness    = (TP/(TP+FP))+(TN/(FN+TN))-1,
     # http://onlinelibrary.wiley.com/doi/10.1111/j.1365-2664.2006.01214.x/full
