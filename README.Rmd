@@ -67,6 +67,8 @@ In brief, the process below is 1) take a table of observations of two or more en
 library("ggplot2")   # for plotting results
 library("NLMR")      # for creating simulated landscapes
 library("rasterVis") # for plotting simulated lan
+library("pROC")      # for evaluation of model AUC metric
+library("dplyr")     # for data manipulation
 library("klrfome")   # for modeling
 ```
 
@@ -75,7 +77,7 @@ library("klrfome")   # for modeling
 In this block, the random `seed`, `sigma` and `lambda` hyperparameters, and the `dist_metric` are all set. The `sigma` parameter controls how "close" observations must be to be considered similar. Closeness in this context is defined in the 'feature space', but in geographic or measurement space. At a higher `sigma` more distant observations can still be considered similar. The `lambda` hyperparameter controls the regularization in the KLR model by penalizing large coefficients; it must by greater than zero. This means that the higher the `lambda` penalty, the closer the model will shrink its `alpha` parameters closer to zero, thereby reducing the influence of any one or group of observations on the overall model. These two hyperparameters are most critical as the govern the flexibility and scope of the model. Ideally, these will be set via k-fold Cross-Validation, Leave-one-out cross-validation, grid search, or trial and error. Exploring these hyperparameters will likely take most of the time and attention within the modeling process. 
 ```{r params}
 #Parameters
-set.seed(1337)
+set.seed(232)
 sigma = 0.5
 lambda = 0.1
 dist_metric = "euclidean"
@@ -210,6 +212,46 @@ rasterVis::levelplot(pred_rast, margin = FALSE, par.settings=viridisTheme()) +
 
 stopCluster(cl)
 ```
+
+
+#### Model Evaluation
+
+```{r model_evla}
+### Make some polygons around the simulated site points.
+### If all you have is points for sites, site radius can be an assumption
+site_pnts  <- SpatialPoints(coords)
+site_polys <- rgeos::gBuffer(site_pnts, width = 6, byid = FALSE)
+
+### extract sensitivity raster values to site areas
+site_sample <- raster::extract(pred_rast, site_polys, weights = FALSE, 
+                               small = TRUE, df = TRUE) %>%
+  rename(pred = layer) %>%
+  mutate(presence = 1)
+### sample for an environmental background of sensitivity values. (e.g. n = 500)
+bkg_sample <- data.frame(ID = 0, pred = sampleRandom(pred_rast, 500),
+                         presence = 0)
+model_pred <- rbind(site_sample, bkg_sample)
+
+### A vector of the sensitivity thresholds that you want to evaluate the model at
+threshold <- seq(0,1,0.1)
+### Compute True Positive, True Negative, False Positive, and False Negative values at each threshold
+kstats <- CM_quads(model_pred, threshold)
+
+### use the pROC::auc and klrfome::metrics functions to compute the metrics of choice at each threshold
+Test_area_metrics <- kstats %>%
+  group_by(Threshold) %>%
+  dplyr::mutate(AUC = round(pROC::auc(model_pred$presence, model_pred$pred, type = "linear"),3),
+                YoudensJ = round(metrics(TP,TN,FP,FN)$Informedness,3),
+                KG       = round(metrics(TP,TN,FP,FN)$KG,3),
+                Sensitivity = round(metrics(TP,TN,FP,FN)$Sensitivity,3),
+                FPR = round(metrics(TP,TN,FP,FN)$FPR,3),
+                FNR = round(metrics(TP,TN,FP,FN)$FNR,3)) %>%
+  data.frame()
+
+print(Test_area_metrics)
+```
+
+
 
 ### Main Package Functions
 

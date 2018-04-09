@@ -4,8 +4,6 @@
 <p align="center">
 <img width="326" height="134" src="https://github.com/mrecos/klrfome/blob/master/klrfome_logo/KLR-black.png?raw=true">
 </p>
-
-
 #### klrfome - Kernel Logistic Regression on Focal Mean Embeddings
 
 The purpose of this package is to solve the *Distribution Regression* problem for archaeological site location modeling; or any other data for that matter. The aim of Distribution Regression is to map a single scalar outcome (e.g. presence/absence; 0/1) to a distribution of features. This is opposed to typical regression where you have one observation mapping a single outcome to a single set of features/predictors. For example, an archaeological site is singularly defined as either present or absent, however the area within the sites boundary is not singularly defined by any one measurement. The area with an archaeology site is defined by an infinite distribution of measurements. Modeling this in traditional terms means either collapsing that distribution to a single measurement or pretending that a site is actually a series of adjacent, but independent measurements. The methods developed for this package take a different view instead by modeling the distribution of measurements from within a single site on a scale of similarity to the distribution of measurements on other sites and the environmental background in general. This method avoids collapsing measurements and promotes the assumption of independence from within a site to between sites. By doing so, this approach models a richer description of the landscape in a more intuitive sense of similarity.
@@ -15,8 +13,6 @@ To achieve this goal, the package fits a Kernel Logistic Regression (KLR) model 
 <p align="left">
 <img width="400" height="400" src="https://github.com/mrecos/klrfome/blob/master/analysis/images/KLR_map.jpg?raw=true">
 </p>
-
-
 ### Citation
 
 Please cite this package as:
@@ -39,8 +35,6 @@ Example workflow on simulated data (Try me!)
 <img 
 src="https://github.com/mrecos/klrfome/blob/master/README_images/KLRfome_dataflow.png?raw=true">
 </p>
-
-
 In brief, the process below is 1) take a table of observations of two or more environmental variables within known sites and across the background of the study area; 2) use `format_data()` to convert that table to a list and under-sample the background data to a desired ratio (each group of observations with a site or background area are referred o in the ML literature as "bags"); 3) use `build_k()` function with the `sigma` hyperparameter and distance (default `euclidean`) to create a similarity matrix between all site and background bags; 4) the similarity matrix is the object that the kernel logistic regression model `klr()` function uses to fit its parameters. Steps 3 and 4 are where this method detracts most from traditional regression, but it is also what sets this method apart. unlike most regression that fits a model to a table of measurements, this approach fits a model to a matrix of similarities between all of the units of analysis (sites and background areas).
 
 #### Libraries
@@ -49,6 +43,8 @@ In brief, the process below is 1) take a table of observations of two or more en
 library("ggplot2")   # for plotting results
 library("NLMR")      # for creating simulated landscapes
 library("rasterVis") # for plotting simulated lan
+library("pROC")      # for evaluation of model AUC metric
+library("dplyr")     # for data manipulation
 library("klrfome")   # for modeling
 ```
 
@@ -58,7 +54,7 @@ In this block, the random `seed`, `sigma` and `lambda` hyperparameters, and the 
 
 ``` r
 #Parameters
-set.seed(1337)
+set.seed(232)
 sigma = 0.5
 lambda = 0.1
 dist_metric = "euclidean"
@@ -89,12 +85,11 @@ The first step in modeling these data is to build the similarity kernel with `bu
 K <- build_K(train_data, sigma = sigma, dist_metric = dist_metric, progress = FALSE)
 #### Train KLR model
 train_log_pred <- KLR(K, train_presence, lambda, 100, 0.001, verbose = 2)
-#> Step 1. Absolute Relative Approximate Error = 125.6576
-#> Step 2. Absolute Relative Approximate Error = 12.488
-#> Step 3. Absolute Relative Approximate Error = 0.322
-#> Step 4. Absolute Relative Approximate Error = 0.0369
-#> Step 5. Absolute Relative Approximate Error = 0
-#> Found solution in 5 steps.
+#> Step 1. Absolute Relative Approximate Error = 128.6897
+#> Step 2. Absolute Relative Approximate Error = 14.2954
+#> Step 3. Absolute Relative Approximate Error = 0.9626
+#> Step 4. Absolute Relative Approximate Error = 0.0133
+#> Found solution in 4 steps.
 #### Predict KLR model on test data
 test_log_pred <- KLR_predict(test_data, train_data, dist_metric = dist_metric,
                              train_log_pred[["alphas"]], sigma, progress = FALSE)
@@ -140,8 +135,6 @@ params <- list(train_data = train_data,
 <img 
 src="https://github.com/mrecos/klrfome/blob/master/README_images/KLRfome_prediction.png?raw=true">
 </p>
-
-
 This package can be used to predict on tabular data as above, but a more practical approach is to predict directly on a set of raster layers representing the predictor variables. Most of the code below is there for creating a simulated landscape that has some fidelity to the training data. For real-world examples, the prediction starts with a raster stack of predictor variable rasters. Form there the function `scale_prediction_rasters` center and scales the values of the rasters to that of the train\_data. Having data that is centered at zero and scaled to z-scores is critical in measuring the distance between observations. Further, it is critical that the test data (raster stack) is scaled to the same values as the training data or the predictions will be invalid. Once scaled, the raster stack is sent to the `KLR_raster_predict` function for prediction. The prediction function requires a scaled raster stack of the same variables used to train the model, the `ngb` value that specifies the x and y dimension of the focal window, and finally the list of params from the trained model. The setting on `KLR_raster_predict` shown here are predicting over the entire raster at once and not in parallel. The `KLR_raster_predict` function has options for splitting the prediction into a number of squares and predicting on each of those. Further, each split raster block can be assigned to a different core on your computer to compute in parallel. This is because prediction is a time consuming process and it is often helpful to split the computation into more manageable blocks. Oh, and you can set it to return the predicted blocks as a list of raster (all in memory) or to save each block as a GeoTiff after it is predicted. A version of parallel processing is shown in the next code section.
 
 ``` r
@@ -220,6 +213,55 @@ rasterVis::levelplot(pred_rast, margin = FALSE, par.settings=viridisTheme()) +
 #                                    save_loc = "c:/Temp/tif", overwrite = TRUE)
 
 stopCluster(cl)
+```
+
+#### Model Evaluation
+
+``` r
+### Make some polygons around the simulated site points.
+### If all you have is points for sites, site radius can be an assumption
+site_pnts  <- SpatialPoints(coords)
+site_polys <- rgeos::gBuffer(site_pnts, width = 6, byid = FALSE)
+
+### extract sensitivity raster values to site areas
+site_sample <- raster::extract(pred_rast, site_polys, weights = FALSE, 
+                               small = TRUE, df = TRUE) %>%
+  rename(pred = layer) %>%
+  mutate(presence = 1)
+### sample for an environmental background of sensitivity values. (e.g. n = 500)
+bkg_sample <- data.frame(ID = 0, pred = sampleRandom(pred_rast, 500),
+                         presence = 0)
+model_pred <- rbind(site_sample, bkg_sample)
+
+### A vector of the sensitivity thresholds that you want to evaluate the model at
+threshold <- seq(0,1,0.1)
+### Compute True Positive, True Negative, False Positive, and False Negative values at each threshold
+kstats <- CM_quads(model_pred, threshold)
+
+### use the pROC::auc and klrfome::metrics functions to compute the metrics of choice at each threshold
+Test_area_metrics <- kstats %>%
+  group_by(Threshold) %>%
+  dplyr::mutate(AUC = round(pROC::auc(model_pred$presence, model_pred$pred, type = "linear"),3),
+                YoudensJ = round(metrics(TP,TN,FP,FN)$Informedness,3),
+                KG       = round(metrics(TP,TN,FP,FN)$KG,3),
+                Sensitivity = round(metrics(TP,TN,FP,FN)$Sensitivity,3),
+                FPR = round(metrics(TP,TN,FP,FN)$FPR,3),
+                FNR = round(metrics(TP,TN,FP,FN)$FNR,3)) %>%
+  data.frame()
+
+print(Test_area_metrics)
+#>    Threshold  TP  FP  TN  FN   AUC YoudensJ    KG Sensitivity   FPR   FNR
+#> 1        0.0 324 500   0   0 0.736    0.000 0.000       1.000 1.000 0.000
+#> 2        0.1 324 422  78   0 0.736    0.156 0.156       1.000 0.844 0.000
+#> 3        0.2 324 350 150   0 0.736    0.300 0.300       1.000 0.700 0.000
+#> 4        0.3 317 316 184   7 0.736    0.346 0.354       0.978 0.632 0.022
+#> 5        0.4 308 286 214  16 0.736    0.379 0.398       0.951 0.572 0.049
+#> 6        0.5 295 253 247  29 0.736    0.404 0.444       0.910 0.506 0.090
+#> 7        0.6 280 220 280  44 0.736    0.424 0.491       0.864 0.440 0.136
+#> 8        0.7 254 190 310  70 0.736    0.404 0.515       0.784 0.380 0.216
+#> 9        0.8 211 144 356 113 0.736    0.363 0.558       0.651 0.288 0.349
+#> 10       0.9  97  89 411 227 0.736    0.121 0.405       0.299 0.178 0.701
+#> 11       1.0   0   0 500 324 0.736    0.000   NaN       0.000 0.000 1.000
 ```
 
 ### Main Package Functions
