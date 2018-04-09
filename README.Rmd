@@ -69,6 +69,7 @@ library("NLMR")      # for creating simulated landscapes
 library("rasterVis") # for plotting simulated lan
 library("pROC")      # for evaluation of model AUC metric
 library("dplyr")     # for data manipulation
+library("knitr")     # for printing tables in this document
 library("klrfome")   # for modeling
 ```
 
@@ -248,7 +249,7 @@ Test_area_metrics <- kstats %>%
                 FNR = round(metrics(TP,TN,FP,FN)$FNR,3)) %>%
   data.frame()
 
-print(Test_area_metrics)
+knitr::kable(Test_area_metrics)
 ```
 
 

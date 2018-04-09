@@ -15,8 +15,6 @@ To achieve this goal, the package fits a Kernel Logistic Regression (KLR) model 
 <p align="left">
 <img width="400" height="400" src="https://github.com/mrecos/klrfome/blob/master/analysis/images/KLR_map.jpg?raw=true">
 </p>
-
-
 ### Citation
 
 Please cite this package as:
@@ -39,6 +37,8 @@ Example workflow on simulated data (Try me!)
 <img 
 src="https://github.com/mrecos/klrfome/blob/master/README_images/KLRfome_dataflow.png?raw=true">
 </p>
+
+
 In brief, the process below is 1) take a table of observations of two or more environmental variables within known sites and across the background of the study area; 2) use `format_data()` to convert that table to a list and under-sample the background data to a desired ratio (each group of observations with a site or background area are referred o in the ML literature as "bags"); 3) use `build_k()` function with the `sigma` hyperparameter and distance (default `euclidean`) to create a similarity matrix between all site and background bags; 4) the similarity matrix is the object that the kernel logistic regression model `klr()` function uses to fit its parameters. Steps 3 and 4 are where this method detracts most from traditional regression, but it is also what sets this method apart. unlike most regression that fits a model to a table of measurements, this approach fits a model to a matrix of similarities between all of the units of analysis (sites and background areas).
 
 #### Libraries
@@ -49,6 +49,7 @@ library("NLMR")      # for creating simulated landscapes
 library("rasterVis") # for plotting simulated lan
 library("pROC")      # for evaluation of model AUC metric
 library("dplyr")     # for data manipulation
+library("knitr")     # for printing tables in this document
 library("klrfome")   # for modeling
 ```
 
@@ -255,20 +256,22 @@ Test_area_metrics <- kstats %>%
                 FNR = round(metrics(TP,TN,FP,FN)$FNR,3)) %>%
   data.frame()
 
-print(Test_area_metrics)
-#>    Threshold  TP  FP  TN  FN   AUC YoudensJ    KG Sensitivity   FPR   FNR
-#> 1        0.0 324 500   0   0 0.736    0.000 0.000       1.000 1.000 0.000
-#> 2        0.1 324 422  78   0 0.736    0.156 0.156       1.000 0.844 0.000
-#> 3        0.2 324 350 150   0 0.736    0.300 0.300       1.000 0.700 0.000
-#> 4        0.3 317 316 184   7 0.736    0.346 0.354       0.978 0.632 0.022
-#> 5        0.4 308 286 214  16 0.736    0.379 0.398       0.951 0.572 0.049
-#> 6        0.5 295 253 247  29 0.736    0.404 0.444       0.910 0.506 0.090
-#> 7        0.6 280 220 280  44 0.736    0.424 0.491       0.864 0.440 0.136
-#> 8        0.7 254 190 310  70 0.736    0.404 0.515       0.784 0.380 0.216
-#> 9        0.8 211 144 356 113 0.736    0.363 0.558       0.651 0.288 0.349
-#> 10       0.9  97  89 411 227 0.736    0.121 0.405       0.299 0.178 0.701
-#> 11       1.0   0   0 500 324 0.736    0.000   NaN       0.000 0.000 1.000
+knitr::kable(Test_area_metrics)
 ```
+
+|  Threshold|   TP|   FP|   TN|   FN|    AUC|  YoudensJ|     KG|  Sensitivity|    FPR|    FNR|
+|----------:|----:|----:|----:|----:|------:|---------:|------:|------------:|------:|------:|
+|        0.0|  324|  500|    0|    0|  0.736|     0.000|  0.000|        1.000|  1.000|  0.000|
+|        0.1|  324|  422|   78|    0|  0.736|     0.156|  0.156|        1.000|  0.844|  0.000|
+|        0.2|  324|  350|  150|    0|  0.736|     0.300|  0.300|        1.000|  0.700|  0.000|
+|        0.3|  317|  316|  184|    7|  0.736|     0.346|  0.354|        0.978|  0.632|  0.022|
+|        0.4|  308|  286|  214|   16|  0.736|     0.379|  0.398|        0.951|  0.572|  0.049|
+|        0.5|  295|  253|  247|   29|  0.736|     0.404|  0.444|        0.910|  0.506|  0.090|
+|        0.6|  280|  220|  280|   44|  0.736|     0.424|  0.491|        0.864|  0.440|  0.136|
+|        0.7|  254|  190|  310|   70|  0.736|     0.404|  0.515|        0.784|  0.380|  0.216|
+|        0.8|  211|  144|  356|  113|  0.736|     0.363|  0.558|        0.651|  0.288|  0.349|
+|        0.9|   97|   89|  411|  227|  0.736|     0.121|  0.405|        0.299|  0.178|  0.701|
+|        1.0|    0|    0|  500|  324|  0.736|     0.000|    NaN|        0.000|  0.000|  1.000|
 
 ### Main Package Functions
 
