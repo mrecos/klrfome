@@ -26,6 +26,7 @@ RUN . /etc/environment \
   && R -e "install.packages('NLMR')"\
   && R -e "install.packages('rgeos')"\
   && R -e "install.packages('doParallel')"\
+  && R -e "install.packages('pROC')"\
   && R -e "devtools::install('/klrfome', dep=TRUE)" \
 
  # render the manuscript into a docx, you'll need to edit this if you've
