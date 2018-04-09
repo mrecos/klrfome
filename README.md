@@ -4,6 +4,8 @@
 <p align="center">
 <img width="326" height="134" src="https://github.com/mrecos/klrfome/blob/master/klrfome_logo/KLR-black.png?raw=true">
 </p>
+
+
 #### klrfome - Kernel Logistic Regression on Focal Mean Embeddings
 
 The purpose of this package is to solve the *Distribution Regression* problem for archaeological site location modeling; or any other data for that matter. The aim of Distribution Regression is to map a single scalar outcome (e.g. presence/absence; 0/1) to a distribution of features. This is opposed to typical regression where you have one observation mapping a single outcome to a single set of features/predictors. For example, an archaeological site is singularly defined as either present or absent, however the area within the sites boundary is not singularly defined by any one measurement. The area with an archaeology site is defined by an infinite distribution of measurements. Modeling this in traditional terms means either collapsing that distribution to a single measurement or pretending that a site is actually a series of adjacent, but independent measurements. The methods developed for this package take a different view instead by modeling the distribution of measurements from within a single site on a scale of similarity to the distribution of measurements on other sites and the environmental background in general. This method avoids collapsing measurements and promotes the assumption of independence from within a site to between sites. By doing so, this approach models a richer description of the landscape in a more intuitive sense of similarity.
@@ -13,6 +15,8 @@ To achieve this goal, the package fits a Kernel Logistic Regression (KLR) model 
 <p align="left">
 <img width="400" height="400" src="https://github.com/mrecos/klrfome/blob/master/analysis/images/KLR_map.jpg?raw=true">
 </p>
+
+
 ### Citation
 
 Please cite this package as:
@@ -135,6 +139,8 @@ params <- list(train_data = train_data,
 <img 
 src="https://github.com/mrecos/klrfome/blob/master/README_images/KLRfome_prediction.png?raw=true">
 </p>
+
+
 This package can be used to predict on tabular data as above, but a more practical approach is to predict directly on a set of raster layers representing the predictor variables. Most of the code below is there for creating a simulated landscape that has some fidelity to the training data. For real-world examples, the prediction starts with a raster stack of predictor variable rasters. Form there the function `scale_prediction_rasters` center and scales the values of the rasters to that of the train\_data. Having data that is centered at zero and scaled to z-scores is critical in measuring the distance between observations. Further, it is critical that the test data (raster stack) is scaled to the same values as the training data or the predictions will be invalid. Once scaled, the raster stack is sent to the `KLR_raster_predict` function for prediction. The prediction function requires a scaled raster stack of the same variables used to train the model, the `ngb` value that specifies the x and y dimension of the focal window, and finally the list of params from the trained model. The setting on `KLR_raster_predict` shown here are predicting over the entire raster at once and not in parallel. The `KLR_raster_predict` function has options for splitting the prediction into a number of squares and predicting on each of those. Further, each split raster block can be assigned to a different core on your computer to compute in parallel. This is because prediction is a time consuming process and it is often helpful to split the computation into more manageable blocks. Oh, and you can set it to return the predicted blocks as a list of raster (all in memory) or to save each block as a GeoTiff after it is predicted. A version of parallel processing is shown in the next code section.
 
 ``` r
