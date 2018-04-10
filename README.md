@@ -15,6 +15,8 @@ To achieve this goal, the package fits a Kernel Logistic Regression (KLR) model 
 <p align="left">
 <img width="400" height="400" src="https://github.com/mrecos/klrfome/blob/master/analysis/images/KLR_map.jpg?raw=true">
 </p>
+
+
 ### Citation
 
 Please cite this package as:
@@ -224,6 +226,8 @@ stopCluster(cl)
 
 #### Model Evaluation
 
+Evaluating model on independent test data is very important for understanding the models ability to generalize to new observations. The `klrfome` package provides two functions to assist with this; `CM-quads()` and `metrics()`. In order to use these functions, the user needs to extract the sensitivity values output from `klr_raster_predict` at both site locations (preferably not those used to create the model) and a large number of random locations to sample the full distribution of sensitivities. The code below uses the simulated site locations, `raster::extract`, and `sampleRandom` to obtain these values. Once the values are put into a table and labelled as 1 or 0, the `CM-quads` function is applied to retrieve the True Positive, True Negative, False Positive, and False Negative values of the model at one or more probability thresholds. Choosing the appropriate threshold at which to classify a model into High, Moderate, and Low or Site-present vs. site-absent needs a good deal of consideration for both the intrinsic model quality and extrinsic model goals. Here I show how to evaluate the classification metrics at every `0.1` threshold between 0 and 1. The results from `CM_quads` (named for the four quadrants of the confusion matrix) are then evaluated with the `pROC::auc` and `klrfome::metrics` functions to calculate the metrics of choice.
+
 ``` r
 ### Make some polygons around the simulated site points.
 ### If all you have is points for sites, site radius can be an assumption
@@ -272,6 +276,8 @@ knitr::kable(Test_area_metrics)
 |        0.8|  211|  144|  356|  113|  0.736|     0.363|  0.558|        0.651|  0.288|  0.349|
 |        0.9|   97|   89|  411|  227|  0.736|     0.121|  0.405|        0.299|  0.178|  0.701|
 |        1.0|    0|    0|  500|  324|  0.736|     0.000|    NaN|        0.000|  0.000|  1.000|
+
+In this case those metrics are the `auc`, `Youdens J`, `KG` = Kvamme Gain, `Sensitivity`, `FPR` = False Positive Rate, and `FNR` = False Negative Rate. While there is no one metric that is a perfect descriptor of model performance in all scenarios, these are the metrics that I find most useful for describing archaeological predictive models. In this example, I am aiming to maximize my two-class classification for the Youden's J (aka Informedness). As such, I would set my site-present vs. site-absent `Threshold` at **0.6**. At this threshold we have a `Sensitivity` = **0.864** and a `FPR` = **0.44**.
 
 ### Main Package Functions
 
