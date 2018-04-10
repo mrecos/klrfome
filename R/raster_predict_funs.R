@@ -1,4 +1,4 @@
-#' rescale_raster
+#' rescale_sim_raster
 #'
 #' @param rast 
 #' @param mean 
@@ -8,7 +8,7 @@
 #' @export
 #'
 
-rescale_raster <- function(rast,mean,sd){
+rescale_sim_raster <- function(rast,mean,sd){
   r_vals <- rast@data@values
   rast[] <- mean + (r_vals - mean(r_vals)) * (sd/sd(r_vals))
   return(rast)
