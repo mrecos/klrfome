@@ -265,21 +265,23 @@ This package contains the functions necessary to compute Kernel Linear Regressio
 #### KLR_funs.R for Fitting and Predicting on Tabular Data
 
 
-*   `build_K` - Function takes list of training data, scalar value for `sigma` hyperparameter, and a distance method to compute a mean embedding similarity kernel. This kernel is a pair-wise (N x N) matrix of the mean similarity between the attributes describing each site location and background group.
+*   `build_K` - Function takes list of training data, scalar value for `sigma` hyperparameter, and a distance method to compute a mean embedding similarity kernel. This kernel is a pair-wise (N x N) matrix of the mean similarity between the attributes describing each site location and background group. Optional inouts are `progress` for a progress bar and `dist_metric` for the distance computation. By default, the distance metric is `euclidean` and should likely stay as such unless you have explored other distances and know why/how you want to use them.
+
 *   `KLR` - Function takes the similarity kernel matrix `K`, a vector of presence/absence coded as `1` or `0`, and a scalar value for the `lambda` regularizing hyperparameter; optionally values for maximum iterations and threshold. This function performs Kernel Logistic Regression (KLR) via Iterative Re-weighted Least Squares (IRLS). The objective is to approximate a set of parameters that minimize the negative likelihood of the parameters given the data and response. This function returns a list of `pred`, the estimated response (probability of site-presence) for the training data, and `alphas`, the approximated parameters from the IRLS algorithm.
+
 *   `KLR_predict` - Function takes a list of the training data, a list of the testing data, a vector of the approximated `alphas` parameters, a scalar value for the `sigma` kernel hyperparameter, and a distance method. This function predicts the probability of site presence for new observations based on the training data and `alphas` parameters. This is accomplished by building the `k*k` kernel matrix as the similarity between the training test data then computing the inverse logit of `k*k %*% alphas`. The output is the predicted probability of site presence for each training data example.
 
 
 #### raster_predict_funs.R for Predicting on Raster Data
 
 
-*   `rescale_sim_raster` - 
+*   `rescale_sim_raster` - Function that rescales simulated rasters from `NLMR::nlm_gaussianfield` or whatever you want to use, to the mean and standard deviation of the simulated data used to fit the `klr` model. You will have to add the `mean` and `sd` arguments manually based on what you put into the `get_sim_data` function. The example in the code above inputs the default `mean` and `sd` values from the defualts of the `get_sim_data` function. Returned is a raster scaled too your simualted training data.
 
-*   `sim_trend` - 
+*   `sim_trend` - Function is used to take create `n` number of simulated site locations of `size` cell dimensions on a `rows` by `cols` raster. The latter two arguments should match the size of your simulated rasters. The function randomly locates the sites and then creates a distance gradient (trend) from the site locations outward. The trend is a value `1` at the sites and reduces to `0` at the maximum combined distance from all sites. The output of this function is a `list` of a `matrix` of simulated site x/y coordinates (centers) and a `raster` of the trend surface. The point of the trend is to then combine it with the simulated rasters (as down in the code above) such that the raster depicting site-likely conditions is multiplied by the trend to output a raster retaining site-likely conditions near simulated site locations. Conversely, the site-unlikely simulated raster is multiplied by the inverse of the trend to result in a raster retaining site-unlikely characteristics away from the site locations. When those two rasters are added you get a simulated environment that is more preferable to site locations near site locations. It is a bit involved for something that had nothing to do with the actual KLRfome model, but it is needed to produce actual correlated environments for model testing.
 
-*   `scale_prediction_rasters` -
+*   `scale_prediction_rasters` - Function scales your predictor `rater stack` based on the `params` list created in the model fitting process. This script simply loops over the rasters in the stack and centers and scales based on mean and sd of the training data used to fit the `klr` model. The function outputs a `raster stack`.
 
-*   `KLR_raster_predict` - 
+*   `KLR_raster_predict` - Function predicts the probability of site-presence based on a `raster stack` of center/scaled predictor rasters, a focal neighborhood size in cells as `ngb`, and the `params` list of model fit parameters. Finally, the function also needs to the the number of columns as `cols` and rows as `rows` of the study areas raster stack. The rest of the arguments default to predicting the entire raster stack in one pass and only on a single core (not in parallel). The rest of the argument control whether the study area is split (`split = TRUE`) into a grid of blocks. The `ppside` positive integer controls the number of blocks along each axis of the study area. If you wish to compute the prediction in parallel, you will need to split it into blocks so that each block can be sent to a different processor core. The final set of optional arguments control how the prediction is returned, either as a `output = "list"` or `output = "save"` for returning a list of rasters of saving each out as a GeoTiff, and then arguments for the GeoTiff location with `save_loc` and whether to overwrite existing GeoTiffs with `overwrite`. The function contains a bit of logic to try and assist the user in which arguments go with what. Perhaps future versions will streamline this a bit.
 
 
 #### format_site_data.R for Data Formatting
@@ -296,14 +298,13 @@ This package contains the functions necessary to compute Kernel Linear Regressio
 
 #### metrics.R for Calculating Performance Metrics
 
+*   `CM_quads` - Function takes a data.frame of predicted probabilities (must be called `pred`) and actual observed presence/absence (must be called `presence` and contain `1 = presence` and `0 = absence`). Optional input is a threshold value or values in the form of a single scalar (default = 0.5) or a numeric vector to loop over. The function calculates the True Positive, True Negative, False Positive, and False Negative quantities at each threshold. These quantities are typically shown in a 2x2 confusion matrix, hence the name Confusion Matrix (CM) quadrants. The output is a data.frame with columns for the `TP`, `FP`, `TN`, and `FN` at each desired `Threshold`. This is useful for figuring out how the model performs at a variety of thresholds. In the example code above I also compute the `AUC` statistic that gives an indication of model performance across all thresholds.
 
-*   `metrics` -
-
+*   `metrics` - Function provides a large quantity of metrics based on the quadrants of the Confusion Matrix derived from a threshold of the predicted probability values. The input to this function is the `TP`, `TN`, `FP`, and `FN` quantities of a thresholded model as derived from the `CM_quads` function. The output of this model is a list of `51` different metrics such as `Sensitivity`, `Youden's J`, `Positive Predictive Gain`, and many more. Some are commonplace and others are practically unknown. I put a few note in the function as to where they come from. The function returns all `51` as a list.
 
 #### plot.R for Plotting Similarity Kernel
 
-
-*   `K_corrplot` - 
+*   `K_corrplot` - Function is a pretty simple wrapper around `corrplot::corrplot()` with hierarchical clustering. Inputs for this function are the similarity matrix `K` and the `train_data` with the option of an integer for the number of clusters to partition the data; default = 4. Output is a plot or if assigned to an object, it is an object of class `matrix`.
 
 
 ### Licenses
