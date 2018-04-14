@@ -42,3 +42,11 @@ ggplot(predicted_log, aes(x = as.factor(obs), y = pred, color = as.factor(obs)))
   theme(
     legend.position = "none"
   )
+
+### Save parameters for later prediction
+params <- list(train_data = train_data,
+               alphas_pred = train_log_pred[["alphas"]],
+               sigma = sigma,
+               lambda = lambda,
+               means = formatted_data$means,
+               sds = formatted_data$sds)
