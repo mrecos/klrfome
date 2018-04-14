@@ -1,5 +1,5 @@
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1211182.svg)](https://doi.org/10.5281/zenodo.1211182) [![Build Status](https://travis-ci.org/mrecos/klrfome.svg?branch=master)](https://travis-ci.org/mrecos/klrfome)
+[![DOI](https://zenodo.org/badge/103055953.svg)](https://zenodo.org/badge/latestdoi/103055953) [![Build Status](https://travis-ci.org/mrecos/klrfome.svg?branch=master)](https://travis-ci.org/mrecos/klrfome)
 
 <p align="center">
 <img width="326" height="134" src="https://github.com/mrecos/klrfome/blob/master/klrfome_logo/KLR-black.png?raw=true">
@@ -21,7 +21,7 @@ To achieve this goal, the package fits a Kernel Logistic Regression (KLR) model 
 
 Please cite this package as:
 
-> Harris, Matthew D., (2017). *klrfome - Kernel Logistic Regression on Focal Mean Embeddings*. Accessed 10 Sep 2017. Online at <https://doi.org/10.5281/zenodo.1211182>
+> Harris, Matthew D., (2017). *klrfome - Kernel Logistic Regression on Focal Mean Embeddings*. Accessed 10 Sep 2017. Online at <https://doi.org/10.5281/zenodo.1218403>
 
 ### Installation
 
