@@ -30,8 +30,8 @@ The purpose of this package is to solve the *Distribution Regression* problem fo
 To achieve this goal, the package fits a Kernel Logistic Regression (KLR) model onto a mean embedding similarity matrix and predicts as a roving focal function of varying window size. The name of the package is derived from this approach; **K**ernel **L**ogistic **R**egression on **FO**cal **M**ean **E**mbeddings (**klrfome**) pronounced *clear foam*.
 
 
-<p align="left">
-<img width="400" height="400" src="https://github.com/mrecos/klrfome/blob/master/analysis/images/KLR_map.jpg?raw=true">
+<p align="center">
+<img width="800" height="600" src="https://github.com/mrecos/klrfome/blob/master/SAA_2018_poster/SAA_2018_poster_small.jpg?raw=true">
 </p>
 
 
