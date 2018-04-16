@@ -16,6 +16,8 @@ To achieve this goal, the package fits a Kernel Logistic Regression (KLR) model 
 <img width="800" height="600" src="https://github.com/mrecos/klrfome/blob/master/SAA_2018_poster/SAA_2018_poster_small.jpg?raw=true">
 </p>
 
+(High-res versions of research poster are in the [/SAA\_2018\_poster](https://github.com/mrecos/klrfome/tree/master/SAA_2018_poster) folder)
+
 
 ### Citation
 
