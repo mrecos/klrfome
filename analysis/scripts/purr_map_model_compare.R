@@ -25,12 +25,11 @@ SVM_helper <- function(dat_split, cost = 0.001){
              data = svm_data, cost = cost,
              family = "binomial")
 }
-KRR_helper <- function(dat_split, sigma, lambda, dist_method){
+KRR_helper <- function(dat_split, sigma, lambda, dist_metric){
   krr_data <- dat_split$train_data
-  K <- build_K(krr_data, krr_data, sigma, dist_method = dist_method, progres = TRUE)
-  diag(K) <- 1
+  K <- build_K(krr_data, krr_data, sigma, dist_method = dist_metric, progres = TRUE)
   #### Train
-  krr <- KRR_logit_optim(K, dat_split$train_presence, lambda, 100, 0.001, verbose = 0)
+  krr <- KLR(K, dat_split$train_presence, lambda, 100, 0.001, verbose = 0)
   return(krr)
 }
 predict_helper <- function(model,splits,model_type,
@@ -42,11 +41,10 @@ predict_helper <- function(model,splits,model_type,
                             obs  = splits$tbl_test_presence)
   }
   if(model_type == "KRR"){
-    method_object <- proxy::pr_DB$get_entry("Euclidean")
     alphas_pred   <- model[["alphas"]]
     newdata    <- splits$test_data
     train_data <- splits$train_data
-    preds <- KRR_logit_predict(newdata, train_data, alphas_pred, sigma, dist_method = method_object)
+    preds <- KLR_predict(newdata, train_data, alphas_pred, sigma, dist_method = dist_metric)
     predicted <- data.frame(pred = preds,
                             obs  = splits$test_presence)
   }
@@ -75,10 +73,9 @@ library("pROC")
 library("data.table")
 library("tidyverse")
 library("e1071")         # for SVM comparison
-library("DistRegLMERR")
+library("klrfome")
 library("future")
 
-method_object <- proxy::pr_DB$get_entry("Euclidean")
 sigma <- 1
 lambda <- 0.11
 
@@ -89,6 +86,7 @@ background_site_balance = 1
 sample_fraction = 0.50
 train_test_split = 0.75
 confusion_matrix_cutoff = 0.5
+dist_metric = "euclidean"
 
 physioshed_ids <- c(1,2,6,8,12)
 
@@ -112,7 +110,7 @@ for(z in seq_along(physioshed_ids)){
 
   ###### parallel fitting and model compare
   message(paste0("starting maps for ",physioshed,"\n"))
-  searches <- 100
+  searches <- 2
   model_data <- seq_len(searches) %>%
     data_frame(
       id = .,
@@ -126,7 +124,7 @@ for(z in seq_along(physioshed_ids)){
   model_fits <- model_data %>%
     mutate(model_LR    = map(splits,     ~future::future(logreg_helper(.x))),
            model_SVM   = map(splits,     ~future::future(SVM_helper(.x, cost = 0.001))),
-           model_KRR   = map(splits,     ~future::future(KRR_helper(.x, sigma, lambda, method_object)))) %>%
+           model_KRR   = map(splits,     ~future::future(KRR_helper(.x, sigma, lambda, dist_metric)))) %>%
     mutate(model_LR    = map(model_LR,   ~future::value(.x)),
            model_SVM   = map(model_SVM,  ~future::value(.x)),
            model_KRR   = map(model_KRR,  ~future::value(.x)))

@@ -25,8 +25,8 @@ library("klrfome")
 
 #Parameters
 # set.seed(3849)
-sigma = 1
-lambda = 0.11
+sigma = 2
+lambda = 0.81
 dist_metric = "euclidean"
 
 ### Data parameters
@@ -48,10 +48,6 @@ dat1 <- dplyr::select(dat,presence, SITENO,
                       ed_h6, std_32c, cd_h7, slpvr_16c, ed_h2, cd_conf, elev_2_conf)
 # elev_2_strm, e_hyd_min, ed_drnh, elev_2_drainh,
 # tri_16c, cd_h5)
-### Center and Standardize data
-variables <- setdiff(colnames(dat1), c("presence", "SITENO"))
-dat1   <- data.frame(apply(dat1[, variables],2,scale))
-dat1   <- cbind(dat1, dat[,c("presence","SITENO")])
 ## Reduce number of sites to N_sites
 formatted_data <- format_site_data(dat1, N_sites, train_test_split, background_site_balance,
                                    sample_fraction = sample_fraction)
@@ -68,7 +64,7 @@ tbl_test_presence       <- formatted_data[["tbl_test_presence"]]
 ## Logistic Mean Embedding KRR Model
 #### Build Kernel Matrix
 K <- build_K(train_data, train_data, sigma, dist_metric = dist_metric)
-diag(K) <- 1
+# diag(K) <- 1
 #### Train
 train_log_pred <- KLR(K, train_presence, lambda, 100, 0.001, verbose = 2)
 #### Predict
@@ -82,11 +78,16 @@ predicted_log <- data.frame(pred = test_log_pred,
                             obs = test_presence,
                             pred_cat = ifelse(test_log_pred >= confusion_matrix_cutoff,1,0))
 
-### Performance Metrics
+### Performance Metrics ##
+preds <- data.frame(preds = test_log_pred, obs = test_presence)
+cm_cutoff <- get_YJ_max_threshold(preds)
+cm <- make_quads(ifelse(test_log_pred >= cm_cutoff, 1, 0), preds$obs)
+klrfome::metrics(cm["TP"],cm["TN"],cm["FP"],cm["FN"])$Informedness
+# Get AUC #
+roc_obj <- pROC::roc(test_presence, test_log_pred)
+as.numeric(pROC::auc(roc_obj))
 group_by(predicted_log, obs) %>%
   summarize(mean_pred = mean(pred))
-# x <- confusionMatrix(predicted_log$pred_cat, predicted_log$obs, positive = "1")
-krr_metrics <- get_metrics(predicted_log)
 
 ### compare to logit
 lr <- glm(presence ~ ., data = dplyr::select(tbl_train_data, -SITENO), family = "binomial")

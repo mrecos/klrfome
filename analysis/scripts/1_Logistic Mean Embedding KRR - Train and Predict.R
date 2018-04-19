@@ -27,6 +27,10 @@ train_log_pred <- KLR(K, train_presence, lambda, 100, 0.001, verbose = 2)
 test_log_pred <- KLR_predict(test_data, train_data, dist_metric = dist_metric,
                              train_log_pred[["alphas"]], sigma)
 
+### Metrics
+cm <- make_quads(ifelse(test_log_pred >= 0.5, 1, 0), test_presence)
+metrics(TP = cm[1], TN = cm[3], FP = cm[2], FN = cm[4])$Informedness
+
 ### Plot K Matrix
 K_corrplot(K,train_data,clusters=4)
 
