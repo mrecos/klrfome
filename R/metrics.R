@@ -11,7 +11,7 @@ make_quads <- function(pred,obs){
   FP = sum(pred == 1 & obs == 0, na.rm = TRUE)
   TN = sum(pred == 0 & obs == 0, na.rm = TRUE)
   FN = sum(pred == 0 & obs == 1, na.rm = TRUE)
-  return("TP"=TP,"FP"=FP,"TN"=TN,"FN"=FN)
+  return(c("TP"=TP,"FP"=FP,"TN"=TN,"FN"=FN))
 }
 
 #' CM_quads
