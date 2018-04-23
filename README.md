@@ -12,12 +12,14 @@ The purpose of this package is to solve the *Distribution Regression* problem fo
 
 To achieve this goal, the package fits a Kernel Logistic Regression (KLR) model onto a mean embedding similarity matrix and predicts as a roving focal function of varying window size. The name of the package is derived from this approach; **K**ernel **L**ogistic **R**egression on **FO**cal **M**ean **E**mbeddings (**klrfome**) pronounced *clear foam*.
 
+This model is inspired by and borrows from Zoltán Szabó's work on mean embeddings (Szabó et al. 2016, Szabó et al. (2015)) and Ji Zhu & Trevor Hastie's Kernel Logistic Regression algorithm (Zhu and Hastie 2005). I extend a hardy **thank you** to Zoltán for his correspondence during the development of this approach. However, all errors, oversights, and omissions are my own.
+
 <p align="center">
 <img width="800" height="600" src="https://github.com/mrecos/klrfome/blob/master/SAA_2018_poster/SAA_2018_poster_small.jpg?raw=true">
 </p>
 
-(High-res versions of research poster are in the [/SAA\_2018\_poster](https://github.com/mrecos/klrfome/tree/master/SAA_2018_poster) folder)
 
+(High-res versions of research poster are in the [/SAA\_2018\_poster](https://github.com/mrecos/klrfome/tree/master/SAA_2018_poster) folder)
 
 ### Citation
 
@@ -296,7 +298,7 @@ This package contains the functions necessary to compute Kernel Linear Regressio
 
 #### raster\_predict\_funs.R for Predicting on Raster Data
 
--   `rescale_sim_raster` - Function that rescales simulated rasters from `NLMR::nlm_gaussianfield` or whatever you want to use, to the mean and standard deviation of the simulated data used to fit the `klr` model. You will have to add the `mean` and `sd` arguments manually based on what you put into the `get_sim_data` function. The example in the code above inputs the default `mean` and `sd` values from the defualts of the `get_sim_data` function. Returned is a raster scaled too your simualted training data.
+-   `rescale_sim_raster` - Function that rescales simulated rasters from `NLMR::nlm_gaussianfield` (Sciaini, Fritsch, and Simpkins 2017) or whatever you want to use, to the mean and standard deviation of the simulated data used to fit the `klr` model. You will have to add the `mean` and `sd` arguments manually based on what you put into the `get_sim_data` function. The example in the code above inputs the default `mean` and `sd` values from the defualts of the `get_sim_data` function. Returned is a raster scaled too your simualted training data.
 
 -   `sim_trend` - Function is used to take create `n` number of simulated site locations of `size` cell dimensions on a `rows` by `cols` raster. The latter two arguments should match the size of your simulated rasters. The function randomly locates the sites and then creates a distance gradient (trend) from the site locations outward. The trend is a value `1` at the sites and reduces to `0` at the maximum combined distance from all sites. The output of this function is a `list` of a `matrix` of simulated site x/y coordinates (centers) and a `raster` of the trend surface. The point of the trend is to then combine it with the simulated rasters (as down in the code above) such that the raster depicting site-likely conditions is multiplied by the trend to output a raster retaining site-likely conditions near simulated site locations. Conversely, the site-unlikely simulated raster is multiplied by the inverse of the trend to result in a raster retaining site-unlikely characteristics away from the site locations. When those two rasters are added you get a simulated environment that is more preferable to site locations near site locations. It is a bit involved for something that had nothing to do with the actual KLRfome model, but it is needed to produce actual correlated environments for model testing.
 
@@ -322,7 +324,8 @@ This package contains the functions necessary to compute Kernel Linear Regressio
 
 -   `K_corrplot` - Function is a pretty simple wrapper around `corrplot::corrplot()` with hierarchical clustering. Inputs for this function are the similarity matrix `K` and the `train_data` with the option of an integer for the number of clusters to partition the data; default = 4. Output is a plot or if assigned to an object, it is an object of class `matrix`.
 
-### Licenses
+Licenses
+========
 
 **Text and figures:** [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)
 
@@ -330,6 +333,26 @@ This package contains the functions necessary to compute Kernel Linear Regressio
 
 **Data:** [CC-0](http://creativecommons.org/publicdomain/zero/1.0/) attribution requested in reuse
 
-### Contributions
+Contributions
+=============
 
 We welcome contributions from everyone. Before you get started, please see our [contributor guidelines](CONTRIBUTING.md). Please note that this project is released with a [Contributor Code of Conduct](CONDUCT.md). By participating in this project you agree to abide by its terms.
+
+References
+==========
+
+Flaxman, Seth, Yu-Xiang Wang, and Alexander J. Smola. 2015. “Who Supported Obama in 2012?: Ecological Inference Through Distribution Regression.” In *Proceedings of the 21th Acm Sigkdd International Conference on Knowledge Discovery and Data Mining*, 289–98. ACM.
+
+Law, H. C. L., D. J. Sutherland, D. Sejdinovic, and S. Flaxman. 2017. “Bayesian Approaches to Distribution Regression.” *ArXiv E-Prints*, May.
+
+Muandet, Krikamol, Kenji Fukumizu, Bharath Sriperumbudur, and Bernhard Schölkopf. 2017. “Kernel Mean Embedding of Distributions: A Review and Beyond.” *Foundations and Trends in Machine Learning* 10 (1-2): 1–141.
+
+Sciaini, Marco, Matthias Fritsch, and Craig E. Simpkins. 2017. *NLMR: Simulating Neutral Landscape Models* (version 0.2.0). <https://CRAN.R-project.org/package=NLMR>.
+
+Song, Li, and Arthur Fukumizu Kenjiand Gretto. 2013. “Kernel Embeddings of Conditional Distributions: A Unified Kernel Framework for Nonparametric Inference in Graphical Models.” *IEEE Signal Processing Magazine* 30 (4): 98–111.
+
+Szabó, Zoltán, Arthur Gretton, Barnabás Póczos, and Bharath Sriperumbudur. 2015. “Two-Stage Sampled Learning Theory on Distributions.” In *International Conference on Artificial Intelligence and Statistics (Aistats)*, 948–57.
+
+Szabó, Zoltán, Bharath Sriperumbudur, Barnabás Póczos, and Arthur Gretton. 2016. “Learning Theory for Distribution Regression.” *Journal of Machine Learning Research* 17: 1–40.
+
+Zhu, Ji, and Trevor Hastie. 2005. “Kernel Logistic Regression and the Import-Vector Machine.” *Journal of Computational and Graphical Statistics* 14 (1): 185–205.

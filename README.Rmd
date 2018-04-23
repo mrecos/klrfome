@@ -1,5 +1,8 @@
 ---
 output: github_document
+bibliography: "./JOSS/paper.bib"
+nocite: | 
+  @Muandet, @Song, @2017arXiv170504293L, @Flaxman
 ---
 
 ```{r, echo = FALSE}
@@ -28,6 +31,9 @@ knitr::opts_chunk$set(
 The purpose of this package is to solve the *Distribution Regression* problem for archaeological site location modeling; or any other data for that matter. The aim of Distribution Regression is to map a single scalar outcome (e.g. presence/absence; 0/1) to a distribution of features. This is opposed to typical regression where you have one observation mapping a single outcome to a single set of features/predictors. For example, an archaeological site is singularly defined as either present or absent, however the area within the sites boundary is not singularly defined by any one measurement. The area with an archaeology site is defined by an infinite distribution of measurements. Modeling this in traditional terms means either collapsing that distribution to a single measurement or pretending that a site is actually a series of adjacent, but independent measurements. The methods developed for this package take a different view instead by modeling the distribution of measurements from within a single site on a scale of similarity to the distribution of measurements on other sites and the environmental background in general. This method avoids collapsing measurements and promotes the assumption of independence from within a site to between sites. By doing so, this approach models a richer description of the landscape in a more intuitive sense of similarity.
 
 To achieve this goal, the package fits a Kernel Logistic Regression (KLR) model onto a mean embedding similarity matrix and predicts as a roving focal function of varying window size. The name of the package is derived from this approach; **K**ernel **L**ogistic **R**egression on **FO**cal **M**ean **E**mbeddings (**klrfome**) pronounced *clear foam*.
+
+
+This model is inspired by and borrows from Zoltán Szabó's work on mean embeddings [@Szabo, @Szabo2] and Ji Zhu & Trevor Hastie's Kernel Logistic Regression algorithm [@Zhu]. I extend a hardy **thank you** to Zoltán for his correspondence during the development of this approach. However, all errors, oversights, and omissions are my own. 
 
 
 <p align="center">
@@ -276,7 +282,7 @@ This package contains the functions necessary to compute Kernel Linear Regressio
 #### raster_predict_funs.R for Predicting on Raster Data
 
 
-*   `rescale_sim_raster` - Function that rescales simulated rasters from `NLMR::nlm_gaussianfield` or whatever you want to use, to the mean and standard deviation of the simulated data used to fit the `klr` model. You will have to add the `mean` and `sd` arguments manually based on what you put into the `get_sim_data` function. The example in the code above inputs the default `mean` and `sd` values from the defualts of the `get_sim_data` function. Returned is a raster scaled too your simualted training data.
+*   `rescale_sim_raster` - Function that rescales simulated rasters from `NLMR::nlm_gaussianfield` [@NLMR] or whatever you want to use, to the mean and standard deviation of the simulated data used to fit the `klr` model. You will have to add the `mean` and `sd` arguments manually based on what you put into the `get_sim_data` function. The example in the code above inputs the default `mean` and `sd` values from the defualts of the `get_sim_data` function. Returned is a raster scaled too your simualted training data.
 
 *   `sim_trend` - Function is used to take create `n` number of simulated site locations of `size` cell dimensions on a `rows` by `cols` raster. The latter two arguments should match the size of your simulated rasters. The function randomly locates the sites and then creates a distance gradient (trend) from the site locations outward. The trend is a value `1` at the sites and reduces to `0` at the maximum combined distance from all sites. The output of this function is a `list` of a `matrix` of simulated site x/y coordinates (centers) and a `raster` of the trend surface. The point of the trend is to then combine it with the simulated rasters (as down in the code above) such that the raster depicting site-likely conditions is multiplied by the trend to output a raster retaining site-likely conditions near simulated site locations. Conversely, the site-unlikely simulated raster is multiplied by the inverse of the trend to result in a raster retaining site-unlikely characteristics away from the site locations. When those two rasters are added you get a simulated environment that is more preferable to site locations near site locations. It is a bit involved for something that had nothing to do with the actual KLRfome model, but it is needed to produce actual correlated environments for model testing.
 
@@ -308,7 +314,7 @@ This package contains the functions necessary to compute Kernel Linear Regressio
 *   `K_corrplot` - Function is a pretty simple wrapper around `corrplot::corrplot()` with hierarchical clustering. Inputs for this function are the similarity matrix `K` and the `train_data` with the option of an integer for the number of clusters to partition the data; default = 4. Output is a plot or if assigned to an object, it is an object of class `matrix`.
 
 
-### Licenses
+# Licenses
 
 **Text and figures:**  [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)
 
@@ -316,6 +322,8 @@ This package contains the functions necessary to compute Kernel Linear Regressio
 
 $\textbf{Data:}$ [CC-0](http://creativecommons.org/publicdomain/zero/1.0/) attribution requested in reuse
 
-### Contributions
+# Contributions
 
 We welcome contributions from everyone. Before you get started, please see our [contributor guidelines](CONTRIBUTING.md). Please note that this project is released with a [Contributor Code of Conduct](CONDUCT.md). By participating in this project you agree to abide by its terms.
+
+# References
