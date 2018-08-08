@@ -33,8 +33,11 @@ get_sim_data(site_samples, N_site_bags, sites_var1_mean = 50,
 \item{background_site_balance}{- [scaler] Ratio of site to bacground groups}
 }
 \value{
-- data.frame and list of simulated training and test set data
+- data.frame of simulated training and test set data
 }
 \description{
-get_sim_data
+`get_sim_data()` is a function to simulate archaeological site data for use in this package. Beacuse archaeological site data is often a protected class of data or because this package requires data in a particular format; this function helps to test run models without neededing real data.
+}
+\details{
+This function requires only the setting of parameters and does not rely on input data. The function generated as data.frame of with four columns including `presence` as a 1/0 variable for site presence/absence, `SITENO` that is a group level label for each site (presence == 1) and for each collection of background data points (presence == 0), and `var1` and `var2` that are the simulated environmental variables used as regression features. The number of sites and background samples to generate is controlled by the `site_samples` and `N_site_bags` arguments respectively. The `background_site_balance` controls the ratio of site to background groups in the output data.frame. The remaining arguments are used to control how similar the two simulated environmental features are within and between site presence/absence groups. The features are simulated from a normal distribution and can be controlled by adjusting the `mean` and `sd` (standard deviation) arguments for each. Similar distribution parameters between site and background approximate a more homogeneous environment where sites are found on less distinct landforms. Alternatively, greater difference in the distribution parameters between sites and background approximate an environment where sites are found on distinct landforms. Adjusting this can give insight into how the model works for a range of proxy environments.
 }

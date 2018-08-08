@@ -40,7 +40,7 @@ train_data <- formatted_data[["train_data"]]
 train_presence <- formatted_data[["train_presence"]]
 test_presence <- formatted_data[["test_presence"]]
 
-##### Logistic Mean Embedding KRR Model
+##### Logistic Mean Embedding KLR Model
 #### Build Kernel Matrix
 K <- build_K(train_data, sigma = sigma, dist_metric = dist_metric)
 #### Train
