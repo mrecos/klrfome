@@ -23,5 +23,32 @@ KLR(K, presence, lambda, maxiter = 100, tol = 0.01, verbose = 1)
 list: `pred` - predicted probabiity of positive class, `alphas` - estimated coefficients
 }
 \description{
-KLR
+`KLR()` Is the primary model fitting function in the `klrfome` package. This function fits a Kernel Logistic Regression (KLR) model to a similarity or distance matrix.
+}
+\details{
+the `KLR` function takes the similarity kernel matrix `K`, a vector `presnece` of presence/absence coded as 1 or 0, and a scalar value for the `lambda` regularizing hyperparameter; optionally values for maximum iterations and threshold. This function performs Kernel Logistic Regression (KLR) via Iterative Re-weighted Least Squares (IRLS). The objective is to approximate a set of parameters that minimize the negative likelihood of the parameters given the data and response. This function returns a list of `pred`, the estimated response (probability of site-presence) for the training data, and `alphas`, the approximated parameters from the IRLS algorithm.
+}
+\examples{
+\dontrun{
+sim_data <- get_sim_data(site_samples = 800, N_site_bags = 75,
+sites_var1_mean = 80, sites_var1_sd   = 10,
+sites_var2_mean = 5,  sites_var2_sd   = 2,
+backg_var1_mean = 100,backg_var1_sd   = 20,
+backg_var2_mean = 6,  backg_var2_sd   = 3)
+formatted_data <- format_site_data(sim_data, N_sites=10, train_test_split=0.8,
+                                   sample_fraction = 0.9, background_site_balance=1)
+train_data <- formatted_data[["train_data"]]
+train_presence <- formatted_data[["train_presence"]]
+test_presence <- formatted_data[["test_presence"]]
+
+##### Logistic Mean Embedding KLR Model
+#### Build Kernel Matrix
+K <- build_K(train_data, sigma = sigma, dist_metric = dist_metric)
+#### Train
+train_log_pred <- KLR(K, train_presence, lambda, 100, 0.001, verbose = 2)
+#### Predict
+test_log_pred <- KLR_predict(test_data, train_data, dist_metric = dist_metric,
+                            train_log_pred[["alphas"]], sigma)
+}
+
 }

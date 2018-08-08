@@ -24,5 +24,8 @@ KLR_predict(test_data, train_data, alphas_pred, sigma, progress = TRUE,
 - [vector] - predicted probabiity of positive class
 }
 \description{
-KLR_predict
+`KLR_predict()` is a function to predict the probability of site presence to a new list of data based on the fitted alpha parameters returned from the `KLR()` funtion.
+}
+\details{
+This function takes a list of the `test_data`, a list of the `train_data`, a vector of the approximated alpha parameters as `alpha_pred`, a scalar value for the `sigma` kernel hyperparameter, and a distance method (deafult = "Euclidean"). This function predicts the probability of site presence for new observations based on the training data and `alphas` parameters. This is accomplished by building the `k*k` kernel matrix as the similarity between the training test data then computing the inverse logit of `k*k %*% alphas`. The output is the predicted probability of site presence for each training data example.
 }

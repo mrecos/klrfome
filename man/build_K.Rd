@@ -8,9 +8,9 @@ build_K(y1, y2 = y1, sigma, progress = TRUE,
   dist_metric = "euclidean")
 }
 \arguments{
-\item{y1}{- [NxP] Matrix of data from bag i}
+\item{y1}{- [list] List of site/background data formatted by `format_site_data()`}
 
-\item{y2}{- [NxP] Matrix of data from bag j}
+\item{y2}{- [list] Typically left blank as y2 == y1.}
 
 \item{sigma}{- [scaler] smoothing hyperparameters for RBF kernel}
 
@@ -22,5 +22,32 @@ build_K(y1, y2 = y1, sigma, progress = TRUE,
 - matrix K
 }
 \description{
-build_k
+`build_k()` is a primary package function that takes in the formatted list of site/background data and builds a similarity matrix suitable for computation with the `KLR()` function or direct study.
+}
+\details{
+This function takes list of training data, scalar value for `sigma` hyperparameter, and a distance method to compute a mean embedding similarity kernel. This kernel is a pair-wise (N x N) matrix of the mean similarity between the attributes describing each site location and background group. Optional inouts are `progress` for a progress bar and `dist_metric` for the distance computation. By default, the distance metric is euclidean and should likely stay as such unless you have explored other distances and know why/how you want to use them.
+}
+\examples{
+\dontrun{
+sim_data <- get_sim_data(site_samples = 800, N_site_bags = 75,
+sites_var1_mean = 80, sites_var1_sd   = 10,
+sites_var2_mean = 5,  sites_var2_sd   = 2,
+backg_var1_mean = 100,backg_var1_sd   = 20,
+backg_var2_mean = 6,  backg_var2_sd   = 3)
+formatted_data <- format_site_data(sim_data, N_sites=10, train_test_split=0.8,
+                                   sample_fraction = 0.9, background_site_balance=1)
+train_data <- formatted_data[["train_data"]]
+train_presence <- formatted_data[["train_presence"]]
+test_presence <- formatted_data[["test_presence"]]
+
+##### Logistic Mean Embedding KLR Model
+#### Build Kernel Matrix
+K <- build_K(train_data, sigma = sigma, dist_metric = dist_metric)
+#### Train
+train_log_pred <- KLR(K, train_presence, lambda, 100, 0.001, verbose = 2)
+#### Predict
+test_log_pred <- KLR_predict(test_data, train_data, dist_metric = dist_metric,
+                            train_log_pred[["alphas"]], sigma)
+}
+
 }

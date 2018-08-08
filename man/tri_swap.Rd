@@ -13,5 +13,5 @@ tri_swap(m)
 - Matrix
 }
 \description{
-tri_swap
+`tri_swap()` is an internal helper function used to flip the sides of a matrix
 }

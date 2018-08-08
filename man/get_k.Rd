@@ -19,5 +19,8 @@ get_k(y1, y2, sigma, dist_metric = "euclidean")
 Matrix G
 }
 \description{
-get_k
+`get_k()` is an internal function used by `build_k()` to calcualte similarity kernel for each pair of observations
+}
+\details{
+This function takes two data.frames or matricies, calculates the cross distance between them, and then applies a radial basis function to the resulting distance matrix.
 }
