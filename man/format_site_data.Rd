@@ -10,15 +10,44 @@ format_site_data(dat, N_sites, train_test_split, background_site_balance,
 \arguments{
 \item{dat}{- [data.frame] A data.frame of presence and absence records. Column "presence" must contain presence/absence as 1/0, and column "SITENO" contains the grouping variable.}
 
-\item{N_sites}{- [scaler] The number of sites to randomly select}
+\item{N_sites}{- [scalar] The number of sites to randomly select for analysis}
 
-\item{train_test_split}{- [scaler] a float from 0 to 1 indicating the percent of N_sites to be used as training data.}
+\item{train_test_split}{- [scalar] a float from 0 to 1 indicating the percent of N_sites to be used as training dataset vs testing dataset.}
 
-\item{background_site_balance}{- [scaler] Integer > 0 indicating how many background groups per site group}
+\item{background_site_balance}{- [scalar] Integer > 0 indicating how many background groups per site group}
 }
 \value{
 - list of various ways to arrange site data and mean/sd of data
 }
 \description{
-format_site_data
+`format_site_data()` formats a data.frame of a specific format into a list suitable for use with the klrfome model.
+}
+\details{
+The function takes a data.frame that at a mimimum must include a column for site presence/absence, a column for the site identifier, and one or more columns of covariates to be used in the regression model. There are three additional required parameters to this function and they are; `N_sites` which can be used to limit the number of sites (groups of the presence == 1 class) returned in the results; `train_test_split` that is used to split the site present data into training and testing data sets; and `background_site_balance` that is the ratio of background observation groups to include for each site group. The choice of `N_sites` and `background_site_balance` argument values are influenced by a number of factors including the amount of data, length of computation, and site prevelance.
+
+This function returns a list object which is a reformatting of the input data where each list element if a grouping of present or absence observations. This is needed because the klrfome model works on groups of observations.
+}
+\examples{
+\dontrun{
+sim_data <- get_sim_data(site_samples = 800, N_site_bags = 75,
+sites_var1_mean = 80, sites_var1_sd   = 10,
+sites_var2_mean = 5,  sites_var2_sd   = 2,
+backg_var1_mean = 100,backg_var1_sd   = 20,
+backg_var2_mean = 6,  backg_var2_sd   = 3)
+formatted_data <- format_site_data(sim_data, N_sites=10, train_test_split=0.8,
+                                   sample_fraction = 0.9, background_site_balance=1)
+train_data <- formatted_data[["train_data"]]
+train_presence <- formatted_data[["train_presence"]]
+test_presence <- formatted_data[["test_presence"]]
+
+##### Logistic Mean Embedding KRR Model
+#### Build Kernel Matrix
+K <- build_K(train_data, sigma = sigma, dist_metric = dist_metric)
+#### Train
+train_log_pred <- KLR(K, train_presence, lambda, 100, 0.001, verbose = 2)
+#### Predict
+test_log_pred <- KLR_predict(test_data, train_data, dist_metric = dist_metric,
+                            train_log_pred[["alphas"]], sigma)
+}
+
 }

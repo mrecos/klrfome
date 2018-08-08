@@ -4,7 +4,8 @@
 \alias{build_K}
 \title{build_k}
 \usage{
-build_K(y1, y2 = y1, sigma, progress = TRUE, dist_metric = "euclidean")
+build_K(y1, y2 = y1, sigma, progress = TRUE,
+  dist_metric = "euclidean")
 }
 \arguments{
 \item{y1}{- [NxP] Matrix of data from bag i}
