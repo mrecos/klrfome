@@ -33,9 +33,6 @@ The purpose of this package is to solve the *Distribution Regression* problem fo
 To achieve this goal, the package fits a Kernel Logistic Regression (KLR) model onto a mean embedding similarity matrix and predicts as a roving focal function of varying window size. The name of the package is derived from this approach; **K**ernel **L**ogistic **R**egression on **FO**cal **M**ean **E**mbeddings (**klrfome**) pronounced *clear foam*.
 
 
-This model is inspired by and borrows from Zoltán Szabó's work on mean embeddings [@Szabo, @Szabo2] and Ji Zhu & Trevor Hastie's Kernel Logistic Regression algorithm [@Zhu]. I extend a hardy **thank you** to Zoltán for his correspondence during the development of this approach. However, all errors, oversights, and omissions are my own. 
-
-
 <p align="center">
 <img width="800" height="600" src="https://github.com/mrecos/klrfome/blob/master/SAA_2018_poster/SAA_2018_poster_small.jpg?raw=true">
 </p>
@@ -46,6 +43,10 @@ This model is inspired by and borrows from Zoltán Szabó's work on mean embeddi
 Please cite this package as:
 
 > Harris, Matthew D., (2017). *klrfome - Kernel Logistic Regression on Focal Mean Embeddings*. Accessed 10 Sep 2017. Online at <https://doi.org/10.5281/zenodo.1218403>
+
+### Special Thanks
+
+This model is inspired by and borrows from Zoltán Szabó's work on mean embeddings [@Szabo, @Szabo2] and Ji Zhu & Trevor Hastie's Kernel Logistic Regression algorithm [@Zhu]. I extend a hardy **thank you** to Zoltán for his correspondence during the development of this approach. This approach would not have been created without his help. Further, a big **thank you** to Ben Markwick for his moral support and `rrtools` package used to create this package. However that being said, all errors, oversights, and omissions are my own. 
 
 
 ### Installation
