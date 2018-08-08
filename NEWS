@@ -1,0 +1,6 @@
+klrfome v2.1.0 (Release date: 2018-04-14)
+==============
+
+Changes:
+
+* This is a functionality update release of the klrfome package. The name is an acronym for Kernel Logistic Regression on FOcal Mean Embedding Kernels (pronounced as "clear foam"). This package computes a mean embedding similarity kernel, performs kernel logistic regression, and predicts on raster images with the option for parallel processing. This process is developed with the express interest in predicting archaeological site sensitivity, but the model is likely useful for other applications within and beyond archaeology. This release includes a series of functions for evaluating the performance of model predictions using a variety of common (and uncommon) metrics. These metrics are those derivable from the quantities of a confusion matrix. Additional updates include bug fixes and an updated Dockerfile for the installation of the NLMR package. The package README includes a fully reproducible workflow using simulated data and includes an example of the new evaluation functions. This release is published following the presentation of this package at the SAA 2018 meeting in Washington, D.C. (April 12th, 2018). Please file issues or pull requests if bugs are encountered.
