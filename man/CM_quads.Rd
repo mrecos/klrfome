@@ -12,8 +12,11 @@ CM_quads(dat, threshold = 0.5)
 \item{threshold}{- [scalar or vector] a scalar or vector of one or more thresholds at which to evaluate the Confusion Matrix quadrants.}
 }
 \value{
-[data.frame] Confusion Matrix quatrants at one or more threshold values.
+[data.frame] A data.frame of Confusion Matrix quatrants at one or more threshold values.
 }
 \description{
-CM_quads
+`CM_quads()` produces the True Positive, False Positive, True Negative, and False Negative quantities of the Confusion Matrix at one or more threshholds for the binary classification of continuous prediction values.
+}
+\details{
+This function takes two arguments: 1) a data.frame of two columns; `pred` is a column of continuous predicted values and `presence` is a binary observed class value (encoded as `1 == present` or `0 == absent`); and 2) a scalar or numeric vector of threshold values `threshold` at which to classify the continuous values of `pred` into binary 1/0 classes. The results is a data table where each row holds the TP, FP, TN, FN counts for each of the thresholds given in `threshold`.
 }

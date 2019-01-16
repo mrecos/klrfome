@@ -1,10 +1,19 @@
 #' make_quads
+#' 
+#' `make_quads()` Produces True Positive, False Positive, True Negative, and False Negative quantities from two binary input vectors of predicted and observed classes.
+#' 
+#' This function takes two binary vectors coded as 1 == presence/positive and 0 == absent/negative. The `pred` vector is the predicted binary class and `obs` vector is the true observed class. The output quantites can be used for additional metric evaluation.
 #'
 #' @param pred - [vector] Predicted probabilities.
 #' @param obs - [vector] Observed presence/absence as 1/0
 #'
 #' @return [vector] TP, FP, TN, FN names vector
 #' @export
+#'
+#'\dontrun{
+#' cm <- make_quads(ifelse(test_log_pred >= 0.5, 1, 0), test_presence)
+#' metrics(TP = cm[1], TN = cm[3], FP = cm[2], FN = cm[4])$Informedness
+#'}
 #'
 make_quads <- function(pred,obs){
   TP = sum(pred == 1 & obs == 1, na.rm = TRUE)
@@ -16,10 +25,15 @@ make_quads <- function(pred,obs){
 
 #' CM_quads
 #'
+#' `CM_quads()` produces the True Positive, False Positive, True Negative, and False Negative quantities of the Confusion Matrix at one or more threshholds for the binary classification of continuous prediction values.
+#' 
+#' This function takes two arguments: 1) a data.frame of two columns; `pred` is a column of continuous predicted values and `presence` is a binary observed class value (encoded as `1 == present` or `0 == absent`); and 2) a scalar or numeric vector of threshold values `threshold` at which to classify the continuous values of `pred` into binary 1/0 classes. The results is a data table where each row holds the TP, FP, TN, FN counts for each of the thresholds given in `threshold`.
+#'  
+#'
 #' @param dat - [data.frame] Table with two columns, "pred" and "presence". "pred" is the predicted probability. "presence" is the observed presence/absence as 1/0.
 #' @param threshold - [scalar or vector] a scalar or vector of one or more thresholds at which to evaluate the Confusion Matrix quadrants.
 #'
-#' @return [data.frame] Confusion Matrix quatrants at one or more threshold values.
+#' @return [data.frame] A data.frame of Confusion Matrix quatrants at one or more threshold values.
 #'
 #' @importFrom dplyr group_by summarise
 #' @export
@@ -81,9 +95,6 @@ CI_metrics <- function(TP,TN,FP,FN,a=0.05){
   n <- TP + FN # Site cell count
   a <- a # alpha level
   z <- qnorm(1-(0.5*a),0,1) # z quantile formula from wikipedia
-  # asymptotic method
-  # CI_plus  <- p+(z*sqrt((1/n)*p*(1-p)))
-  # CI_minus <- p-(z*sqrt((1/n)*p*(1-p)))
   # Wilson method
   CI_plus  <- ((p+0.5*(z^2)/n) - (z*sqrt((p*(1-p)+0.25*(z^2)/n)/n)))/(1+(z^2)/n)
   CI_minus <- ((p+0.5*(z^2)/n) + (z*sqrt((p*(1-p)+0.25*(z^2)/n)/n)))/(1+(z^2)/n)
@@ -102,6 +113,10 @@ CI_metrics <- function(TP,TN,FP,FN,a=0.05){
 }
 
 #' metrics
+#' 
+#' `metrics()` returns a wide range of binary class evaluation metrics based on the inputs of True Positive, True Negative, Fale Positive, and Fale Negative quantities
+#' 
+#' This function is a one-stop-shop to compute 50+ metric results based on the input of TP, TN, FP, and FN
 #'
 #' @param TP - [scalar] True Positives
 #' @param TN - [scalar] True Negatives

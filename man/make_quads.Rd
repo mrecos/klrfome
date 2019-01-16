@@ -15,5 +15,8 @@ make_quads(pred, obs)
 [vector] TP, FP, TN, FN names vector
 }
 \description{
-make_quads
+`make_quads()` Produces True Positive, False Positive, True Negative, and False Negative quantities from two binary input vectors of predicted and observed classes.
+}
+\details{
+This function takes two binary vectors coded as 1 == presence/positive and 0 == absent/negative. The `pred` vector is the predicted binary class and `obs` vector is the true observed class. The output quantites can be used for additional metric evaluation.
 }

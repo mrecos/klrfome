@@ -21,5 +21,8 @@ metrics(TP, TN, FP, FN)
 [list] - list of all metrics
 }
 \description{
-metrics
+`metrics()` returns a wide range of binary class evaluation metrics based on the inputs of True Positive, True Negative, Fale Positive, and Fale Negative quantities
+}
+\details{
+This function is a one-stop-shop to compute 50+ metric results based on the input of TP, TN, FP, and FN
 }
