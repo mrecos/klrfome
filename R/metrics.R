@@ -58,13 +58,22 @@ CM_quads <- function(dat,threshold = 0.5){
 
 
 #' cohens_kappa
+#' 
+#' `cohens_kappa()` is a metric scoring function that returns the Cohen's Kappa statistic
+#' 
+#' This function takes integer counts for True Positive `TP`, True Negative `TN`, False Positive `FP`, and False Negative `FN` values and returns the Cohen's Kappa. This statistic measure the agreement between observations and predictions. See: https://en.wikipedia.org/wiki/Cohen%27s_kappa
 #'
 #' @param TP - [scalar] True Positives
 #' @param TN - [scalar] True Negatives
 #' @param FP - [scalar] False Positives
 #' @param FN - [scalar] False Negatives
 #'
-#' @return [scalar] Cohen's Kappa
+#' @return [scalar] Cohen's Kappa statistic
+#' 
+#' #'\dontrun{
+#' cm <- make_quads(ifelse(test_log_pred >= 0.5, 1, 0), test_presence)
+#' cohens_kappa(TP = cm[1], TN = cm[3], FP = cm[2], FN = cm[4])
+#'}
 #'
 cohens_kappa <- function(TP,TN,FP,FN){
   A <- TP
@@ -79,38 +88,6 @@ cohens_kappa <- function(TP,TN,FP,FN){
   return(k)
 }
 
-#' CI_metrics
-#'
-#' @param TP - [scalar] True Positives
-#' @param TN - [scalar] True Negatives
-#' @param FP - [scalar] False Positives
-#' @param FN - [scalar] False Negatives
-#' @param a - [scalar] alpha level
-#'
-#' @return list
-#'
-CI_metrics <- function(TP,TN,FP,FN,a=0.05){
-  # Calculate binomial CI (alpha = a) on Sensitivity (sites %)
-  p <- TP/(TP+FN) # Sensitivity
-  n <- TP + FN # Site cell count
-  a <- a # alpha level
-  z <- qnorm(1-(0.5*a),0,1) # z quantile formula from wikipedia
-  # Wilson method
-  CI_plus  <- ((p+0.5*(z^2)/n) - (z*sqrt((p*(1-p)+0.25*(z^2)/n)/n)))/(1+(z^2)/n)
-  CI_minus <- ((p+0.5*(z^2)/n) + (z*sqrt((p*(1-p)+0.25*(z^2)/n)/n)))/(1+(z^2)/n)
-  Specificity <- TN/(FP+TN) # TNR
-  metrics <- list(
-    Sensitivity = p,
-    Specificity = Specificity,
-    CI_plus     = CI_plus,
-    CI_minus    = CI_minus,
-    KG_plus     = 1-((1-Specificity)/CI_plus),
-    KG_minus    = 1-((1-Specificity)/CI_minus),
-    Indicative_plus  = CI_plus-(1-Specificity),
-    Indicative_minus = CI_minus-(1-Specificity)
-  )
-  return(metrics)
-}
 
 #' metrics
 #' 
