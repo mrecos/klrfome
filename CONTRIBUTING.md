@@ -10,7 +10,7 @@ agree to abide by our [code of conduct](CONDUCT.md).
   * Clearly describe your issue, including steps to reproduce when it is a bug, or some justification for a proposed improvement.
 * [Fork](https://github.com/mrecos/DistRegLMERR/#fork-destination-box) the repository on GitHub to make a copy of the repository on your account. Or use this line in your shell terminal:
 
-    `git clone git@github.com:your-username/DistRegLMERR.git`
+    `git clone git@github.com:your-username/klrfome.git`
     
 ## Making changes
 
@@ -19,11 +19,11 @@ agree to abide by our [code of conduct](CONDUCT.md).
 * Make sure you write [good commit messages](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html).
 * Make sure you have added the necessary tests for your code changes.
 * Run _all_ the tests using `devtools::check()` to assure nothing else was accidentally broken.
-* If you need help or unsure about anything, post an update to [your issue](https://github.com/mrecos/DistRegLMERR/issues/).
+* If you need help or unsure about anything, post an update to [your issue](https://github.com/mrecos/klrfome/issues/).
 
 ## Submitting your changes
 
-Push to your fork and [submit a pull request](https://github.com/mrecos/DistRegLMERR/compare/).
+Push to your fork and [submit a pull request](https://github.com/mrecos/klrfome/compare/).
 
 At this point you're waiting on us. We like to at least comment on pull requests
 within a few days (and, typically, one business day). We may suggest
@@ -31,7 +31,7 @@ some changes or improvements or alternatives.
 
 Some things you can do that will increase the chance that your pull request is accepted:
 
-* Engage in discussion on [your issue](https://github.com/mrecos/DistRegLMERR/issues/).
+* Engage in discussion on [your issue](https://github.com/mrecos/klrfome/issues/).
 * Be familiar with the backround literature cited in the [README](README.Rmd)
 * Write tests that pass.
 * Follow our [code style guide](http://adv-r.had.co.nz/Style.html).
