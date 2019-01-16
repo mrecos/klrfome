@@ -12,8 +12,27 @@
 #' 
 #' @examples 
 #' \dontrun{
+#' sim_data <- get_sim_data(site_samples = 800, N_site_bags = 75,
+#' sites_var1_mean = 80, sites_var1_sd   = 10,
+#' sites_var2_mean = 5,  sites_var2_sd   = 2,
+#' backg_var1_mean = 100,backg_var1_sd   = 20,
+#' backg_var2_mean = 6,  backg_var2_sd   = 3)
+#' formatted_data <- format_site_data(sim_data, N_sites=10, train_test_split=0.8,
+#'                                    sample_fraction = 0.9, background_site_balance=1)
+#' train_data <- formatted_data[["train_data"]]
+#' train_presence <- formatted_data[["train_presence"]]
+#' test_presence <- formatted_data[["test_presence"]]
+#'
+#' ##### Logistic Mean Embedding KLR Model
+#' #### Build Kernel Matrix
+#' K <- build_K(train_data, sigma = sigma, dist_metric = dist_metric)
+#' #### Train
+#' train_log_pred <- KLR(K, train_presence, lambda, 100, 0.001, verbose = 2)
+#' #### Predict
+#' test_log_pred <- KLR_predict(test_data, train_data, dist_metric = dist_metric,
+#'                             train_log_pred[["alphas"]], sigma)
+#'                             
 #' cm <- make_quads(ifelse(test_log_pred >= 0.5, 1, 0), test_presence)
-#' metrics(TP = cm[1], TN = cm[3], FP = cm[2], FN = cm[4])$Informedness
 #'}
 #'
 make_quads <- function(pred,obs){
@@ -39,12 +58,37 @@ make_quads <- function(pred,obs){
 #' @importFrom dplyr group_by summarise
 #' @export
 #' 
+#' @examples 
+#' \dontrun{
+#' sim_data <- get_sim_data(site_samples = 800, N_site_bags = 75,
+#' sites_var1_mean = 80, sites_var1_sd   = 10,
+#' sites_var2_mean = 5,  sites_var2_sd   = 2,
+#' backg_var1_mean = 100,backg_var1_sd   = 20,
+#' backg_var2_mean = 6,  backg_var2_sd   = 3)
+#' formatted_data <- format_site_data(sim_data, N_sites=10, train_test_split=0.8,
+#'                                    sample_fraction = 0.9, background_site_balance=1)
+#' train_data <- formatted_data[["train_data"]]
+#' train_presence <- formatted_data[["train_presence"]]
+#' test_presence <- formatted_data[["test_presence"]]
+#'
+#' ##### Logistic Mean Embedding KLR Model
+#' #### Build Kernel Matrix
+#' K <- build_K(train_data, sigma = sigma, dist_metric = dist_metric)
+#' #### Train
+#' train_log_pred <- KLR(K, train_presence, lambda, 100, 0.001, verbose = 2)
+#' #### Predict
+#' test_log_pred <- KLR_predict(test_data, train_data, dist_metric = dist_metric,
+#'                             train_log_pred[["alphas"]], sigma)
+#'                             
+#' cm_values <- CM_quads(data.frame(pred=test_log_pred, presence=test_presence))
+#'}
+#' 
 CM_quads <- function(dat,threshold = 0.5){
   threshold_class <- NULL
   for(i in seq_along(threshold)){
     threshold_i <- data.frame(pred = dat$pred,
                               obs = dat$presence,
-                              pred_cat = ifelse(model_pred$pred >= threshold[i],1,0),
+                              pred_cat = ifelse(dat$pred >= threshold[i],1,0),
                               Threshold = threshold[i])
     threshold_class <- rbind(threshold_class, threshold_i)
   }
@@ -60,7 +104,7 @@ CM_quads <- function(dat,threshold = 0.5){
 
 #' cohens_kappa
 #' 
-#' `cohens_kappa()` is a metric scoring function that returns the Cohen's Kappa statistic
+#' `cohens_kappa()` is a metric scoring function that returns the Cohen's Kappa statistic. Not an exported function.
 #' 
 #' This function takes integer counts for True Positive `TP`, True Negative `TN`, False Positive `FP`, and False Negative `FN` values and returns the Cohen's Kappa. This statistic measure the agreement between observations and predictions. See: https://en.wikipedia.org/wiki/Cohen%27s_kappa
 #'
@@ -71,10 +115,6 @@ CM_quads <- function(dat,threshold = 0.5){
 #'
 #' @return [scalar] Cohen's Kappa statistic
 #' 
-#' #'\dontrun{
-#' cm <- make_quads(ifelse(test_log_pred >= 0.5, 1, 0), test_presence)
-#' cohens_kappa(TP = cm[1], TN = cm[3], FP = cm[2], FN = cm[4])
-#'}
 #'
 cohens_kappa <- function(TP,TN,FP,FN){
   A <- TP
@@ -105,6 +145,32 @@ cohens_kappa <- function(TP,TN,FP,FN){
 #' @return [list] - list of all metrics
 #' @importFrom boot logit
 #' @export
+#'
+#' @examples 
+#' \dontrun{
+#' sim_data <- get_sim_data(site_samples = 800, N_site_bags = 75,
+#' sites_var1_mean = 80, sites_var1_sd   = 10,
+#' sites_var2_mean = 5,  sites_var2_sd   = 2,
+#' backg_var1_mean = 100,backg_var1_sd   = 20,
+#' backg_var2_mean = 6,  backg_var2_sd   = 3)
+#' formatted_data <- format_site_data(sim_data, N_sites=10, train_test_split=0.8,
+#'                                    sample_fraction = 0.9, background_site_balance=1)
+#' train_data <- formatted_data[["train_data"]]
+#' train_presence <- formatted_data[["train_presence"]]
+#' test_presence <- formatted_data[["test_presence"]]
+#'
+#' ##### Logistic Mean Embedding KLR Model
+#' #### Build Kernel Matrix
+#' K <- build_K(train_data, sigma = sigma, dist_metric = dist_metric)
+#' #### Train
+#' train_log_pred <- KLR(K, train_presence, lambda, 100, 0.001, verbose = 2)
+#' #### Predict
+#' test_log_pred <- KLR_predict(test_data, train_data, dist_metric = dist_metric,
+#'                             train_log_pred[["alphas"]], sigma)
+#'                             
+#' cm <- make_quads(ifelse(test_log_pred >= 0.5, 1, 0), test_presence)
+#' metrics(TP = cm[1], TN = cm[3], FP = cm[2], FN = cm[4])$Informedness
+#'}
 #'
 metrics <- function(TP,TN,FP,FN){
   if (!requireNamespace("dplyr", quietly = TRUE)) {
