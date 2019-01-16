@@ -9,7 +9,7 @@ Encoding: UTF-8
 LazyData: true
 URL: https://github.com/mrecos/klrfome
 BugReports: https://github.com/mrecos/klrfome/issues
-Imports: 
+Imports:
   rdist,
   Matrix,
   raster,
@@ -21,4 +21,5 @@ Imports:
 Suggests:
   boot,
   pROC,
+  testthat
 RoxygenNote: 6.1.0
