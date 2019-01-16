@@ -20,3 +20,10 @@ make_quads(pred, obs)
 \details{
 This function takes two binary vectors coded as 1 == presence/positive and 0 == absent/negative. The `pred` vector is the predicted binary class and `obs` vector is the true observed class. The output quantites can be used for additional metric evaluation.
 }
+\examples{
+\dontrun{
+cm <- make_quads(ifelse(test_log_pred >= 0.5, 1, 0), test_presence)
+metrics(TP = cm[1], TN = cm[3], FP = cm[2], FN = cm[4])$Informedness
+}
+
+}

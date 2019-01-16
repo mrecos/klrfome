@@ -20,7 +20,7 @@
 #' @import dplyr
 #' @export
 #' 
-#' #' @examples
+#' @examples
 #'\dontrun{
 #' sim_data <- get_sim_data(site_samples = 800, N_site_bags = 75,
 #' sites_var1_mean = 80, sites_var1_sd   = 10,

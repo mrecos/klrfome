@@ -200,8 +200,8 @@ tri_swap <- function(m) {
 #' @return - [vector] - predicted probabiity of positive class
 #' @export
 #'
-#'#' @examples
-#'\dontrun{
+#' @examples
+#' \dontrun{
 #' sim_data <- get_sim_data(site_samples = 800, N_site_bags = 75,
 #' sites_var1_mean = 80, sites_var1_sd   = 10,
 #' sites_var2_mean = 5,  sites_var2_sd   = 2,

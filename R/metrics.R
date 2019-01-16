@@ -9,8 +9,9 @@
 #'
 #' @return [vector] TP, FP, TN, FN names vector
 #' @export
-#'
-#'\dontrun{
+#' 
+#' @examples 
+#' \dontrun{
 #' cm <- make_quads(ifelse(test_log_pred >= 0.5, 1, 0), test_presence)
 #' metrics(TP = cm[1], TN = cm[3], FP = cm[2], FN = cm[4])$Informedness
 #'}
