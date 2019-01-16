@@ -14,8 +14,11 @@ split_raster_stack(rast_stack, ppside, ngb, split = TRUE)
 \item{split}{}
 }
 \value{
-[raster]
+[list] a list of raster chips
 }
 \description{
-split_raster_stack
+Internal function to used by `KLR_raster_predict()` split input rasters into overlapping blocks for prediction.
+}
+\details{
+`split_raster_stack()` takes a raster stack, creates a grid of `ppside` pixels, adds a collar, clips out each raster, and returns a list
 }

@@ -7,17 +7,20 @@
 KLR_predict_each(rast_stack, ngb, params, progress = progress)
 }
 \arguments{
-\item{rast_stack}{}
+\item{rast_stack}{[raster stack] either a full study area stack or blocks from within a split stack}
 
-\item{ngb}{}
+\item{ngb}{[integer] pixel dimension of focal neighborhood}
 
-\item{params}{}
+\item{params}{[list] params from fitting process, see `KLR_raster_predict()` examples}
 
-\item{progress}{}
+\item{progress}{[logical] TRUE to show function progress}
 }
 \value{
-[raster]
+[raster] a raster of predicted presence
 }
 \description{
-KLR_predict_each
+`KLR_predict_each()` predict probability of presence on a raster or neighborhood. Not exported
+}
+\details{
+This is an internal function to bridge between `KLR_raster_predict()` and `KLR_predict()`. This takes a raster stack of the study area of blocks, formats that data into the tabular format for prediction, and send the data to `KLR_predict()`.
 }

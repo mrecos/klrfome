@@ -7,15 +7,52 @@
 rescale_sim_raster(rast, mean, sd)
 }
 \arguments{
-\item{rast}{}
+\item{rast}{[raster] input raster object}
 
-\item{mean}{}
+\item{mean}{[numeric] value of mean used in `get_sim_data()` function.}
 
-\item{sd}{}
+\item{sd}{[numeric] value of standard deviation used in `get_sim_data()` function.}
 }
 \value{
-[raster]
+[raster] a raster object scaled to the input data
 }
 \description{
-rescale_sim_raster
+Helper function to rescale a simulated landscape to match the mean and standard deviation of the simulated data used to fit a model.
+`rescale_sim_raster()` - Function that rescales simulated rasters from `NLMR::nlm_gaussianfield` (Sciaini, Fritsch, and Simpkins 2017) or whatever you want to use, to the mean and standard deviation of the simulated data used to fit the klr model. You will have to add the mean and sd arguments manually based on what you put into the get_sim_data function. The example in the code above inputs the default mean and sd values from the defualts of the `get_sim_data()` function. Returned is a raster scaled too your simualted training data.
+}
+\examples{
+\dontrun{
+### width and hieght of roving focal window (required)
+ngb = 5
+### Number of rows and columns in prediction rasters
+## needed for making simulated rasters, as well as for predicting real-world rasters
+cols = 100
+rows = 100
+
+### Create simulated environmental rasters  (sim data only) ####
+s_var1r <- NLMR::nlm_gaussianfield(cols,rows, autocorr_range = 20)
+s_var1 <- rescale_sim_raster(s_var1r, 50, 10) 
+s_var2 <- rescale_sim_raster(s_var1r, 3, 2) 
+b_var1r <- NLMR::nlm_gaussianfield(cols,rows,autocorr_range = 20)
+b_var1 <- rescale_sim_raster(b_var1r, 100, 20) 
+b_var2 <- rescale_sim_raster(b_var1r, 6, 3) 
+### Create a site-present trend surface  (sim data only)
+trend_coords <- sim_trend(cols, rows, n = 3)
+coords <- trend_coords$coords
+trend <- trend_coords$trend
+inv_trend <- abs(1-trend)
+var1 <- (s_var1 * trend) + (b_var1 * inv_trend)
+var2 <- (s_var2 * trend) + (b_var2 * inv_trend)
+#### end simulated data creation ####
+
+### Create raster stack of predictor variables
+pred_var_stack <- raster::stack(var1, var2)
+names(pred_var_stack) <- c("var1","var2")
+### scale rasters to training data
+pred_var_stack_scaled <- scale_prediction_rasters(pred_var_stack, params, verbose = 0)
+### Predict raster (single chunk, not in parallel) 
+pred_rast <- KLR_raster_predict(pred_var_stack_scaled, ngb = ngb, params, split = FALSE, ppside = NULL,
+                                progress = FALSE, parallel = FALSE)
+}
+
 }

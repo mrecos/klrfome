@@ -353,7 +353,7 @@ KLR_raster_predict <- function(rast_stack, ngb, params, cols, rows, split = FALS
     if(isTRUE(parallel)){
       message("Parallel only works when split == TRUE and ppside > 1. Continuing without parallel","\n")
     }
-    pred_rast <- klrfome::KLR_predict_each(rast_stack, ngb, params, progress)
+    pred_rast <- klrfome:::KLR_predict_each(rast_stack, ngb, params, progress)
     return(pred_rast)
   } else if(isTRUE(split) & !is.null(ppside)){ # split & ppside == TRUE
     if(!(output %in% c("list","save"))){ # check for output to be set
@@ -366,7 +366,7 @@ KLR_raster_predict <- function(rast_stack, ngb, params, cols, rows, split = FALS
       if(output == "list"){ # split, ppside, parallel, and list output
         pred_rast_list = foreach(i=seq_along(split_stack), .inorder = TRUE, .verbose = progress,
                                  .packages=c('klrfome','raster')) %dopar% {
-                                   pred_rast_i <- klrfome::KLR_predict_each(split_stack[[i]], ngb, params, progress)
+                                   pred_rast_i <- klrfome:::KLR_predict_each(split_stack[[i]], ngb, params, progress)
                                    crop_raster_collar(pred_rast_i, ngb, cols, rows)
                                  }
         return(pred_rast_list)
@@ -378,7 +378,7 @@ KLR_raster_predict <- function(rast_stack, ngb, params, cols, rows, split = FALS
         }
         foreach(i=seq_along(split_stack), .inorder = TRUE, .verbose = progress,
                 .packages=c('klrfome','raster')) %dopar% {
-                  pred_rast_i <- KLR_predict_each(split_stack[[i]], ngb, params, progress)
+                  pred_rast_i <- klrfome:::KLR_predict_each(split_stack[[i]], ngb, params, progress)
                   pred_rast_i <- crop_raster_collar(pred_rast_i, ngb, cols, rows)
                   writeRaster(pred_rast_i, filename=file.path(save_loc, paste("prediction_block_",i,".tif",sep="")),
                               format="GTiff",datatype="FLT4S",overwrite = overwrite)
@@ -393,7 +393,7 @@ KLR_raster_predict <- function(rast_stack, ngb, params, cols, rows, split = FALS
       pred_rast_list <- vector(mode = "list", length = length(split_stack))
       for(i in seq_along(split_stack)){
         cat("Predicting for block", i, "of", length(split_stack),"\n")
-        pred_rast_i <- klrfome::KLR_predict_each(split_stack[[i]], ngb, params, progress)
+        pred_rast_i <- klrfome:::KLR_predict_each(split_stack[[i]], ngb, params, progress)
         # deal with edge effects of blocking
         pred_rast_i <- crop_raster_collar(pred_rast_i, ngb, cols, rows)
         if(output == "list"){ # split, ppside, no parallel, list output

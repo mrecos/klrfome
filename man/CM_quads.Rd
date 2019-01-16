@@ -20,3 +20,29 @@ CM_quads(dat, threshold = 0.5)
 \details{
 This function takes two arguments: 1) a data.frame of two columns; `pred` is a column of continuous predicted values and `presence` is a binary observed class value (encoded as `1 == present` or `0 == absent`); and 2) a scalar or numeric vector of threshold values `threshold` at which to classify the continuous values of `pred` into binary 1/0 classes. The results is a data table where each row holds the TP, FP, TN, FN counts for each of the thresholds given in `threshold`.
 }
+\examples{
+\dontrun{
+sim_data <- get_sim_data(site_samples = 800, N_site_bags = 75,
+sites_var1_mean = 80, sites_var1_sd   = 10,
+sites_var2_mean = 5,  sites_var2_sd   = 2,
+backg_var1_mean = 100,backg_var1_sd   = 20,
+backg_var2_mean = 6,  backg_var2_sd   = 3)
+formatted_data <- format_site_data(sim_data, N_sites=10, train_test_split=0.8,
+                                   sample_fraction = 0.9, background_site_balance=1)
+train_data <- formatted_data[["train_data"]]
+train_presence <- formatted_data[["train_presence"]]
+test_presence <- formatted_data[["test_presence"]]
+
+##### Logistic Mean Embedding KLR Model
+#### Build Kernel Matrix
+K <- build_K(train_data, sigma = sigma, dist_metric = dist_metric)
+#### Train
+train_log_pred <- KLR(K, train_presence, lambda, 100, 0.001, verbose = 2)
+#### Predict
+test_log_pred <- KLR_predict(test_data, train_data, dist_metric = dist_metric,
+                            train_log_pred[["alphas"]], sigma)
+                            
+cm_values <- CM_quads(data.frame(pred=test_log_pred, presence=test_presence))
+}
+
+}

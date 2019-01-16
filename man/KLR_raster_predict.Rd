@@ -9,19 +9,19 @@ KLR_raster_predict(rast_stack, ngb, params, cols, rows, split = FALSE,
   output = "list", save_loc = NULL, overwrite = FALSE)
 }
 \arguments{
-\item{rast_stack}{}
+\item{rast_stack}{[raster stack] of prediction rasters (usually scaled)}
 
-\item{ngb}{}
+\item{ngb}{[integer] pixel dimension of square neighborhood used to predict model on}
 
-\item{params}{}
+\item{params}{[list] list of important model parameters. (See example)}
 
-\item{split}{}
+\item{split}{[logical] TRUE/FALSE for whether to split raster into chunks. If `parallal` == TRUE, then `split` must == TRUE}
 
-\item{ppside}{}
+\item{ppside}{[integer] the number of blocks to split the study area into if `split` == TRUE}
 
-\item{progress}{}
+\item{progress}{[logical] if TRUE, displays progress of function}
 
-\item{parallel}{}
+\item{parallel}{[logical] if TRUE, prediction will be excuted as parallel computations. Requires a parallel backend, `split` == TRUE, and number for `ppside`}
 
 \item{output}{[string] either 'list' or 'save'. If 'list', returns list of predicted blocks. If 'save', blocks are saved to save_loc as GeoTiff}
 
@@ -30,8 +30,77 @@ KLR_raster_predict(rast_stack, ngb, params, cols, rows, split = FALSE,
 \item{overwrite}{[logical] TRUE will overwrite saved raster GeoTiffs in save_loc}
 }
 \value{
-[raster]
+[raster], [list], or [nothing] - If `parallel` == FALSE, a raster object is returned. If `parallel` == TRUE then either a list of raster objects if `output` == "list", or files are saved as images if `output` == "save"
 }
 \description{
-KLR_raster_predict
+`KLR_raster_predict()` predicts a fit KLR model to new data.
+}
+\details{
+`KLR_raster_predict()` - Function predicts the probability of site-presence based on a `rast_stack` raster stack of center/scaled predictor rasters, a focal neighborhood size in cells as `ngb`, and the params list of model fit parameters. Finally, the function also needs to the the number of columns as cols and rows as rows of the study areas raster stack. The rest of the arguments default to predicting the entire raster stack in one pass and only on a single core (not in parallel). The rest of the argument control whether the study area is split (`split` = TRUE) into a grid of blocks. The `ppside` positive integer controls the number of blocks along each axis of the study area. If you wish to compute the prediction in `parallel`, you will need to split it into blocks so that each block can be sent to a different processor core. The final set of optional arguments control how the prediction is returned, either as a `output` = "list" or `output` = "save" for returning a list of rasters of saving each out as a GeoTiff, and then arguments for the GeoTiff location with `save_loc` and whether to overwrite existing GeoTiffs with `overwrite.` The function contains a bit of logic to try and assist the user in which arguments go with what. Perhaps future versions will streamline this a bit.
+}
+\examples{
+\dontrun{
+### Create param list
+params <- list(train_data = train_data,
+alphas_pred = train_log_pred[["alphas"]],
+sigma = sigma,
+lambda = lambda,
+means = formatted_data$means,
+sds = formatted_data$sds)
+
+### width and hieght of roving focal window (required)
+ngb = 5
+### Number of rows and columns in prediction rasters
+## needed for making simulated rasters, as well as for predicting real-world rasters
+cols = 100
+rows = 100
+
+### Create simulated environmental rasters  (sim data only) ####
+s_var1r <- NLMR::nlm_gaussianfield(cols,rows, autocorr_range = 20)
+s_var1 <- rescale_sim_raster(s_var1r, 50, 10) 
+s_var2 <- rescale_sim_raster(s_var1r, 3, 2) 
+b_var1r <- NLMR::nlm_gaussianfield(cols,rows,autocorr_range = 20)
+b_var1 <- rescale_sim_raster(b_var1r, 100, 20) 
+b_var2 <- rescale_sim_raster(b_var1r, 6, 3) 
+### Create a site-present trend surface  (sim data only)
+trend_coords <- sim_trend(cols, rows, n = 3)
+coords <- trend_coords$coords
+trend <- trend_coords$trend
+inv_trend <- abs(1-trend)
+var1 <- (s_var1 * trend) + (b_var1 * inv_trend)
+var2 <- (s_var2 * trend) + (b_var2 * inv_trend)
+#### end simulated data creation ####
+
+### Create raster stack of predictor variables
+pred_var_stack <- raster::stack(var1, var2)
+names(pred_var_stack) <- c("var1","var2")
+### scale rasters to training data
+pred_var_stack_scaled <- scale_prediction_rasters(pred_var_stack, params, verbose = 0)
+### Predict raster (single chunk, not in parallel) 
+pred_rast <- KLR_raster_predict(pred_var_stack_scaled, ngb = ngb, params, split = FALSE, ppside = NULL,
+                                progress = FALSE, parallel = FALSE)
+### plot with simulated sites
+rasterVis::levelplot(pred_rast, margin = FALSE, par.settings=viridisTheme()) +
+layer(sp.points(sp.points(SpatialPoints(coords), pch=15, cex = 2.25, col = "red")), columns=1)
+
+   ## Or with parallel backend ##
+library("doParallel")
+### create and register parallel backend
+cl <- makeCluster(detectCores())
+doParallel::registerDoParallel(cl)
+
+### Use same KLR_raster_predict function with parallel = TRUE
+pred_rast_list <- KLR_raster_predict(pred_var_stack_scaled, ngb = ngb, params, split = TRUE, ppside = 5,
+                                     progress = FALSE, parallel = TRUE, output = "list",
+                                     save_loc = NULL, overwrite = TRUE, cols = cols, rows = rows)
+#> Splitting rasters into blocks 
+#> Predicting splits in parallel on 8 cores
+### Merge list back to a single raster
+pred_rast <-  do.call(merge, pred_rast_list)
+### plot with simulated sites
+rasterVis::levelplot(pred_rast, margin = FALSE, par.settings=viridisTheme()) +
+  layer(sp.points(sp.points(SpatialPoints(coords), pch=15, cex = 2.25, col = "red")), columns=1)    
+                         
+}
+
 }

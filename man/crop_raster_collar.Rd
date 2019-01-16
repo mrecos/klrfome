@@ -9,11 +9,15 @@ crop_raster_collar(pred_rast, ngb, cols, rows)
 \arguments{
 \item{pred_rast}{[raster] predicted raster}
 
-\item{ngb}{[scalar] square neighborhodd size in cells}
+\item{ngb}{[integer] square neighborhodd size in cells}
+
+\item{cols}{[integer] cols of crop}
+
+\item{rows}{[integer] rows of crop}
 }
 \value{
-[raster]
+[raster] a cropped raster
 }
 \description{
-crop_raster_collar
+Utility function to crop a raster by a neighborhood. Not exported
 }

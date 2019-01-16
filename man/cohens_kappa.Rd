@@ -17,14 +17,9 @@ cohens_kappa(TP, TN, FP, FN)
 }
 \value{
 [scalar] Cohen's Kappa statistic
-
-#'\dontrun{
-cm <- make_quads(ifelse(test_log_pred >= 0.5, 1, 0), test_presence)
-cohens_kappa(TP = cm[1], TN = cm[3], FP = cm[2], FN = cm[4])
-}
 }
 \description{
-`cohens_kappa()` is a metric scoring function that returns the Cohen's Kappa statistic
+`cohens_kappa()` is a metric scoring function that returns the Cohen's Kappa statistic. Not an exported function.
 }
 \details{
 This function takes integer counts for True Positive `TP`, True Negative `TN`, False Positive `FP`, and False Negative `FN` values and returns the Cohen's Kappa. This statistic measure the agreement between observations and predictions. See: https://en.wikipedia.org/wiki/Cohen%27s_kappa
