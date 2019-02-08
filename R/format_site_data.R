@@ -43,6 +43,10 @@ format_site_data <- function(dat, N_sites, train_test_split, background_site_bal
     stop("dplyr needed for this function to work. Please install it.",
          call. = FALSE)
   }
+  if (!("SITENO" %in% names(dat) & "presence" %in% names(dat))) {
+    stop("Data must contain colums named 'presence' and 'SITENO'. See ?format_site_data",
+         call. = FALSE)
+  }
   variables <- setdiff(colnames(dat), c("presence", "SITENO"))
   means  <- sapply(dat[variables], mean, na.rm=T)
   sds    <- sapply(dat[variables], sd, na.rm=T)

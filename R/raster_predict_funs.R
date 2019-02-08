@@ -209,6 +209,7 @@ scale_prediction_rasters <- function(pred_var_stack, params, verbose = 1){
 #' @importFrom rgeos gBuffer
 #' @return [list] a list of raster chips
 #'
+#'
 split_raster_stack <- function(rast_stack, ppside, ngb, split=TRUE){
   # modified from - https://stackoverflow.com/questions/29784829/r-raster-package-split-image-into-multiples
   h        <- ceiling(ncol(rast_stack)/ppside)
@@ -360,7 +361,7 @@ KLR_raster_predict <- function(rast_stack, ngb, params, cols, rows, split = FALS
       stop("In order to use split the raster, you need to set output = to 'list' or 'save' & 'save_loc","\n")
     }
     cat("Splitting rasters into blocks","\n")
-    split_stack <- klrfome::split_raster_stack(rast_stack, ppside, ngb, split=TRUE)
+    split_stack <- klrfome:::split_raster_stack(rast_stack, ppside, ngb, split=TRUE)
     if(isTRUE(parallel)){ # split, ppside, and parallel = TRUE
       cat("Predicting splits in parallel on",getDoParWorkers(),"cores","\n")
       if(output == "list"){ # split, ppside, parallel, and list output
