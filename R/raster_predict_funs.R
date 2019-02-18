@@ -117,8 +117,8 @@ sim_trend <- function(cols, rows, n = 2, size = 2){
                                                     crd[1],crd[1]-size))^0.5
     trend <- trend + site_i
   }
-  mn <- cellStats(trend, min)
-  mx <- cellStats(trend, max)
+  mn <- raster::cellStats(trend, min)
+  mx <- raster::cellStats(trend, max)
   trend <- abs(1-((trend-mn)/(mx-mn))) # standardize and invert
   return(list(trend = trend, coords = coords))
 }

@@ -47,15 +47,19 @@ format_site_data <- function(dat, N_sites, train_test_split, background_site_bal
     stop("Data must contain colums named 'presence' and 'SITENO'. See ?format_site_data",
          call. = FALSE)
   }
+  if (length(setdiff(colnames(dat), c("presence", "SITENO"))) == 0) {
+    stop("Data must contain variable colums in addition to 'presence' and 'SITENO'. See ?format_site_data",
+         call. = FALSE)
+  }
   variables <- setdiff(colnames(dat), c("presence", "SITENO"))
   means  <- sapply(dat[variables], mean, na.rm=T)
   sds    <- sapply(dat[variables], sd, na.rm=T)
-  dat_c   <- data.frame(apply(dat[, variables],2,scale))  # should be scaled on only training data mean/sd
+  dat_c   <- data.frame(apply(dat[, variables, drop = FALSE],2,scale))  # should be scaled on only training data mean/sd
   dat   <- cbind(dat_c, dat[,c("presence","SITENO")])
   N_back_bags <- N_sites * background_site_balance
   ## Reduce number of sites to N_sites
-  sites <- filter(dat, presence == 1)
-  site_names <- unique(sites$SITENO)
+  sites <- dplyr::filter(dat, presence == 1)
+  site_names <- as.character(unique(sites$SITENO))
   N_sites_index <- sample(site_names, N_sites)
   sites <- filter(sites, SITENO %in% N_sites_index)
   ### Split Sites Data
