@@ -1,6 +1,6 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2598673.svg)](https://doi.org/10.5281/zenodo.2598673)
-
+[![DOI](http://joss.theoj.org/papers/10.21105/joss.00722/status.svg)](https://doi.org/10.21105/joss.00722)
 [![Build
 Status](https://travis-ci.org/mrecos/klrfome.svg?branch=master)](https://travis-ci.org/mrecos/klrfome)
 
