@@ -1,5 +1,6 @@
 
-[![DOI](https://zenodo.org/badge/103055953.svg)](https://zenodo.org/badge/latestdoi/103055953)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2598673.svg)](https://doi.org/10.5281/zenodo.2598673)
+
 [![Build
 Status](https://travis-ci.org/mrecos/klrfome.svg?branch=master)](https://travis-ci.org/mrecos/klrfome)
 
