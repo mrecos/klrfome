@@ -324,7 +324,7 @@ rasterVis::levelplot(pred_rast, margin = FALSE, par.settings=viridisTheme()) +
 <p align="left">
 
 <img 
-src="https://github.com/mrecos/klrfome/blob/master/README_images/README-predict_rasters-1?raw=true">
+src="https://github.com/mrecos/klrfome/blob/master/README_images/README-predict_rasters-1.png?raw=true">
 
 </p>
 
