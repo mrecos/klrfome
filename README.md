@@ -321,8 +321,12 @@ pred_rast <- KLR_raster_predict(pred_var_stack_scaled, ngb = ngb, params, split 
 rasterVis::levelplot(pred_rast, margin = FALSE, par.settings=viridisTheme()) +
   layer(sp.points(sp.points(SpatialPoints(coords), pch=15, cex = 2.25, col = "red")), columns=1)
 ```
+<p align="left">
 
-![](README_images/README-predict_rasters-1.png)<!-- -->
+<img 
+src="https://github.com/mrecos/klrfome/blob/master/README_images/README-predict_rasters-1?raw=true">
+
+</p>
 
 ### Predicting in parallel/multi-core
 
@@ -367,7 +371,12 @@ rasterVis::levelplot(pred_rast, margin = FALSE, par.settings=viridisTheme()) +
   layer(sp.points(sp.points(SpatialPoints(coords), pch=15, cex = 2.25, col = "red")), columns=1)
 ```
 
-![](README_images/README-multi-proc-1.png)<!-- -->
+<p align="left">
+
+<img 
+src="https://github.com/mrecos/klrfome/blob/master/README_images/README-multi-proc-1.png?raw=true">
+
+</p>
 
 ``` r
 
