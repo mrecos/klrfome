@@ -210,7 +210,10 @@ test_log_pred <- KLR_predict(test_data, train_data, dist_metric = dist_metric,
 K_corrplot(K,train_data,clusters=4)
 ```
 
-![](README_images/README-fit_model-1.png)<!-- -->
+<img 
+src="https://github.com/mrecos/klrfome/blob/master/README_images/README-fit_model-1.png?raw=true">
+
+</p>
 
 ``` r
 
@@ -228,7 +231,11 @@ ggplot(predicted_log, aes(x = as.factor(obs), y = pred, color = as.factor(obs)))
   )
 ```
 
-![](README_images/README-fit_model-2.png)<!-- -->
+<img 
+src="https://github.com/mrecos/klrfome/blob/master/README_images/README-fit_model-2.png?raw=true">
+
+</p>
+
 
 ``` r
 
