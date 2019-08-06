@@ -50,7 +50,7 @@ foam*.
 [/SAA\_2018\_poster](https://github.com/mrecos/klrfome/tree/master/SAA_2018_poster)
 folder)
 
-### Citation
+### Package Citation
 
 Please cite this package as:
 
