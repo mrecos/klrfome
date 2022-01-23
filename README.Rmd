@@ -79,6 +79,7 @@ library("pROC")      # for evaluation of model AUC metric
 library("dplyr")     # for data manipulation
 library("knitr")     # for printing tables in this document
 library("klrfome")   # for modeling
+library("sp")        # for plotting raster prediction in document
 ```
 
 
@@ -191,7 +192,7 @@ pred_rast <- KLR_raster_predict(pred_var_stack_scaled, ngb = ngb, params, split 
                                 progress = FALSE, parallel = FALSE)
 ### plot with simulated sites
 rasterVis::levelplot(pred_rast, margin = FALSE, par.settings=viridisTheme()) +
-  layer(sp.points(sp.points(SpatialPoints(coords), pch=15, cex = 2.25, col = "red")), columns=1)
+  latticeExtra::layer(sp.points(SpatialPoints(coords), pch=15, cex = 2.25, col = "red"))
 
 ```
 
@@ -199,9 +200,10 @@ rasterVis::levelplot(pred_rast, margin = FALSE, par.settings=viridisTheme()) +
 ### Predicting in parallel/multi-core
 This package uses the `foreach` package's `%dopar%` function to parallelize model prediction. To make this work you need to start a parallel backend. Here I show how to do this with `doParallel` package. It is simple in most cases, just make a cluster with `makeCluster` and the number of cores you have available and then register the cluster with `registerDoParallel` (note the use of `stopCluster()` when you are done). In the `KLR_raster_predict` function, you need to set a few things. Set `parallel` = `TRUE`, `split` = `TRUE`, and `ppside` is the number of raster blocks on the x and y axis (resulting in `ppside`^2 number of output rasters). The function also gives the options for `output = "list"` to return a `list` or `output = "save"` to save each raster as a GeoTiff to the `save_loc` directory. Finally, the `cols` and `rows` values are used here so that the split function knows the dimensions of the entire prediction raster. It need to know this becuase it mitigates the edge effect predicting on blocks by putting a collar of size `ngb` around each block. The `cols` and `rows` lets the function know when to remove the collar and when it is at an edge of the study area.
 ```{r multi-proc}
+library("parallel")
 library("doParallel")
 ### create and register parallel backend
-cl <- makeCluster(detectCores())
+cl <- parallel::makeCluster(parallel::detectCores())
 doParallel::registerDoParallel(cl)
 
 ### Use same KLR_raster_predict function with parallel = TRUE
@@ -212,14 +214,14 @@ pred_rast_list <- KLR_raster_predict(pred_var_stack_scaled, ngb = ngb, params, s
 pred_rast <-  do.call(merge, pred_rast_list)
 ### plot with simulated sites
 rasterVis::levelplot(pred_rast, margin = FALSE, par.settings=viridisTheme()) +
-  layer(sp.points(sp.points(SpatialPoints(coords), pch=15, cex = 2.25, col = "red")), columns=1)
+  latticeExtra::layer(sp.points(sp.points(SpatialPoints(coords), pch=15, cex = 2.25, col = "red")), columns=1)
 
 ### Or set output = "save" to save each prediction block out to a folder as a GeoTiff # not run
 # pred_rast_list <- KLR_raster_predict(pred_var_stack_scaled, ngb = ngb, params, split = TRUE, ppside = 5,
 #                                    progress = FALSE, parallel = TRUE, output = "save",
 #                                    save_loc = "c:/Temp/tif", overwrite = TRUE)
 
-stopCluster(cl)
+parallel::stopCluster(cl)
 ```
 
 
@@ -239,7 +241,7 @@ site_sample <- raster::extract(pred_rast, site_polys, weights = FALSE,
   rename(pred = layer) %>%
   mutate(presence = 1)
 ### sample for an environmental background of sensitivity values. (e.g. n = 500)
-bkg_sample <- data.frame(ID = 0, pred = sampleRandom(pred_rast, 500),
+bkg_sample <- data.frame(ID = 0, pred = raster::sampleRandom(pred_rast, 500),
                          presence = 0)
 model_pred <- rbind(site_sample, bkg_sample)
 
