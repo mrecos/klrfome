@@ -1,13 +1,10 @@
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2598673.svg)](https://doi.org/10.5281/zenodo.2598673)
-[![DOI](http://joss.theoj.org/papers/10.21105/joss.00722/status.svg)](https://doi.org/10.21105/joss.00722)
+[![DOI](https://zenodo.org/badge/103055953.svg)](https://zenodo.org/badge/latestdoi/103055953)
 [![Build
 Status](https://travis-ci.org/mrecos/klrfome.svg?branch=master)](https://travis-ci.org/mrecos/klrfome)
 
 <p align="center">
-
 <img width="326" height="134" src="https://github.com/mrecos/klrfome/blob/master/klrfome_logo/KLR-black.png?raw=true">
-
 </p>
 
 #### klrfome - Kernel Logistic Regression on Focal Mean Embeddings
@@ -37,20 +34,17 @@ To achieve this goal, the package fits a Kernel Logistic Regression
 (KLR) model onto a mean embedding similarity matrix and predicts as a
 roving focal function of varying window size. The name of the package is
 derived from this approach; **K**ernel **L**ogistic **R**egression on
-**FO**cal **M**ean **E**mbeddings (**klrfome**) pronounced *clear
-foam*.
+**FO**cal **M**ean **E**mbeddings (**klrfome**) pronounced *clear foam*.
 
 <p align="center">
-
 <img width="800" height="600" src="https://github.com/mrecos/klrfome/blob/master/SAA_2018_poster/SAA_2018_poster_small.jpg?raw=true">
-
 </p>
 
 (High-res versions of research poster are in the
-[/SAA\_2018\_poster](https://github.com/mrecos/klrfome/tree/master/SAA_2018_poster)
+[/SAA_2018_poster](https://github.com/mrecos/klrfome/tree/master/SAA_2018_poster)
 folder)
 
-### Package Citation
+### Citation
 
 Please cite this package as:
 
@@ -61,13 +55,13 @@ Please cite this package as:
 ### Special Thanks
 
 This model is inspired by and borrows from Zoltán Szabó’s work on mean
-embeddings (Szabó et al. 2016, @Szabo2) and Ji Zhu & Trevor Hastie’s
-Kernel Logistic Regression algorithm (Zhu and Hastie 2005). I extend a
-hardy **thank you** to Zoltán for his correspondence during the
-development of this approach. This approach would not have been created
-without his help. Further, a big **thank you** to Ben Markwick for his
-moral support and `rrtools` package used to create this package. However
-that being said, all errors, oversights, and omissions are my own.
+embeddings Szabó et al. (2015) and Ji Zhu & Trevor Hastie’s Kernel
+Logistic Regression algorithm (Zhu and Hastie 2005). I extend a hardy
+**thank you** to Zoltán for his correspondence during the development of
+this approach. This approach would not have been created without his
+help. Further, a big **thank you** to Ben Markwick for his moral support
+and `rrtools` package used to create this package. However that being
+said, all errors, oversights, and omissions are my own.
 
 ### Installation
 
@@ -78,13 +72,11 @@ You can install klrfome from github with:
 devtools::install_github("mrecos/klrfome")
 ```
 
-## Example workflow on simulated data (Try me\!)
+## Example workflow on simulated data (Try me!)
 
 <p align="left">
-
 <img 
 src="https://github.com/mrecos/klrfome/blob/master/README_images/KLRfome_dataflow.png?raw=true">
-
 </p>
 
 In brief, the process below is 1) take a table of observations of two or
@@ -113,14 +105,15 @@ library("pROC")      # for evaluation of model AUC metric
 library("dplyr")     # for data manipulation
 library("knitr")     # for printing tables in this document
 library("klrfome")   # for modeling
+library("sp")        # for plotting raster prediction in document
 ```
 
 #### Set hyperparameters and load simulated site location data
 
 In this block, the random `seed`, `sigma` and `lambda` hyperparameters,
 and the `dist_metric` are all set. The `sigma` parameter controls how
-“close” observations must be to be considered similar. Closeness in
-this context is defined in the ‘feature space’, but in geographic or
+“close” observations must be to be considered similar. Closeness in this
+context is defined in the ‘feature space,’ but in geographic or
 measurement space. At a higher `sigma` more distant observations can
 still be considered similar. The `lambda` hyperparameter controls the
 regularization in the KLR model by penalizing large coefficients; it
@@ -197,26 +190,28 @@ to a `list` to be used for predicting on a study area raster stack.
 K <- build_K(train_data, sigma = sigma, dist_metric = dist_metric, progress = FALSE)
 #### Train KLR model
 train_log_pred <- KLR(K, train_presence, lambda, 100, 0.001, verbose = 2)
-#> Step 1. Absolute Relative Approximate Error = 128.6897
-#> Step 2. Absolute Relative Approximate Error = 14.2954
-#> Step 3. Absolute Relative Approximate Error = 0.9626
-#> Step 4. Absolute Relative Approximate Error = 0.0133
-#> Found solution in 4 steps.
+#> Step 1. Absolute Relative Approximate Error = 120.2567
+#> Step 2. Absolute Relative Approximate Error = 9.6064
+#> Step 3. Absolute Relative Approximate Error = 0.6178
+#> Step 4. Absolute Relative Approximate Error = 0.0477
+#> Step 5. Absolute Relative Approximate Error = 0
+#> Found solution in 5 steps.
 #### Predict KLR model on test data
 test_log_pred <- KLR_predict(test_data, train_data, dist_metric = dist_metric,
                              train_log_pred[["alphas"]], sigma, progress = FALSE)
 
 ### Plot K Matrix
 K_corrplot(K,train_data,clusters=4)
+#> Warning in text.default(pos.xlabel[, 1], pos.xlabel[, 2], newcolnames, srt =
+#> tl.srt, : "cl.lim" is not a graphical parameter
+#> Warning in text.default(pos.ylabel[, 1], pos.ylabel[, 2], newrownames, col =
+#> tl.col, : "cl.lim" is not a graphical parameter
+#> Warning in title(title, ...): "cl.lim" is not a graphical parameter
 ```
 
-<img 
-src="https://github.com/mrecos/klrfome/blob/master/README_images/README-fit_model-1.png?raw=true">
-
-</p>
+![](README_images/README-fit_model-1.png)<!-- -->
 
 ``` r
-
 ### Plot Test Set Prediction
 predicted_log <- data.frame(pred = test_log_pred, obs = test_presence)
 ggplot(predicted_log, aes(x = as.factor(obs), y = pred, color = as.factor(obs))) +
@@ -231,14 +226,9 @@ ggplot(predicted_log, aes(x = as.factor(obs), y = pred, color = as.factor(obs)))
   )
 ```
 
-<img 
-src="https://github.com/mrecos/klrfome/blob/master/README_images/README-fit_model-2.png?raw=true">
-
-</p>
-
+![](README_images/README-fit_model-2.png)<!-- -->
 
 ``` r
-
 ### Save parameters for later prediction
 params <- list(train_data = train_data,
                alphas_pred = train_log_pred[["alphas"]],
@@ -251,10 +241,8 @@ params <- list(train_data = train_data,
 #### Predicting on a raster stack
 
 <p align="left">
-
 <img 
 src="https://github.com/mrecos/klrfome/blob/master/README_images/KLRfome_prediction.png?raw=true">
-
 </p>
 
 This package can be used to predict on tabular data as above, but a more
@@ -264,7 +252,7 @@ for creating a simulated landscape that has some fidelity to the
 training data. For real-world examples, the prediction starts with a
 raster stack of predictor variable rasters. Form there the function
 `scale_prediction_rasters` center and scales the values of the rasters
-to that of the train\_data. Having data that is centered at zero and
+to that of the train_data. Having data that is centered at zero and
 scaled to z-scores is critical in measuring the distance between
 observations. Further, it is critical that the test data (raster stack)
 is scaled to the same values as the training data or the predictions
@@ -319,14 +307,10 @@ pred_rast <- KLR_raster_predict(pred_var_stack_scaled, ngb = ngb, params, split 
                                 progress = FALSE, parallel = FALSE)
 ### plot with simulated sites
 rasterVis::levelplot(pred_rast, margin = FALSE, par.settings=viridisTheme()) +
-  layer(sp.points(sp.points(SpatialPoints(coords), pch=15, cex = 2.25, col = "red")), columns=1)
+  latticeExtra::layer(sp.points(SpatialPoints(coords), pch=15, cex = 2.25, col = "red"))
 ```
-<p align="left">
 
-<img 
-src="https://github.com/mrecos/klrfome/blob/master/README_images/README-predict_rasters-1.png?raw=true">
-
-</p>
+![](README_images/README-predict_rasters-1.png)<!-- -->
 
 ### Predicting in parallel/multi-core
 
@@ -350,12 +334,12 @@ know when to remove the collar and when it is at an edge of the study
 area.
 
 ``` r
+library("parallel")
 library("doParallel")
 #> Loading required package: foreach
 #> Loading required package: iterators
-#> Loading required package: parallel
 ### create and register parallel backend
-cl <- makeCluster(detectCores())
+cl <- parallel::makeCluster(parallel::detectCores())
 doParallel::registerDoParallel(cl)
 
 ### Use same KLR_raster_predict function with parallel = TRUE
@@ -368,24 +352,18 @@ pred_rast_list <- KLR_raster_predict(pred_var_stack_scaled, ngb = ngb, params, s
 pred_rast <-  do.call(merge, pred_rast_list)
 ### plot with simulated sites
 rasterVis::levelplot(pred_rast, margin = FALSE, par.settings=viridisTheme()) +
-  layer(sp.points(sp.points(SpatialPoints(coords), pch=15, cex = 2.25, col = "red")), columns=1)
+  latticeExtra::layer(sp.points(sp.points(SpatialPoints(coords), pch=15, cex = 2.25, col = "red")), columns=1)
 ```
 
-<p align="left">
-
-<img 
-src="https://github.com/mrecos/klrfome/blob/master/README_images/README-multi-proc-1.png?raw=true">
-
-</p>
+![](README_images/README-multi-proc-1.png)<!-- -->
 
 ``` r
-
 ### Or set output = "save" to save each prediction block out to a folder as a GeoTiff # not run
 # pred_rast_list <- KLR_raster_predict(pred_var_stack_scaled, ngb = ngb, params, split = TRUE, ppside = 5,
 #                                    progress = FALSE, parallel = TRUE, output = "save",
 #                                    save_loc = "c:/Temp/tif", overwrite = TRUE)
 
-stopCluster(cl)
+parallel::stopCluster(cl)
 ```
 
 #### Model Evaluation
@@ -423,7 +401,7 @@ site_sample <- raster::extract(pred_rast, site_polys, weights = FALSE,
   rename(pred = layer) %>%
   mutate(presence = 1)
 ### sample for an environmental background of sensitivity values. (e.g. n = 500)
-bkg_sample <- data.frame(ID = 0, pred = sampleRandom(pred_rast, 500),
+bkg_sample <- data.frame(ID = 0, pred = raster::sampleRandom(pred_rast, 500),
                          presence = 0)
 model_pred <- rbind(site_sample, bkg_sample)
 
@@ -442,23 +420,45 @@ Test_area_metrics <- kstats %>%
                 FPR = round(metrics(TP,TN,FP,FN)$FPR,3),
                 FNR = round(metrics(TP,TN,FP,FN)$FNR,3)) %>%
   data.frame()
+#> Setting levels: control = 0, case = 1
+#> Setting direction: controls < cases
+#> Setting levels: control = 0, case = 1
+#> Setting direction: controls < cases
+#> Setting levels: control = 0, case = 1
+#> Setting direction: controls < cases
+#> Setting levels: control = 0, case = 1
+#> Setting direction: controls < cases
+#> Setting levels: control = 0, case = 1
+#> Setting direction: controls < cases
+#> Setting levels: control = 0, case = 1
+#> Setting direction: controls < cases
+#> Setting levels: control = 0, case = 1
+#> Setting direction: controls < cases
+#> Setting levels: control = 0, case = 1
+#> Setting direction: controls < cases
+#> Setting levels: control = 0, case = 1
+#> Setting direction: controls < cases
+#> Setting levels: control = 0, case = 1
+#> Setting direction: controls < cases
+#> Setting levels: control = 0, case = 1
+#> Setting direction: controls < cases
 
 knitr::kable(Test_area_metrics)
 ```
 
-| Threshold |  TP |  FP |  TN |  FN |   AUC | YoudensJ |    KG | Sensitivity |   FPR |   FNR |
-| --------: | --: | --: | --: | --: | ----: | -------: | ----: | ----------: | ----: | ----: |
-|       0.0 | 336 | 500 |   0 |   0 | 0.738 |    0.000 | 0.000 |       1.000 | 1.000 | 0.000 |
-|       0.1 | 331 | 409 |  91 |   5 | 0.738 |    0.167 | 0.170 |       0.985 | 0.818 | 0.015 |
-|       0.2 | 289 | 336 | 164 |  47 | 0.738 |    0.188 | 0.219 |       0.860 | 0.672 | 0.140 |
-|       0.3 | 277 | 302 | 198 |  59 | 0.738 |    0.220 | 0.267 |       0.824 | 0.604 | 0.176 |
-|       0.4 | 268 | 265 | 235 |  68 | 0.738 |    0.268 | 0.336 |       0.798 | 0.530 | 0.202 |
-|       0.5 | 258 | 237 | 263 |  78 | 0.738 |    0.294 | 0.383 |       0.768 | 0.474 | 0.232 |
-|       0.6 | 247 | 208 | 292 |  89 | 0.738 |    0.319 | 0.434 |       0.735 | 0.416 | 0.265 |
-|       0.7 | 239 | 157 | 343 |  97 | 0.738 |    0.397 | 0.559 |       0.711 | 0.314 | 0.289 |
-|       0.8 | 192 | 118 | 382 | 144 | 0.738 |    0.335 | 0.587 |       0.571 | 0.236 | 0.429 |
-|       0.9 | 128 |  37 | 463 | 208 | 0.738 |    0.307 | 0.806 |       0.381 | 0.074 | 0.619 |
-|       1.0 |   0 |   0 | 500 | 336 | 0.738 |    0.000 |   NaN |       0.000 | 0.000 | 1.000 |
+| Threshold |  TP |  FP |  TN |  FN |  AUC | YoudensJ |    KG | Sensitivity |   FPR |   FNR |
+|----------:|----:|----:|----:|----:|-----:|---------:|------:|------------:|------:|------:|
+|       0.0 | 336 | 500 |   0 |   0 | 0.85 |    0.000 | 0.000 |       1.000 | 1.000 | 0.000 |
+|       0.1 | 336 | 357 | 143 |   0 | 0.85 |    0.286 | 0.286 |       1.000 | 0.714 | 0.000 |
+|       0.2 | 334 | 281 | 219 |   2 | 0.85 |    0.432 | 0.435 |       0.994 | 0.562 | 0.006 |
+|       0.3 | 322 | 237 | 263 |  14 | 0.85 |    0.484 | 0.505 |       0.958 | 0.474 | 0.042 |
+|       0.4 | 318 | 203 | 297 |  18 | 0.85 |    0.540 | 0.571 |       0.946 | 0.406 | 0.054 |
+|       0.5 | 311 | 179 | 321 |  25 | 0.85 |    0.568 | 0.613 |       0.926 | 0.358 | 0.074 |
+|       0.6 | 296 | 150 | 350 |  40 | 0.85 |    0.581 | 0.659 |       0.881 | 0.300 | 0.119 |
+|       0.7 | 277 | 126 | 374 |  59 | 0.85 |    0.572 | 0.694 |       0.824 | 0.252 | 0.176 |
+|       0.8 | 238 |  96 | 404 |  98 | 0.85 |    0.516 | 0.729 |       0.708 | 0.192 | 0.292 |
+|       0.9 | 112 |  42 | 458 | 224 | 0.85 |    0.249 | 0.748 |       0.333 | 0.084 | 0.667 |
+|       1.0 |   0 |   0 | 500 | 336 | 0.85 |    0.000 |   NaN |       0.000 | 0.000 | 1.000 |
 
 In this case those metrics are the `auc`, `Youdens J`, `KG` = Kvamme
 Gain, `Sensitivity`, `FPR` = False Positive Rate, and `FNR` = False
@@ -467,8 +467,8 @@ of model performance in all scenarios, these are the metrics that I find
 most useful for describing archaeological predictive models. In this
 example, I am aiming to maximize my two-class classification for the
 Youden’s J (aka Informedness). As such, I would set my site-present
-vs. site-absent `Threshold` at **0.7**. At this threshold we have a
-`Sensitivity` = **0.711** and a `FPR` = **0.314**.
+vs. site-absent `Threshold` at **0.6**. At this threshold we have a
+`Sensitivity` = **0.881** and a `FPR` = **0.3**.
 
 ## Main Package Functions
 
@@ -477,9 +477,9 @@ Regression (KLR) on mean kernel embeddings, functions for preparing site
 and background data, and a function for simulate archaeological site
 location data.
 
-#### KLR\_funs.R for Fitting and Predicting on Tabular Data
+#### KLR_funs.R for Fitting and Predicting on Tabular Data
 
-  - `build_K` - Function takes list of training data, scalar value for
+-   `build_K` - Function takes list of training data, scalar value for
     `sigma` hyperparameter, and a distance method to compute a mean
     embedding similarity kernel. This kernel is a pair-wise (N x N)
     matrix of the mean similarity between the attributes describing each
@@ -489,7 +489,7 @@ location data.
     stay as such unless you have explored other distances and know
     why/how you want to use them.
 
-  - `KLR` - Function takes the similarity kernel matrix `K`, a vector of
+-   `KLR` - Function takes the similarity kernel matrix `K`, a vector of
     presence/absence coded as `1` or `0`, and a scalar value for the
     `lambda` regularizing hyperparameter; optionally values for maximum
     iterations and threshold. This function performs Kernel Logistic
@@ -500,7 +500,7 @@ location data.
     (probability of site-presence) for the training data, and `alphas`,
     the approximated parameters from the IRLS algorithm.
 
-  - `KLR_predict` - Function takes a list of the training data, a list
+-   `KLR_predict` - Function takes a list of the training data, a list
     of the testing data, a vector of the approximated `alphas`
     parameters, a scalar value for the `sigma` kernel hyperparameter,
     and a distance method. This function predicts the probability of
@@ -511,9 +511,9 @@ location data.
     predicted probability of site presence for each training data
     example.
 
-#### raster\_predict\_funs.R for Predicting on Raster Data
+#### raster_predict_funs.R for Predicting on Raster Data
 
-  - `rescale_sim_raster` - Function that rescales simulated rasters from
+-   `rescale_sim_raster` - Function that rescales simulated rasters from
     `NLMR::nlm_gaussianfield` (Sciaini, Fritsch, and Simpkins 2017) or
     whatever you want to use, to the mean and standard deviation of the
     simulated data used to fit the `klr` model. You will have to add the
@@ -523,7 +523,7 @@ location data.
     `get_sim_data` function. Returned is a raster scaled too your
     simualted training data.
 
-  - `sim_trend` - Function is used to take create `n` number of
+-   `sim_trend` - Function is used to take create `n` number of
     simulated site locations of `size` cell dimensions on a `rows` by
     `cols` raster. The latter two arguments should match the size of
     your simulated rasters. The function randomly locates the sites and
@@ -545,13 +545,14 @@ location data.
     it is needed to produce actual correlated environments for model
     testing.
 
-  - `scale_prediction_rasters` - Function scales your predictor `rater
-    stack` based on the `params` list created in the model fitting
-    process. This script simply loops over the rasters in the stack and
-    centers and scales based on mean and sd of the training data used to
-    fit the `klr` model. The function outputs a `raster stack`.
+-   `scale_prediction_rasters` - Function scales your predictor
+    `rater stack` based on the `params` list created in the model
+    fitting process. This script simply loops over the rasters in the
+    stack and centers and scales based on mean and sd of the training
+    data used to fit the `klr` model. The function outputs a
+    `raster stack`.
 
-  - `KLR_raster_predict` - Function predicts the probability of
+-   `KLR_raster_predict` - Function predicts the probability of
     site-presence based on a `raster stack` of center/scaled predictor
     rasters, a focal neighborhood size in cells as `ngb`, and the
     `params` list of model fit parameters. Finally, the function also
@@ -572,9 +573,9 @@ location data.
     try and assist the user in which arguments go with what. Perhaps
     future versions will streamline this a bit.
 
-#### format\_site\_data.R for Data Formatting
+#### format_site_data.R for Data Formatting
 
-  - `format_site_data` - Function takes a `data.frame` of
+-   `format_site_data` - Function takes a `data.frame` of
     presence/background observations. The column `presence` indicated
     site presence of background as `1` or `0` respectively. The `SITENO`
     column indicates either a site identifier or `background`. The
@@ -590,9 +591,9 @@ location data.
     model. Also returned is the mean and standard deviation of the data
     so that new data can be center and scaled to the same parameters.
 
-#### get\_sim\_data.R for Simulating Site Location Data
+#### get_sim_data.R for Simulating Site Location Data
 
-  - `get_sim_data` - Function takes a mean and SD for two simulated
+-   `get_sim_data` - Function takes a mean and SD for two simulated
     predictor variables for each of sites and background. With
     archaeological site data being a protected data set in many settings
     (including this project), it cannot be freely shared. However, it is
@@ -609,7 +610,7 @@ location data.
 
 #### metrics.R for Calculating Performance Metrics
 
-  - `CM_quads` - Function takes a data.frame of predicted probabilities
+-   `CM_quads` - Function takes a data.frame of predicted probabilities
     (must be called `pred`) and actual observed presence/absence (must
     be called `presence` and contain `1 = presence` and `0 = absence`).
     Optional input is a threshold value or values in the form of a
@@ -624,7 +625,7 @@ location data.
     the `AUC` statistic that gives an indication of model performance
     across all thresholds.
 
-  - `metrics` - Function provides a large quantity of metrics based on
+-   `metrics` - Function provides a large quantity of metrics based on
     the quadrants of the Confusion Matrix derived from a threshold of
     the predicted probability values. The input to this function is the
     `TP`, `TN`, `FP`, and `FN` quantities of a thresholded model as
@@ -636,7 +637,7 @@ location data.
 
 #### plot.R for Plotting Similarity Kernel
 
-  - `K_corrplot` - Function is a pretty simple wrapper around
+-   `K_corrplot` - Function is a pretty simple wrapper around
     `corrplot::corrplot()` with hierarchical clustering. Inputs for this
     function are the similarity matrix `K` and the `train_data` with the
     option of an integer for the number of clusters to partition the
@@ -650,9 +651,8 @@ location data.
 
 **Code:** See the [DESCRIPTION](DESCRIPTION) file
 
-\(\textbf{Data:}\)
-[CC-0](http://creativecommons.org/publicdomain/zero/1.0/) attribution
-requested in reuse
+**Data:** [CC-0](http://creativecommons.org/publicdomain/zero/1.0/)
+attribution requested in reuse
 
 # Contributions
 
@@ -663,34 +663,36 @@ participating in this project you agree to abide by its terms.
 
 # References
 
-<div id="refs" class="references">
+<div id="refs" class="references csl-bib-body hanging-indent">
 
-<div id="ref-Flaxman">
+<div id="ref-Flaxman" class="csl-entry">
 
 Flaxman, Seth, Yu-Xiang Wang, and Alexander J. Smola. 2015. “Who
 Supported Obama in 2012?: Ecological Inference Through Distribution
-Regression.” In *Proceedings of the 21th Acm Sigkdd International
+Regression.” In *Proceedings of the 21th ACM SIGKDD International
 Conference on Knowledge Discovery and Data Mining*, 289–98. ACM.
 
 </div>
 
-<div id="ref-2017arXiv170504293L">
+<div id="ref-2017arXiv170504293L" class="csl-entry">
 
 Law, H. C. L., D. J. Sutherland, D. Sejdinovic, and S. Flaxman. 2017.
-“Bayesian Approaches to Distribution Regression.” *ArXiv E-Prints*,
-May.
+“<span class="nocase">Bayesian Approaches to Distribution
+Regression</span>.” *ArXiv e-Prints*, May.
+<https://arxiv.org/abs/1705.04293>.
 
 </div>
 
-<div id="ref-Muandet">
+<div id="ref-Muandet" class="csl-entry">
 
 Muandet, Krikamol, Kenji Fukumizu, Bharath Sriperumbudur, and Bernhard
 Schölkopf. 2017. “Kernel Mean Embedding of Distributions: A Review and
 Beyond.” *Foundations and Trends in Machine Learning* 10 (1-2): 1–141.
+<https://doi.org/10.1561/2200000060>.
 
 </div>
 
-<div id="ref-NLMR">
+<div id="ref-NLMR" class="csl-entry">
 
 Sciaini, Marco, Matthias Fritsch, and Craig E. Simpkins. 2017. *NLMR:
 Simulating Neutral Landscape Models* (version 0.2.0).
@@ -698,25 +700,25 @@ Simulating Neutral Landscape Models* (version 0.2.0).
 
 </div>
 
-<div id="ref-Song">
+<div id="ref-Song" class="csl-entry">
 
 Song, Li, and Arthur Fukumizu Kenjiand Gretto. 2013. “Kernel Embeddings
 of Conditional Distributions: A Unified Kernel Framework for
 Nonparametric Inference in Graphical Models.” *IEEE Signal Processing
-Magazine* 30 (4): 98–111.
+Magazine* 30 (4): 98–111. <https://doi.org/10.1109/msp.2013.2252713>.
 
 </div>
 
-<div id="ref-Szabo2">
+<div id="ref-Szabo2" class="csl-entry">
 
 Szabó, Zoltán, Arthur Gretton, Barnabás Póczos, and Bharath
 Sriperumbudur. 2015. “Two-Stage Sampled Learning Theory on
 Distributions.” In *International Conference on Artificial Intelligence
-and Statistics (Aistats)*, 948–57.
+and Statistics (AISTATS)*, 948–57.
 
 </div>
 
-<div id="ref-Szabo">
+<div id="ref-Szabo" class="csl-entry">
 
 Szabó, Zoltán, Bharath Sriperumbudur, Barnabás Póczos, and Arthur
 Gretton. 2016. “Learning Theory for Distribution Regression.” *Journal
@@ -724,11 +726,11 @@ of Machine Learning Research* 17: 1–40.
 
 </div>
 
-<div id="ref-Zhu">
+<div id="ref-Zhu" class="csl-entry">
 
 Zhu, Ji, and Trevor Hastie. 2005. “Kernel Logistic Regression and the
 Import-Vector Machine.” *Journal of Computational and Graphical
-Statistics* 14 (1): 185–205.
+Statistics* 14 (1): 185–205. <https://doi.org/10.1198/106186005x25619>.
 
 </div>
 
