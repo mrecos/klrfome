@@ -162,7 +162,8 @@ This package uses the `foreach` package's `%dopar%` function to parallelize mode
 library("doParallel")
 library("parallel")
 ### create and register parallel backend
-cl <- makeCluster(detectCores())
+### Vignette uses 2 cores, but you can use as many as you have
+cl <- makeCluster(2L)
 doParallel::registerDoParallel(cl)
 
 ### Use same KLR_raster_predict function with parallel = TRUE
