@@ -4,10 +4,19 @@
 \alias{get_sim_data}
 \title{get_sim_data}
 \usage{
-get_sim_data(site_samples, N_site_bags, sites_var1_mean = 50,
-  sites_var1_sd = 10, sites_var2_mean = 3, sites_var2_sd = 2,
-  backg_var1_mean = 100, backg_var1_sd = 20, backg_var2_mean = 6,
-  backg_var2_sd = 3, background_site_balance = 1)
+get_sim_data(
+  site_samples,
+  N_site_bags,
+  sites_var1_mean = 50,
+  sites_var1_sd = 10,
+  sites_var2_mean = 3,
+  sites_var2_sd = 2,
+  backg_var1_mean = 100,
+  backg_var1_sd = 20,
+  backg_var2_mean = 6,
+  backg_var2_sd = 3,
+  background_site_balance = 1
+)
 }
 \arguments{
 \item{site_samples}{- [scaler] Number of sites to include in simulated data}

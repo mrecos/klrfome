@@ -4,9 +4,20 @@
 \alias{KLR_raster_predict}
 \title{KLR_raster_predict}
 \usage{
-KLR_raster_predict(rast_stack, ngb, params, cols, rows, split = FALSE,
-  ppside = NULL, progress = TRUE, parallel = FALSE,
-  output = "list", save_loc = NULL, overwrite = FALSE)
+KLR_raster_predict(
+  rast_stack,
+  ngb,
+  params,
+  cols,
+  rows,
+  split = FALSE,
+  ppside = NULL,
+  progress = TRUE,
+  parallel = FALSE,
+  output = "list",
+  save_loc = NULL,
+  overwrite = FALSE
+)
 }
 \arguments{
 \item{rast_stack}{[raster stack] of prediction rasters (usually scaled)}

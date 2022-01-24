@@ -4,8 +4,13 @@
 \alias{format_site_data}
 \title{format_site_data}
 \usage{
-format_site_data(dat, N_sites, train_test_split, background_site_balance,
-  sample_fraction)
+format_site_data(
+  dat,
+  N_sites,
+  train_test_split,
+  background_site_balance,
+  sample_fraction
+)
 }
 \arguments{
 \item{dat}{- [data.frame] A data.frame of presence and absence records. Column "presence" must contain presence/absence as 1/0, and column "SITENO" contains the grouping variable.}
@@ -23,7 +28,7 @@ format_site_data(dat, N_sites, train_test_split, background_site_balance,
 `format_site_data()` formats a data.frame of a specific format into a list suitable for use with the klrfome model.
 }
 \details{
-The function takes a data.frame that at a mimimum must include a column for site presence/absence, a column for the site identifier, and one or more columns of covariates to be used in the regression model. There are three additional required parameters to this function and they are; `N_sites` which can be used to limit the number of sites (groups of the presence == 1 class) returned in the results; `train_test_split` that is used to split the site present data into training and testing data sets; and `background_site_balance` that is the ratio of background observation groups to include for each site group. The choice of `N_sites` and `background_site_balance` argument values are influenced by a number of factors including the amount of data, length of computation, and site prevelance.
+The function takes a data.frame that at a mimimum must include a column for site presence/absence, a column for the site identifier, and one or more columns of covariates to be used in the regression model. There are three additional required parameters to this function and they are; `N_sites` which can be used to limit the number of sites (groups of the presence == 1 class) returned in the results; `train_test_split` that is used to split the site present data into training and testing data sets; and `background_site_balance` that is the ratio of background observation groups to include for each site group. The choice of `N_sites` and `background_site_balance` argument values are influenced by a number of factors including the amount of data, length of computation, and site prevelance. 
 
 This function returns a list object which is a reformatting of the input data where each list element if a grouping of present or absence observations. This is needed because the klrfome model works on groups of observations.
 }

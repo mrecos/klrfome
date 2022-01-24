@@ -4,8 +4,14 @@
 \alias{KLR_predict}
 \title{KLR_predict}
 \usage{
-KLR_predict(test_data, train_data, alphas_pred, sigma, progress = TRUE,
-  dist_metric = "euclidean")
+KLR_predict(
+  test_data,
+  train_data,
+  alphas_pred,
+  sigma,
+  progress = TRUE,
+  dist_metric = "euclidean"
+)
 }
 \arguments{
 \item{test_data}{- [list] Training data used to create similarity kernel matrix}
