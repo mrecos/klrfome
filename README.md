@@ -1,4 +1,6 @@
 
+[![R-CMD-check](https://github.com/mrecos/klrfome/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mrecos/klrfome/actions/workflows/R-CMD-check.yaml)
+
 [![DOI](https://zenodo.org/badge/103055953.svg)](https://zenodo.org/badge/latestdoi/103055953)
 
 <p align="center">
