@@ -203,6 +203,7 @@ scale_prediction_rasters <- function(pred_var_stack, params, verbose = 1){
 #'
 #' @param rast_stack [raster stack] a stack of the prediction rasters scaled to the the input training parameters.
 #' @param ppside [integer] the number of blocks to split the study area into if `split` == TRUE
+#' @param ngb [integer] the width and height in raster cell units of roving focal window.
 #' @param split [logical] TRUE/FALSE for whether to split raster into chunks. If `parallal` == TRUE, then `split` must == TRUE
 #'
 #' @importFrom raster rasterToPolygons extent crop ncell aggregate
@@ -266,10 +267,12 @@ crop_raster_collar <- function(pred_rast, ngb, cols, rows){
 #' @param rast_stack [raster stack] of prediction rasters (usually scaled)
 #' @param ngb [integer] pixel dimension of square neighborhood used to predict model on
 #' @param params [list] list of important model parameters. (See example)
+#' @param cols [integer] number of columns in the entire prediction raster. Allows split function to properly crop collars
+#' @param rows [integer] number of rows in the entire prediction raster. Allows split function to properly crop collars
 #' @param split [logical] TRUE/FALSE for whether to split raster into chunks. If `parallal` == TRUE, then `split` must == TRUE
 #' @param ppside [integer] the number of blocks to split the study area into if `split` == TRUE
 #' @param progress [logical] if TRUE, displays progress of function
-#' @param parallel [logical] if TRUE, prediction will be excuted as parallel computations. Requires a parallel backend, `split` == TRUE, and number for `ppside`
+#' @param parallel [logical] if TRUE, prediction will be executed as parallel computations. Requires a parallel backend, `split` == TRUE, and number for `ppside`
 #' @param output [string] either 'list' or 'save'. If 'list', returns list of predicted blocks. If 'save', blocks are saved to save_loc as GeoTiff
 #' @param save_loc [string] Location to save raster blocks (GeoTiff). Uses getwd() is NULL
 #' @param overwrite [logical] TRUE will overwrite saved raster GeoTiffs in save_loc

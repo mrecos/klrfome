@@ -7,17 +7,17 @@
 K_corrplot(K, train_data, clusters = 4)
 }
 \arguments{
-\item{[K]}{- Similarity Kernel Matrix}
+\item{K}{[K] - Similarity Kernel Matrix}
 
-\item{[list]}{- training data}
+\item{train_data}{[list] - training data}
 
-\item{[scalar]}{- clusters}
+\item{clusters}{[scalar] - Number of clusters}
 }
 \value{
 - a correlation matrix object
 }
 \description{
-`K_corrplot()` is a wrapper around `corrplor::corrplot()` that returns a coorplot for visualizing the similarity matrix of site and background bags.
+`K_corrplot()` is a wrapper around `corrplor::corrplot()` that returns a corrplot for visualizing the similarity matrix of site and background bags.
 }
 \details{
 This function is a wrapper of `corrplot::corrplot()` with defaults and hierarchical clustering order. The inputs are the similarity kernel matirx `K`, the `train_data` used to creat `K`, and the number of clusters to display. The `train_data` is only used to procure the labels for site and background bags.
@@ -30,7 +30,7 @@ K <- build_K(train_data, sigma = sigma, dist_metric = dist_metric, progress = FA
 #### Train KLR model
 train_log_pred <- KLR(K, train_presence, lambda, 100, 0.001, verbose = 2)
 ### Plot K Matrix
-K_corrplot(K,train_data,clusters=4)
+K_corrplot(K, train_data, clusters = 4)
 }
 
 }

@@ -26,13 +26,17 @@ KLR_raster_predict(
 
 \item{params}{[list] list of important model parameters. (See example)}
 
+\item{cols}{[integer] number of columns in the entire prediction raster. Allows split function to properly crop collars}
+
+\item{rows}{[integer] number of rows in the entire prediction raster. Allows split function to properly crop collars}
+
 \item{split}{[logical] TRUE/FALSE for whether to split raster into chunks. If `parallal` == TRUE, then `split` must == TRUE}
 
 \item{ppside}{[integer] the number of blocks to split the study area into if `split` == TRUE}
 
 \item{progress}{[logical] if TRUE, displays progress of function}
 
-\item{parallel}{[logical] if TRUE, prediction will be excuted as parallel computations. Requires a parallel backend, `split` == TRUE, and number for `ppside`}
+\item{parallel}{[logical] if TRUE, prediction will be executed as parallel computations. Requires a parallel backend, `split` == TRUE, and number for `ppside`}
 
 \item{output}{[string] either 'list' or 'save'. If 'list', returns list of predicted blocks. If 'save', blocks are saved to save_loc as GeoTiff}
 

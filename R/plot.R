@@ -1,12 +1,12 @@
 #' K_corrplot
 #' 
-#' `K_corrplot()` is a wrapper around `corrplor::corrplot()` that returns a coorplot for visualizing the similarity matrix of site and background bags.
+#' `K_corrplot()` is a wrapper around `corrplor::corrplot()` that returns a corrplot for visualizing the similarity matrix of site and background bags.
 #' 
 #' This function is a wrapper of `corrplot::corrplot()` with defaults and hierarchical clustering order. The inputs are the similarity kernel matirx `K`, the `train_data` used to creat `K`, and the number of clusters to display. The `train_data` is only used to procure the labels for site and background bags.
 #'
-#' @param [K] - Similarity Kernel Matrix
-#' @param [list] - training data
-#' @param [scalar] - clusters
+#' @param K [K] - Similarity Kernel Matrix
+#' @param train_data [list] - training data
+#' @param clusters [scalar] - Number of clusters
 #'
 #' @return - a correlation matrix object
 #' @export
@@ -20,7 +20,7 @@
 #' #### Train KLR model
 #' train_log_pred <- KLR(K, train_presence, lambda, 100, 0.001, verbose = 2)
 #' ### Plot K Matrix
-#' K_corrplot(K,train_data,clusters=4)
+#' K_corrplot(K, train_data, clusters = 4)
 #'}
 #'
 K_corrplot <- function(K,train_data,clusters=4){

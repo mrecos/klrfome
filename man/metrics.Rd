@@ -14,8 +14,6 @@ metrics(TP, TN, FP, FN)
 \item{FP}{- [scalar] False Positives}
 
 \item{FN}{- [scalar] False Negatives}
-
-\item{a}{- [scalar] alpha level}
 }
 \value{
 [list] - list of all metrics

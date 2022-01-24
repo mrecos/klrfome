@@ -2,7 +2,7 @@
 #'
 #'`format_site_data()` formats a data.frame of a specific format into a list suitable for use with the klrfome model.
 #'
-#'The function takes a data.frame that at a mimimum must include a column for site presence/absence, a column for the site identifier, and one or more columns of covariates to be used in the regression model. There are three additional required parameters to this function and they are; `N_sites` which can be used to limit the number of sites (groups of the presence == 1 class) returned in the results; `train_test_split` that is used to split the site present data into training and testing data sets; and `background_site_balance` that is the ratio of background observation groups to include for each site group. The choice of `N_sites` and `background_site_balance` argument values are influenced by a number of factors including the amount of data, length of computation, and site prevelance. 
+#'The function takes a data.frame that at a minimum must include a column for site presence/absence, a column for the site identifier, and one or more columns of covariates to be used in the regression model. There are three additional required parameters to this function and they are; `N_sites` which can be used to limit the number of sites (groups of the presence == 1 class) returned in the results; `train_test_split` that is used to split the site present data into training and testing data sets; and `background_site_balance` that is the ratio of background observation groups to include for each site group. The choice of `N_sites` and `background_site_balance` argument values are influenced by a number of factors including the amount of data, length of computation, and site prevelance. 
 #'
 #'This function returns a list object which is a reformatting of the input data where each list element if a grouping of present or absence observations. This is needed because the klrfome model works on groups of observations.
 #'
@@ -10,6 +10,7 @@
 #' @param dat - [data.frame] A data.frame of presence and absence records. Column "presence" must contain presence/absence as 1/0, and column "SITENO" contains the grouping variable.
 #' @param N_sites - [scalar] The number of sites to randomly select for analysis
 #' @param train_test_split - [scalar] a float from 0 to 1 indicating the percent of N_sites to be used as training dataset vs testing dataset.
+#' @param sample_fraction  - [scalar] a float from 0 to 1 indicating the percent of rows in training dataset to include.
 #' @param background_site_balance - [scalar] Integer > 0 indicating how many background groups per site group
 #'
 #' @return - list of various ways to arrange site data and mean/sd of data
@@ -23,7 +24,7 @@
 #' backg_var1_mean = 100,backg_var1_sd   = 20,
 #' backg_var2_mean = 6,  backg_var2_sd   = 3)
 #' formatted_data <- format_site_data(sim_data, N_sites=10, train_test_split=0.8,
-#'                                    sample_fraction = 0.9, background_site_balance=1)
+#'                                    sample_fraction = 0.9, background_site_balance = 1)
 #' train_data <- formatted_data[["train_data"]]
 #' train_presence <- formatted_data[["train_presence"]]
 #' test_presence <- formatted_data[["test_presence"]]

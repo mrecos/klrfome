@@ -140,7 +140,6 @@ cohens_kappa <- function(TP,TN,FP,FN){
 #' @param TN - [scalar] True Negatives
 #' @param FP - [scalar] False Positives
 #' @param FN - [scalar] False Negatives
-#' @param a - [scalar] alpha level
 #'
 #' @return [list] - list of all metrics
 #' @importFrom boot logit
