@@ -6,4 +6,3 @@
 ^CONTRIBUTING\.md$
 analysis
 ^Dockerfile$
-^\.travis\.yml$
