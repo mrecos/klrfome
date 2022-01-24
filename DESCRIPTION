@@ -17,9 +17,10 @@ Imports:
   NLMR,
   doParallel,
   corrplot,
-  rgeos
-Suggests:
+  rgeos,
   boot,
+  foreach
+Suggests:
   pROC,
   testthat,
   knitr, 
