@@ -7,11 +7,11 @@
 split_raster_stack(rast_stack, ppside, ngb, split = TRUE)
 }
 \arguments{
-\item{rast_stack}{}
+\item{rast_stack}{[raster stack] a stack of the prediction rasters scaled to the the input training parameters.}
 
-\item{ppside}{}
+\item{ppside}{[integer] the number of blocks to split the study area into if `split` == TRUE}
 
-\item{split}{}
+\item{split}{[logical] TRUE/FALSE for whether to split raster into chunks. If `parallal` == TRUE, then `split` must == TRUE}
 }
 \value{
 [list] a list of raster chips

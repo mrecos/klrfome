@@ -201,9 +201,9 @@ scale_prediction_rasters <- function(pred_var_stack, params, verbose = 1){
 #' 
 #' `split_raster_stack()` takes a raster stack, creates a grid of `ppside` pixels, adds a collar, clips out each raster, and returns a list  
 #'
-#' @param rast_stack 
-#' @param ppside 
-#' @param split 
+#' @param rast_stack [raster stack] a stack of the prediction rasters scaled to the the input training parameters.
+#' @param ppside [integer] the number of blocks to split the study area into if `split` == TRUE
+#' @param split [logical] TRUE/FALSE for whether to split raster into chunks. If `parallal` == TRUE, then `split` must == TRUE
 #'
 #' @importFrom raster rasterToPolygons extent crop ncell aggregate
 #' @importFrom rgeos gBuffer
@@ -221,7 +221,7 @@ split_raster_stack <- function(rast_stack, ppside, ngb, split=TRUE){
     agg[]    <- 1:ncell(agg)
     agg_poly <- raster::rasterToPolygons(agg)
     names(agg_poly) <- rep("polis", length(names(agg_poly)))
-    ## adds collar to allow focal window function to be accuracte at the margins
+    ## adds collar to allow focal window function to be accurate at the margins
     exp_agg <- rgeos::gBuffer(agg_poly, byid = TRUE, 
                               width = ngb, joinStyle = "mitre", mitreLimit = ngb)
     r_list <- list()
