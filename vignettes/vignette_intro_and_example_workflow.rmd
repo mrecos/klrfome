@@ -40,6 +40,7 @@ library("pROC")      # for evaluation of model AUC metric
 library("dplyr")     # for data manipulation
 library("knitr")     # for printing tables in this document
 library("klrfome")   # for modeling
+library("sp")        # for plotting raster prediction in document
 ```
 
 
@@ -159,6 +160,7 @@ rasterVis::levelplot(pred_rast, margin = FALSE, par.settings=viridisTheme()) +
 This package uses the `foreach` package's `%dopar%` function to parallelize model prediction. To make this work you need to start a parallel backend. Here I show how to do this with `doParallel` package. It is simple in most cases, just make a cluster with `makeCluster` and the number of cores you have available and then register the cluster with `registerDoParallel` (note the use of `stopCluster()` when you are done). In the `KLR_raster_predict` function, you need to set a few things. Set `parallel` = `TRUE`, `split` = `TRUE`, and `ppside` is the number of raster blocks on the x and y axis (resulting in `ppside`^2 number of output rasters). The function also gives the options for `output = "list"` to return a `list` or `output = "save"` to save each raster as a GeoTiff to the `save_loc` directory. Finally, the `cols` and `rows` values are used here so that the split function knows the dimensions of the entire prediction raster. It need to know this becuase it mitigates the edge effect predicting on blocks by putting a collar of size `ngb` around each block. The `cols` and `rows` lets the function know when to remove the collar and when it is at an edge of the study area.
 ```{r multi-proc}
 library("doParallel")
+library("parallel")
 ### create and register parallel backend
 cl <- makeCluster(detectCores())
 doParallel::registerDoParallel(cl)
@@ -198,7 +200,7 @@ site_sample <- raster::extract(pred_rast, site_polys, weights = FALSE,
   rename(pred = layer) %>%
   mutate(presence = 1)
 ### sample for an environmental background of sensitivity values. (e.g. n = 500)
-bkg_sample <- data.frame(ID = 0, pred = sampleRandom(pred_rast, 500),
+bkg_sample <- data.frame(ID = 0, pred = raster::sampleRandom(pred_rast, 500),
                          presence = 0)
 model_pred <- rbind(site_sample, bkg_sample)
 
