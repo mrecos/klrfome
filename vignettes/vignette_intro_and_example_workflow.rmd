@@ -150,7 +150,7 @@ pred_rast <- KLR_raster_predict(pred_var_stack_scaled, ngb = ngb, params, split 
                                 progress = FALSE, parallel = FALSE)
 ### plot with simulated sites
 rasterVis::levelplot(pred_rast, margin = FALSE, par.settings=viridisTheme()) +
-  layer(sp.points(sp.points(SpatialPoints(coords), pch=15, cex = 2.25, col = "red")), columns=1)
+  latticeExtra::layer(sp.points(sp.points(SpatialPoints(coords), pch=15, cex = 2.25, col = "red")), columns=1)
 
 ```
 
@@ -171,7 +171,7 @@ pred_rast_list <- KLR_raster_predict(pred_var_stack_scaled, ngb = ngb, params, s
 pred_rast <-  do.call(merge, pred_rast_list)
 ### plot with simulated sites
 rasterVis::levelplot(pred_rast, margin = FALSE, par.settings=viridisTheme()) +
-  layer(sp.points(sp.points(SpatialPoints(coords), pch=15, cex = 2.25, col = "red")), columns=1)
+  latticeExtra::layer(sp.points(sp.points(SpatialPoints(coords), pch=15, cex = 2.25, col = "red")), columns=1)
 
 ### Or set output = "save" to save each prediction block out to a folder as a GeoTiff # not run
 # pred_rast_list <- KLR_raster_predict(pred_var_stack_scaled, ngb = ngb, params, split = TRUE, ppside = 5,
