@@ -3,11 +3,15 @@
 
 [![DOI](https://zenodo.org/badge/103055953.svg)](https://zenodo.org/badge/latestdoi/103055953)
 
+last build: Mon Jan 24 11:40:47 2022
+
 <p align="center">
 <img width="326" height="134" src="https://github.com/mrecos/klrfome/blob/master/klrfome_logo/KLR-black.png?raw=true">
 </p>
 
 #### klrfome - Kernel Logistic Regression on Focal Mean Embeddings
+
+[Check out the documentation site](https://mrecos.github.io/klrfome/)
 
 The purpose of this package is to solve the *Distribution Regression*
 problem for archaeological site location modeling; or any other data for
