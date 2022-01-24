@@ -24,6 +24,9 @@ Suggests:
   testthat,
   knitr, 
   rmarkdown,
-  ggplot2
+  ggplot2,
+  rasterVis,
+  parallel,
+  sp
 RoxygenNote: 7.1.2
 VignetteBuilder: knitr
