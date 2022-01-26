@@ -14,8 +14,7 @@ last build: Mon Jan 24 11:40:47 2022
 [Check out the documentation site](https://mrecos.github.io/klrfome/)
 
 The purpose of this package is to solve the *Distribution Regression*
-problem for archaeological site location modeling; or any other data for
-that matter. The aim of Distribution Regression is to map a single
+problem for noncontiguous geospatial features. The use case documented here is for modeling archaeological site locations. The aim of Distribution Regression is to map a single
 scalar outcome (e.g. presence/absence; 0/1) to a distribution of
 features. This is opposed to typical regression where you have one
 observation mapping a single outcome to a single set of
