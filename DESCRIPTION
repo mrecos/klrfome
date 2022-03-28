@@ -20,6 +20,8 @@ Imports:
   rgeos,
   boot,
   foreach
+Remotes:
+  ropensci/NLMR
 Suggests:
   pROC,
   testthat,
