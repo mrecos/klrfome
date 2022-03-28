@@ -14,12 +14,13 @@ Imports:
   Matrix,
   raster,
   dplyr,
-  NLMR,
   doParallel,
   corrplot,
   rgeos,
   boot,
   foreach
+Remotes:
+  ropensci/NLMR
 Suggests:
   pROC,
   testthat,
